@@ -1,4 +1,5 @@
-import discord, asyncio
+import discord, asyncio, json
+from functions import load_json, save_json
 
 class Bot(discord.Client):
     def __init__(self):
