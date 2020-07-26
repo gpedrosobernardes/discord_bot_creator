@@ -1,3 +1,5 @@
+import json
+
 def load_json(jsonfile) -> dict:
     json_file = open(jsonfile, 'r')
     return json.load(json_file)
