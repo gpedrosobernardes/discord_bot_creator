@@ -1,7 +1,6 @@
 import discord, asyncio, json
 from functions import load_json, save_json
 from interpreter import Interpreter
-from emojis2 import emojis
 
 config_path = 'config.json'
 all_config = load_json(config_path)
@@ -26,9 +25,17 @@ class Bot():
                 try:
                     reaction = actual['reaction']
                 except KeyError:
-                    pass
-                else:
-                    await Interpreter.message_and_reply(Interpreter, not any_message.author.bot, expected_message=expected_message, any_message=any_message, reply=reply, reaction=reaction)
+                    reaction = None
+                try:
+                    multi_reply = actual['multi_reply']
+                except KeyError:
+                    multi_reply = None
+                await Interpreter.message_and_reply(
+                    Interpreter,
+                    not any_message.author.bot,
+                    expected_message=expected_message,
+                    any_message=any_message, reply=reply,
+                    reaction=reaction, multi_reply=multi_reply)
 
         client.run(token)
 
