@@ -1,6 +1,7 @@
 import discord, asyncio, json
 from functions import load_json, save_json
 from interpreter import Interpreter
+from emojis import emojis
 
 config_path = 'config.json'
 all_config = load_json(config_path)
@@ -19,9 +20,12 @@ class Bot():
         async def on_message(any_message):
             dici = load_json(message_and_reply_path)
             for x in dici.keys():
-                expected_message = dici[x]["expected message"]
-                reply = dici[x]['reply']
-                await Interpreter.message_and_reply(True, expected_message=expected_message, any_message=any_message, reply=reply)
+                actual = dici[x]
+                expected_message = actual["expected message"]
+                reply = actual['reply']
+                if actual['reaction']:
+                    reaction = emojis[actual['reaction']]
+                await Interpreter.message_and_reply(True, expected_message=expected_message, any_message=any_message, reply=reply, reaction=reaction)
 
         client.run(token)
 

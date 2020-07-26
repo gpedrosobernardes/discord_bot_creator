@@ -1,4 +1,7 @@
-{"Example":{
+{"Example":
+    {
     "expected message":"ola",
-    "reply": "oi, eu sou um bot!"
-}}
+    "reply": "oi, eu sou um bot!",
+    "reaction":":gorila:"
+    }
+}
