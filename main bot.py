@@ -27,7 +27,7 @@ class Bot():
                 except KeyError:
                     reaction = None
                 try:
-                    multi_reply = actual['multi_reply']
+                    multi_reply = actual['multi reply']
                 except KeyError:
                     multi_reply = None
                 await Interpreter.message_and_reply(

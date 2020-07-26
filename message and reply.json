@@ -2,7 +2,7 @@
     {
     "expected message":"ola",
     "reply": "oi, eu sou um bot!",
-    "multi_reply":["oi, eu sou um bot", "bem vindo ao servidor", "como foi seu dia?"]
+    "multi reply":["oi, eu sou um bot", "bem vindo ao servidor", "como foi seu dia?"]
     },
 "2":{
     "expected message":["bom dia","boa tarde","boa noite"],

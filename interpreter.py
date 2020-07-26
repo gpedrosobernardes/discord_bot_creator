@@ -7,6 +7,7 @@ class Interpreter:
         
         all_condiction_is_true = conditions.count(True) == len(conditions)
         all_condiction_is_false = conditions.count(False) == len(conditions)
+        
         reply = reply[random.randint(0, (len(reply)-1))] if type(reply) == list else reply
         if reaction:
             reaction = emoji.emojize(reaction[random.randint(0, (len(reaction)-1))]) if type(reaction) == list else emoji.emojize(reaction)
