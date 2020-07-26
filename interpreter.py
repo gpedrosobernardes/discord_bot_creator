@@ -1,5 +1,6 @@
 import asyncio
 import random
+import emoji
 
 class Interpreter:
     async def message_and_reply(self, *conditions, expected_message, any_message, reply:str,reaction=None):
@@ -13,11 +14,11 @@ class Interpreter:
             if all_condiction_is_true and any_message.content == expected_message:
                 await canal.send(reply)
                 if reaction:
-                    await any_message.add_reaction(reaction)
+                    await any_message.add_reaction(emoji.emojize(reaction))
 
         elif type(expected_message) == list:
             if all_condiction_is_true and any_message.content in expected_message:
                 await canal.send(reply)
                 if reaction:
-                    await any_message.add_reaction(reaction)
+                    await any_message.add_reaction(emoji.emojize(reaction))
 

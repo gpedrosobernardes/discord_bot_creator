@@ -2,7 +2,7 @@
     {
     "expected message":"ola",
     "reply": "oi, eu sou um bot!",
-    "reaction":":gorila:"
+    "reaction":":grinning_face_with_big_eyes:"
     },
 "2":{
     "expected message":["bom dia","boa tarde","boa noite"],
