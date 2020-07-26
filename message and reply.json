@@ -3,5 +3,9 @@
     "expected message":"ola",
     "reply": "oi, eu sou um bot!",
     "reaction":":gorila:"
-    }
+    },
+"2":{
+    "expected message":["bom dia","boa tarde","boa noite"],
+    "reply":["bom dia","boa tarde","boa noite"]
+}
 }

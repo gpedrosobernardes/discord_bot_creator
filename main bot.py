@@ -23,9 +23,11 @@ class Bot():
                 actual = dici[x]
                 expected_message = actual["expected message"]
                 reply = actual['reply']
-                if actual['reaction']:
+                try:
                     reaction = emojis[actual['reaction']]
-                await Interpreter.message_and_reply(True, expected_message=expected_message, any_message=any_message, reply=reply, reaction=reaction)
+                except KeyError:
+                    pass
+                await Interpreter.message_and_reply(Interpreter, not any_message.author.bot, expected_message=expected_message, any_message=any_message, reply=reply, reaction=reaction)
 
         client.run(token)
 
