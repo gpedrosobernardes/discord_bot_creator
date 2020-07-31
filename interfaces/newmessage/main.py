@@ -16,6 +16,10 @@ class NewMessage:
             master = self,
             bg= azul_escuro,
         )
+        self.janela.minsize(
+            width = 690,
+            height = 530 
+        )
         self.camada_1 = tk.Frame(
             master = self.janela,
             bg= azul_escuro

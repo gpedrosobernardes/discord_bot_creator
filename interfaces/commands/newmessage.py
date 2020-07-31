@@ -23,6 +23,11 @@ class Commands:
                 for x in selecionados:
                     lb.delete(x-selecionados.index(x))
 
+    def remove_selected_on_currently_listbox(self, lb:tk.Listbox):
+        selecionados = lb.curselection()
+        for x in selecionados:
+            lb.delete(x-selecionados.index(x))
+
     def remove_all_on_listbox(self):
         for x in self.lista_de_listbox:
             x:tk.Listbox

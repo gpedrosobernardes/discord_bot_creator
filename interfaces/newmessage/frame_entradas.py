@@ -1,5 +1,6 @@
 import tkinter as tk
 from interfaces.tkclasses.SearchBox import SearchBox as Sb
+from interfaces.commands.newmessage import Commands
 from interfaces.colors import *
 from interfaces.fonts import *
 
@@ -7,7 +8,8 @@ class FrameEntrada:
     def main(self):
         frame_preenchimento = tk.Frame(
             master = self.camada_1,
-            bg = azul_frame
+            bg = azul_frame,
+            borderwidth = 10,
         )
         expected_message_text = tk.Label(
             master = frame_preenchimento,
@@ -19,8 +21,9 @@ class FrameEntrada:
             master = frame_preenchimento,
             font = arial,
             bg= azul_entrada,
+            relief = tk.FLAT,
+            borderwidth = 1
         )
-        expected_message.bind('<Return>', lambda event: Commands.insert_on_listbox(self, self.listbox_messages, expected_message))
         reply_text = tk.Label(
             master = frame_preenchimento,
             text = 'Resposta',
@@ -30,9 +33,10 @@ class FrameEntrada:
         reply = tk.Entry(
             master = frame_preenchimento,
             font = arial,
-            bg = azul_entrada
+            bg = azul_entrada,
+            relief = tk.FLAT,
+            borderwidth = 1
         )
-        reply.bind('<Return>', lambda event: Commands.insert_on_listbox(self, self.listbox_replys, reply))
         reactions_text = tk.Label(
             master = frame_preenchimento,
             text = 'Reações',
@@ -45,8 +49,9 @@ class FrameEntrada:
             lista = self.lista_reactions,
             master_overlap = self.camada_2,
             bg = azul_entrada,
+            relief = tk.FLAT,
+            borderwidth = 1
         )
-        reactions.bind('<Return>', lambda event: Commands.insert_on_listbox(self, self.listbox_reactions, reactions))
         condictions_text = tk.Label(
             master = frame_preenchimento,
             text = 'Condições',
@@ -59,8 +64,17 @@ class FrameEntrada:
             lista = self.lista_condictions,
             master_overlap = self.camada_2,
             bg = azul_entrada,
+            relief = tk.FLAT,
+            borderwidth = 1
         )
-        condictions.bind('<Return>', lambda event: Commands.insert_on_listbox(self, self.listbox_condictions, condictions))
+        adicionar = tk.Button(
+            master = frame_preenchimento,
+            text = 'Adicionar',
+            command = lambda : Commands.insert_any_on_listbox(self),
+            bg = azul_entrada,
+            relief = tk.FLAT,
+            borderwidth = 1,
+        )
         condictions_text.grid(
             row = 1,
             column = 1,
@@ -69,12 +83,6 @@ class FrameEntrada:
         condictions.grid(
             row = 2,
             column = 1
-        )
-        adicionar = tk.Button(
-            master = frame_preenchimento,
-            text = 'Adicionar',
-            command = lambda : Commands.insert_any_on_listbox(self),
-            bg = azul_entrada
         )
         expected_message_text.grid(
             row = 3,
@@ -105,14 +113,19 @@ class FrameEntrada:
         )
         adicionar.grid(
             row = 9,
-            column = 1
+            column = 1,
+            pady = 10
         )
         frame_preenchimento.grid(
             row = 1,
             column = 1,
-            ipadx = 10,
-            ipady = 10,
+            sticky = tk.E,
             padx = 50
         )
+
+        expected_message.bind('<Return>', lambda event: Commands.insert_on_listbox(self, self.listbox_messages, expected_message))
+        reply.bind('<Return>', lambda event: Commands.insert_on_listbox(self, self.listbox_replys, reply))
+        reactions.bind('<Return>', lambda event: Commands.insert_on_listbox(self, self.listbox_reactions, reactions))
+        condictions.bind('<Return>', lambda event: Commands.insert_on_listbox(self, self.listbox_condictions, condictions))
 
         self.lista_de_entradas = [expected_message, reply, reactions, condictions]
