@@ -1,5 +1,5 @@
 import tkinter as tk
-from interfaces.newmessage import NewMessage as nm
+from interfaces.newmessage.main import NewMessage as nm
 
 Arial = ("Arial",12)
 
@@ -13,7 +13,7 @@ class Main(tk.Tk):
             master = self,
             text = 'Adicionar mensagem',
             font = Arial,
-            command = lambda : nm.interface(self)
+            command = lambda : nm.main(self)
         )
 
         adicionar_mensagem_button.pack()
