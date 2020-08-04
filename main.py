@@ -1,3 +1,3 @@
-from interfaces.main import Main
+from interfaces.main.main import Main
 
 Main()

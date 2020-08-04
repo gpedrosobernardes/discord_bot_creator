@@ -126,10 +126,11 @@ class FrameListas:
             column = 2,
             pady = 10
         )
-        frame_das_listas.grid(
-            row    = 1,
-            column = 2,
-            padx= 50
+        frame_das_listas.pack(
+            padx = 50,
+            side = tk.LEFT,
+            fill = tk.Y,
+            expand = True
         )
 
         self.lista_de_listbox = [

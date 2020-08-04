@@ -15,7 +15,7 @@ class FrameEntrada:
             master = frame_preenchimento,
             text = "Mensagem esperada",
             font = arial,
-            bg = azul_frame
+            bg = azul_frame,
         )
         expected_message = tk.Entry(
             master = frame_preenchimento,
@@ -23,12 +23,13 @@ class FrameEntrada:
             bg= azul_entrada,
             relief = tk.FLAT,
             borderwidth = 1
+
         )
         reply_text = tk.Label(
             master = frame_preenchimento,
             text = 'Resposta',
             font = arial,
-            bg = azul_frame
+            bg = azul_frame,
         )
         reply = tk.Entry(
             master = frame_preenchimento,
@@ -41,7 +42,7 @@ class FrameEntrada:
             master = frame_preenchimento,
             text = 'Reações',
             font = arial,
-            bg= azul_frame
+            bg= azul_frame,
         )
         reactions = Sb(
             master = frame_preenchimento,
@@ -56,7 +57,7 @@ class FrameEntrada:
             master = frame_preenchimento,
             text = 'Condições',
             font = arial,
-            bg = azul_frame
+            bg = azul_frame,
         )
         condictions = Sb(
             master = frame_preenchimento,
@@ -75,52 +76,47 @@ class FrameEntrada:
             relief = tk.FLAT,
             borderwidth = 1,
         )
-        condictions_text.grid(
-            row = 1,
-            column = 1,
-            sticky = tk.W,
+        condictions_text.pack(
+            fill = tk.X,
+            expand = True
         )
-        condictions.grid(
-            row = 2,
-            column = 1
+        condictions.pack(
+            fill = tk.X,
+            expand = True
         )
-        expected_message_text.grid(
-            row = 3,
-            column = 1,
-            sticky = tk.W
+        expected_message_text.pack(
+            fill = tk.X,
+            expand = True
         )
-        expected_message.grid(
-            row = 4,
-            column = 1
+        expected_message.pack(
+            fill = tk.X,
+            expand = True
         )
-        reply_text.grid(
-            row = 5,
-            column = 1,
-            sticky = tk.W
+        reply_text.pack(
+            fill = tk.X,
+            expand = True
         )
-        reply.grid(
-            row = 6,
-            column = 1
+        reply.pack(
+            fill = tk.X,
+            expand = True
         )
-        reactions_text.grid(
-            row = 7,
-            column = 1,
-            sticky = tk.W
+        reactions_text.pack(
+            fill = tk.X,
+            expand = True
         )
-        reactions.grid(
-            row = 8,
-            column = 1
+        reactions.pack(
+            fill = tk.X,
+            expand = True
         )
-        adicionar.grid(
-            row = 9,
-            column = 1,
+        adicionar.pack(
+            fill = tk.X,
+            expand = True,
             pady = 10
         )
-        frame_preenchimento.grid(
-            row = 1,
-            column = 1,
-            sticky = tk.E,
-            padx = 50
+        frame_preenchimento.pack(
+            side = tk.LEFT,
+            fill = tk.BOTH,
+            expand = True
         )
 
         expected_message.bind('<Return>', lambda event: Commands.insert_on_listbox(self, self.listbox_messages, expected_message))

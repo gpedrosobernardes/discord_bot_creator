@@ -3,7 +3,9 @@ import random
 import emoji
 
 class Interpreter:
-    async def message_and_reply(self, *conditions, expected_message, any_message, reply:str,reaction=None, multi_reply:list=None):
+    async def message_and_reply(
+        self, *conditions, expected_message:str, any_message,
+        reply:str=None, reaction:str=None, multi_reply:list=None):
         
         all_condiction_is_true = conditions.count(True) == len(conditions)
         all_condiction_is_false = conditions.count(False) == len(conditions)
@@ -19,13 +21,13 @@ class Interpreter:
         if multi_reply:
             for reply in multi_reply:
                 reply = reply[random.randint(0,(len(reply)-1))] if type(reply) == list else reply
-                if all_condiction_is_true and message_condiction:
+                if all_condiction_is_true and message_condiction and reply:
                     await canal.send(reply)
                     if reaction:
                         await any_message.add_reaction(reaction)
         
         else:
-            if all_condiction_is_true and message_condiction:
+            if all_condiction_is_true and message_condiction and reply:
                 await canal.send(reply)
                 if reaction:
                     await any_message.add_reaction(reaction)

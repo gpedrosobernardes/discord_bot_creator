@@ -23,8 +23,8 @@ class FrameInferior:
             padx = 10,
             pady = 10
         )
-        frame_inferior.grid(
-            row = 2,
-            column = 1,
-            columnspan = 2,
+        frame_inferior.pack(
+            side = tk.BOTTOM,
+            fill = tk.Y,
+            expand = True
         )

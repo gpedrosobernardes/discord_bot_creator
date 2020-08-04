@@ -17,8 +17,8 @@ class NewMessage:
             bg= azul_escuro,
         )
         self.janela.minsize(
-            width = 690,
-            height = 530 
+            width = 733,
+            height = 458 
         )
         self.camada_1 = tk.Frame(
             master = self.janela,
@@ -27,8 +27,9 @@ class NewMessage:
         self.camada_2 = tk.Frame(
             master = self.janela
         )
-        self.camada_1.place(
-            relx = 0.5, rely = 0.5, anchor=tk.CENTER
+        self.camada_1.pack(
+            fill = tk.BOTH,
+            expand = True
         )
 
         fe.main(self)
