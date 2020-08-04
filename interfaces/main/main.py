@@ -1,5 +1,4 @@
 import tkinter as tk
-from interfaces.newmessage.main import NewMessage as nm
 from interfaces.main.frame_direito import FrameDireito as fd
 from interfaces.main.frame_esquerdo import FrameEsquerdo as fe
 from interfaces.colors import *

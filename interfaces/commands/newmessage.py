@@ -40,16 +40,19 @@ class Commands:
         dict_base = load_json('source/message and reply.json')
         chaves_dict_base = list(dict_base.keys())
         chaves_dict_base.reverse()
-        for x in chaves_dict_base:
-            try:
-                chave = int(x)
-            except TypeError:
-                pass
-            else:
-                name = str(chave+1)
-                break
-        if not name:
-            name = '1'
+        if not self.load:
+            for x in chaves_dict_base:
+                try:
+                    chave = int(x)
+                except TypeError:
+                    pass
+                else:
+                    name = str(chave+1)
+                    break
+            if not name:
+                name = '1'
+        else:
+            name = self.load
         dict_base[name] = {}
         dict_base[name]['expected message'] = self.listbox_messages.get(0, tk.END)
         dict_base[name]['multi reply'] = self.listbox_replys.get(0, tk.END)

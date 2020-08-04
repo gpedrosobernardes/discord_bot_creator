@@ -1,6 +1,7 @@
 import asyncio
 import random
 import emoji
+import discord
 
 class Interpreter:
     async def message_and_reply(
@@ -24,12 +25,17 @@ class Interpreter:
                 if all_condiction_is_true and message_condiction and reply:
                     await canal.send(reply)
                     if reaction:
-                        await any_message.add_reaction(reaction)
-        
+                        try:
+                            await any_message.add_reaction(reaction)
+                        except discord.HTTPException:
+                            print('Erro ignorado.')
         else:
             if all_condiction_is_true and message_condiction and reply:
                 await canal.send(reply)
                 if reaction:
-                    await any_message.add_reaction(reaction)
+                    try:
+                        await any_message.add_reaction(reaction)
+                    except discord.HTTPException:
+                        print('Erro ignorado.')
 
 

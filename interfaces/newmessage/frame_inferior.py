@@ -1,6 +1,7 @@
 import tkinter as tk
 from interfaces.colors import *
 from interfaces.fonts import *
+from interfaces.commands.newmessage import Commands
 
 class FrameInferior:
     def main(self):
@@ -11,7 +12,7 @@ class FrameInferior:
         )
         enter = tk.Button(
             master = frame_inferior,
-            text = 'Confirmar',
+            text = 'Salvar',
             command = lambda : Commands.save_all_json(self),
             bg = azul_entrada,
             relief = tk.FLAT,

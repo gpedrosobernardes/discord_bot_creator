@@ -31,20 +31,20 @@ class FrameListas:
         )
         self.listbox_reactions = tk.Listbox(
             master = frame_das_listas,
-            selectmode= tk.MULTIPLE,
-            bg= azul_entrada,
+            selectmode = tk.MULTIPLE,
+            bg = azul_entrada,
             relief = tk.FLAT,
             borderwidth = 1
         )
         listbox_messages_text = tk.Label(
-            master= frame_das_listas,
+            master = frame_das_listas,
             text = 'Mensagens',
-            bg= azul_frame
+            bg = azul_frame
         )
         self.listbox_messages = tk.Listbox(
             master = frame_das_listas,
-            selectmode= tk.MULTIPLE,
-            bg=azul_entrada,
+            selectmode = tk.MULTIPLE,
+            bg =azul_entrada,
             relief = tk.FLAT,
             borderwidth = 1
         )
@@ -55,69 +55,69 @@ class FrameListas:
         )
         self.listbox_replys = tk.Listbox(
             master = frame_das_listas,
-            selectmode= tk.MULTIPLE,
-            bg=azul_entrada,
+            selectmode = tk.MULTIPLE,
+            bg = azul_entrada,
             relief = tk.FLAT,
             borderwidth = 1
         )
         remover = tk.Button(
-            master= frame_das_listas,
-            text= 'Remover',
+            master = frame_das_listas,
+            text = 'Remover',
             command = lambda: Commands.remove_selected_on_listbox(self),
-            bg= azul_entrada,
+            bg = azul_entrada,
             relief = tk.FLAT,
             borderwidth = 1
         )
         remover_todos = tk.Button(
-            master= frame_das_listas,
-            text= 'Remover todos',
+            master = frame_das_listas,
+            text = 'Remover todos',
             command = lambda : Commands.remove_all_on_listbox(self),
-            bg= azul_entrada,
+            bg = azul_entrada,
             relief = tk.FLAT,
             borderwidth = 1
         )
         listbox_condictions_text.grid(
-            row    = 0,
+            row = 0,
             column = 1,
             padx = 10
         )
         self.listbox_condictions.grid(
-            row    = 1,
+            row = 1,
             column = 1,
             padx = 10
         )
         listbox_replys_text.grid(
-            row    = 2,
+            row = 2,
             column = 1,
             padx = 10
         )
         self.listbox_replys.grid(
-            row    = 3,
+            row = 3,
             column = 1,
             padx = 10
         )
         listbox_messages_text.grid(
-            row    = 0,
+            row = 0,
             column = 2,
             padx = 10
         )
         self.listbox_messages.grid(
-            row    = 1,
+            row = 1,
             column = 2,
             padx = 10
         )
         listbox_reactions_text.grid(
-            row    = 2,
+            row = 2,
             column = 2,
             padx = 10
         )
         self.listbox_reactions.grid(
-            row    = 3,
+            row = 3,
             column = 2,
             padx = 10
         )
         remover.grid(
-            row= 4,
+            row = 4,
             column = 1,
             pady = 10
         )
