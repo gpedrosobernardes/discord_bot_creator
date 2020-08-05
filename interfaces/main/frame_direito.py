@@ -1,95 +1,131 @@
 import tkinter as tk
-from interfaces.tkclasses.SearchBox import SearchBox as sb
 from interfaces.fonts import *
-from functions import load_json
+from functions import load_json, save_json
 from multiprocessing import Process
 from bot import Bot
+import interfaces.paths as path
+import interfaces.colors as color
 
 class FrameDireito:
     def main(self):
         frame_direito_bot = tk.Frame(
-            master = self.camada_1
-        )
-        frame_superior = tk.Frame(
-            master = frame_direito_bot
+            master = self.camada_1,
+            bg = color.azul_frame,
+            borderwidth = 10
         )
         self.log_do_bot = tk.Text(
-            master = frame_superior,
+            master = frame_direito_bot,
             font = arial,
             width = 50,
+            bg = color.azul_entrada,
+            relief = tk.FLAT,
+            state = tk.DISABLED
+        )
+        frame_entrada_comandos = tk.Frame(
+            master = frame_direito_bot,
+            bg = color.azul_frame
         )
         self.entrada_comandos = tk.Entry(
-            master = frame_superior,
-            font = arial
-        )
-        button_enter_entrada_comandos = tk.Button(
-            master = frame_superior,
+            master = frame_entrada_comandos,
             font = arial,
+            bg = color.azul_entrada,
+            width = 40,
+            relief = tk.FLAT
+        )
+        button_entrada_comandos = tk.Button(
+            master = frame_entrada_comandos,
+            # font = arial,
             text = '>',
-            command = lambda : FrameDireito.__entry_command(self)
+            command = lambda : FrameDireito.__entry_command(self),
+            bg = color.azul_entrada,
+            relief = tk.FLAT
         )
-        frame_inferior = tk.Frame(
-            master = frame_direito_bot
+        frame_inserir_token = tk.Frame(
+            master = frame_direito_bot,
+            bg = color.azul_frame
         )
-        inserir_token = sb(
-            lista = [],
-            master = frame_inferior,
-            master_overlap = self.camada_2,
+        self.inserir_token = tk.Entry(
+            master = frame_inserir_token,
+            bg = color.azul_entrada,
+            relief = tk.FLAT
+        )
+        self.button_inserir_token = tk.Button(
+            master = frame_inserir_token,
+            bg = color.azul_entrada,
+            relief = tk.FLAT,
+            text = '>',
+            command = lambda : FrameDireito.__update_token(self)
         )
         FrameDireito.__read_token(self)
-        token_atual = tk.Label(
-            master = frame_inferior,
+        self.token_atual = tk.Label(
+            master = frame_direito_bot,
             text = 'Seu token atual é:\n'
-                   f'{self.token}'
+                   f'{self.token}',
+            bg = color.azul_frame
         )
         self.executar_o_bot = tk.Button(
-            master = frame_inferior,
+            master = frame_direito_bot,
             text = 'Executar o bot',
             font = arial,
             relief = tk.FLAT,
-            command = lambda : FrameDireito.__init_or_finish_bot(self)
+            command = lambda : FrameDireito.__init_or_finish_bot(self),
+            bg = color.azul_entrada,
         )
         frame_direito_bot.grid(
             row = 1,
             column = 2
         )
-        frame_superior.grid(
-            row = 1,
-            column = 1
-        )
         self.log_do_bot.grid(
             row = 1,
-            column = 1
+            column = 1,
+            columnspan = 2
         )
-        self.entrada_comandos.grid(
-            row = 2,
-            column = 1
-        )
-        button_enter_entrada_comandos.grid(
-            row = 2,
-            column = 2
-        )
-        frame_inferior.grid(
+        frame_entrada_comandos.grid(
             row = 2,
             column = 1,
+            columnspan = 2,
+            sticky = tk.W+tk.E
         )
-        token_atual.grid(
+        self.entrada_comandos.grid(
             row = 1,
-            column = 1
+            column = 1,
+            sticky = tk.W+tk.E
         )
-        inserir_token.grid(
-            row = 2,
-            column = 1
+        button_entrada_comandos.grid(
+            row = 1,
+            column = 2,
+            sticky = tk.E
+        )
+        self.token_atual.grid(
+            row = 3,
+            column = 1,
+            sticky = tk.W
+        )
+        frame_inserir_token.grid(
+            row = 4,
+            column = 1,
+            sticky = tk.W
+        )
+        self.inserir_token.grid(
+            row = 1,
+            column = 1,
+        )
+        self.button_inserir_token.grid(
+            row = 1,
+            column = 2,
         )
         self.executar_o_bot.grid(
-            row = 1,
-            column = 2
+            row = 3,
+            column = 2,
+            rowspan = 2,
+            # sticky = tk.E
         )
 
         self.entrada_comandos.bind('<Return>', lambda event: FrameDireito.__entry_command(self))
+        self.inserir_token.bind('<Return>', lambda event: FrameDireito.__update_token(self))
 
     def __read_token(self):
-        config_json = load_json('source/config.json')
+        config_json = load_json(path.config)
         self.token = config_json['token']
 
     def __init_or_finish_bot(self):
@@ -102,3 +138,10 @@ class FrameDireito:
         if entrada in ['/clear','/limpar']:
             self.log_do_bot.delete("0.0", tk.END)
             self.entrada_comandos.delete(0, tk.END)
+
+    def __update_token(self):
+        entrada:str = self.inserir_token.get()
+        current_dict = load_json(path.config)
+        current_dict['token'] = entrada
+        save_json(path.config, current_dict)
+        self.token_atual['text'] = f'Seu token atual é:\n{entrada}'

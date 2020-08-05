@@ -46,5 +46,3 @@ class Bot():
                     multi_reply = multi_reply)
 
         client.run(token)
-
-Bot()

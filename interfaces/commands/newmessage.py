@@ -1,5 +1,6 @@
 import tkinter as tk
 from functions import load_json, save_json
+import interfaces.paths as path
 
 class Commands:
     def insert_on_listbox(self, listbox:tk.Listbox, entry:tk.Entry):
@@ -37,7 +38,7 @@ class Commands:
         return list(map(lambda x: (x.get(0, tk.END)), self.lista_de_listbox))
 
     def save_all_json(self):
-        dict_base = load_json('source/message and reply.json')
+        dict_base = load_json(path.message_and_reply)
         chaves_dict_base = list(dict_base.keys())
         chaves_dict_base.reverse()
         if not self.load:
@@ -58,4 +59,4 @@ class Commands:
         dict_base[name]['multi reply'] = self.listbox_replys.get(0, tk.END)
         dict_base[name]['reaction'] = self.listbox_reactions.get(0, tk.END)
         dict_base[name]['condictions'] = self.listbox_condictions.get(0, tk.END)
-        save_json('source/message and reply.json', dict_base)
+        save_json(path.message_and_reply, dict_base)

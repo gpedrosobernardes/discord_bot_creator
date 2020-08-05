@@ -6,6 +6,7 @@ from interfaces.newmessage.frame_inferior import FrameInferior as fi
 from interfaces.newmessage.frame_listas import FrameListas as fl
 from interfaces.colors import *
 from interfaces.fonts import *
+import interfaces.paths as path
 
 class NewMessage:
     def main(self, load:str = None):
@@ -15,7 +16,7 @@ class NewMessage:
 
         self.janela = tk.Toplevel(
             master = self,
-            bg= azul_escuro,
+            bg = azul_escuro,
         )
         self.janela.minsize(
             width = 733,
@@ -23,7 +24,7 @@ class NewMessage:
         )
         self.camada_1 = tk.Frame(
             master = self.janela,
-            bg= azul_escuro
+            bg = azul_escuro
         )
         self.camada_2 = tk.Frame(
             master = self.janela
@@ -41,7 +42,7 @@ class NewMessage:
 
     def __load_info(self):
         if self.load:
-            messages_json:dict = load_json('source/message and reply.json')
+            messages_json:dict = load_json(path.message_and_reply)
             todas_info:dict = messages_json[self.load]
             try:
                 expected_message = todas_info['expected message']

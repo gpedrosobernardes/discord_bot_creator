@@ -13,7 +13,11 @@ class SearchBox(tk.Entry):
         self.master_overlap = master_overlap
         self.lista = lista
 
-        self.listbox = tk.Listbox(master=master_overlap, activestyle=activestyle, **options)
+        self.listbox = tk.Listbox(
+            master = master_overlap,
+            activestyle = activestyle,
+            **options
+        )
         self.listbox_is_visible = False
         self.listbox.bind('<<ListboxSelect>>', self.__listbox_pressed)
         self.bind('<Button-1>', self.__entry_pressed)
@@ -44,13 +48,10 @@ class SearchBox(tk.Entry):
         self.focus_set()
 
     def set_listbox_visible(self):
-        # eu preciso achar alguma maneira de conseguir a posição absoluta em relação a janela se não eu não consigo usar essa classe se o organizador tiver mais de dois frames
         wl, hl, xl ,yl = tuple(map(lambda x: int(x), self.listbox.winfo_geometry().replace('x','+').split('+')))
         w, h, x ,y = tuple(map(lambda x: int(x), self.winfo_geometry().replace('x','+').split('+')))
         rx, ry = tuple(map(lambda x: int(x), (self.winfo_rootx(),self.winfo_rooty())))
         jx, jy = tuple(map(lambda x: int(x), (self.winfo_toplevel().winfo_rootx(),self.winfo_toplevel().winfo_rooty())))
-        # mw, mh, mx, my = self.master.winfo_geometry().replace('x','+').split('+')
-        # posx, posy = (int(x)+int(mx), (int(y)+int(h))+int(my)) if self.winfo_parent().count('frame') == 2 else (int(x), int(y)+int(h))
         posx, posy = rx-jx, (ry-jy)+h
         self.master_overlap:tk.Frame
 
