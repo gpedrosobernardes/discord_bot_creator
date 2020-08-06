@@ -1,1 +1,6 @@
-{"Example": {"expected message": ["ola", "oi", "ola bot", "oi bot", "tudo bem bot?"], "multi reply": ["oi, eu sou um bot", "bem vindo ao servidor", "como foi seu dia?"], "reaction": [":bowtie:", ":smile:", ":simple_smile:"], "condictions": []}, "2": {"expected message": ["bom dia", "boa tarde", "boa noite"], "reply": ["bom dia", "boa tarde", "boa noite"]}, "3": {"expected message": ["a"], "multi reply": ["a"], "reaction": [":smiley:"], "condictions": []}}
+{"Example": {
+    "expected message": ["ola", "oi", "ola bot", "oi bot", "tudo bem bot?"],
+    "reply": ["oi, eu sou um bot", "bem vindo ao servidor", "como foi seu dia?"],
+    "reaction": [":smile:", ":smile:", ":smile:", ":smile:", ":smile:", ":laughing:", ":smile:", ":smile:", ":smile:", ":smile:"],
+    "condictions": []}
+}

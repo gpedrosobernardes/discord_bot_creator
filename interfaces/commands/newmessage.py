@@ -3,18 +3,25 @@ from functions import load_json, save_json
 import interfaces.paths as path
 
 class Commands:
-    def insert_on_listbox(self, listbox:tk.Listbox, entry:tk.Entry):
+    def insert_on_listbox(self, listbox:tk.Listbox, entry:tk.Entry, limit:int = 0):
+        ''' insere um valor na listbox especificada e apaga o conteudo da entry especificada,
+        se um limite for expecificado ele vai checar se o limite da listbox não foi atingido '''
         if not entry.get() == '':
-            listbox.insert(tk.END, entry.get())
-            entry.delete(0, tk.END)
+            tamanho_listbox = len(set(listbox.get(0,tk.END)))
+            if not tamanho_listbox > limit or limit == 0:
+                listbox.insert(tk.END, entry.get())
+                entry.delete(0, tk.END)
 
     def insert_any_on_listbox(self):
         for x in range(4):
             entrada_atual:tk.Entry = self.lista_de_entradas[x]
             listbox_atual:tk.Listbox = self.lista_de_listbox[x]
-            if not entrada_atual.get() == '':
-                listbox_atual.insert(tk.END, entrada_atual.get())
-                entrada_atual.delete(0, tk.END)
+            if x == 2:
+                # x = 2 se refere ao listbox de reactions no discord o limite de reações por mensagem é de 20
+                # ou seja a gente precisa limitar a quantidade de reactions.
+                Commands.insert_on_listbox(self, listbox_atual, entrada_atual, limit = 19)
+            else:
+                Commands.insert_on_listbox(self, listbox_atual, entrada_atual)
 
     def remove_selected_on_listbox(self):
         for lb in self.lista_de_listbox:

@@ -3,6 +3,7 @@ from interfaces.tkclasses.SearchBox import SearchBox as Sb
 from interfaces.commands.newmessage import Commands
 from interfaces.colors import *
 from interfaces.fonts import *
+import source.emojis as emojis
 
 class FrameEntrada:
     def main(self):
@@ -47,7 +48,7 @@ class FrameEntrada:
         reactions = Sb(
             master = frame_preenchimento,
             font = arial,
-            lista = self.lista_reactions,
+            lista = emojis.emojis,
             master_overlap = self.camada_2,
             bg = azul_entrada,
             relief = tk.FLAT,
@@ -121,7 +122,7 @@ class FrameEntrada:
 
         expected_message.bind('<Return>', lambda event: Commands.insert_on_listbox(self, self.listbox_messages, expected_message))
         reply.bind('<Return>', lambda event: Commands.insert_on_listbox(self, self.listbox_replys, reply))
-        reactions.bind('<Return>', lambda event: Commands.insert_on_listbox(self, self.listbox_reactions, reactions))
+        reactions.bind('<Return>', lambda event: Commands.insert_on_listbox(self, self.listbox_reactions, reactions, limit = 19))
         condictions.bind('<Return>', lambda event: Commands.insert_on_listbox(self, self.listbox_condictions, condictions))
 
         self.lista_de_entradas = [expected_message, reply, reactions, condictions]

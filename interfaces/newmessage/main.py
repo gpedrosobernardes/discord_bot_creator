@@ -11,7 +11,6 @@ import interfaces.paths as path
 class NewMessage:
     def main(self, load:str = None):
         self.load = load
-        self.lista_reactions = load_json('source/emojis.json')['emojis']
         self.lista_condictions = ['testando','testando 2','testando 3']
 
         self.janela = tk.Toplevel(
