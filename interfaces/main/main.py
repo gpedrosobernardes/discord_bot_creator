@@ -14,6 +14,11 @@ class Main(tk.Tk):
             bg = color.azul_escuro,
         )
 
+        self.minsize(
+            width = 808,
+            height = 543
+        )
+
         self.camada_1 = tk.Frame(
             master = self,
             bg = color.azul_escuro

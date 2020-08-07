@@ -1,10 +1,9 @@
 import tkinter as tk
 from interfaces.fonts import *
-from functions import load_json, save_json
 from interfaces.newmessage.main import NewMessage as nm
+from interfaces.commands.main import MainCommands
 import interfaces.paths as path
 import interfaces.colors as color
-import json
 
 class FrameEsquerdo:
     def main(self):
@@ -18,7 +17,7 @@ class FrameEsquerdo:
             text = 'Editar mensagem',
             font = arial,
             relief = tk.FLAT,
-            command = lambda: FrameEsquerdo.__edit_message(self),
+            command = lambda: MainCommands.edit_message(self),
             bg = color.azul_entrada
         )
         self.todas_mensagens = tk.Listbox(
@@ -27,7 +26,7 @@ class FrameEsquerdo:
             height = 20,
             bg = color.azul_entrada
         )
-        FrameEsquerdo.__load_info_messages(self)
+        MainCommands.load_info_messages(self)
         adicionar_mensagem_button = tk.Button(
             master = frame_esquerdo_mensagens,
             text = 'Adicionar mensagem',
@@ -39,7 +38,7 @@ class FrameEsquerdo:
         remover_mensagem_button = tk.Button(
             master = frame_esquerdo_mensagens,
             text = 'Remover mensagem',
-            command = lambda : FrameEsquerdo.__remove_message(self),
+            command = lambda : MainCommands.remove_message(self),
             font = arial,
             relief = tk.FLAT,
             bg = color.azul_entrada,
@@ -57,26 +56,3 @@ class FrameEsquerdo:
             pady = 10
         )
         remover_mensagem_button.pack()
-
-    def __load_info_messages(self):
-        try:
-            all_messages = load_json(path.message_and_reply)
-        except json.decoder.JSONDecodeError:
-            pass
-        else:
-            for x in all_messages.keys():
-                self.todas_mensagens.insert(tk.END, x)
-
-    def __edit_message(self):
-        lista_nomes = self.todas_mensagens.get(0, tk.END)
-        selecionado:str = lista_nomes[self.todas_mensagens.curselection()[0]]
-        nm.main(self, selecionado)
-
-    def __remove_message(self):
-        lista_nomes = self.todas_mensagens.get(0, tk.END)
-        selecionado = self.todas_mensagens.curselection()[0]
-        nome_selecionado:str = lista_nomes[selecionado]
-        self.todas_mensagens.delete(selecionado)
-        message_and_reply_json = load_json(path.message_and_reply)
-        del message_and_reply_json[nome_selecionado]
-        save_json(path.message_and_reply, message_and_reply_json)

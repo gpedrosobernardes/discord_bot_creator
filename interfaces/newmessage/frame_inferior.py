@@ -10,7 +10,7 @@ class FrameInferior:
             bg = azul_frame,
             bd = 10
         )
-        enter = tk.Button(
+        save = tk.Button(
             master = frame_inferior,
             text = 'Salvar',
             command = lambda : Commands.save_all_json(self),
@@ -18,11 +18,23 @@ class FrameInferior:
             relief = tk.FLAT,
             borderwidth = 1
         )
-        enter.grid(
+        save_and_quit = tk.Button(
+            master = frame_inferior,
+            text = 'Salvar e sair',
+            command = lambda : Commands.save_and_quit(self),
+            bg = azul_entrada,
+            relief = tk.FLAT,
+            borderwidth = 1, 
+        )
+        save.grid(
             row = 1,
             column = 1,
             padx = 10,
             pady = 10
+        )
+        save_and_quit.grid(
+            row = 2,
+            column = 1,
         )
         frame_inferior.pack(
             side = tk.BOTTOM,

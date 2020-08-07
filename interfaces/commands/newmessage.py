@@ -1,5 +1,6 @@
 import tkinter as tk
 from functions import load_json, save_json, have_in
+from interfaces.commands.main import MainCommands
 import interfaces.paths as path
 import json
 
@@ -82,3 +83,8 @@ class Commands:
             dict_base[name]['conditions'] = lista_conditions if not len(lista_conditions) == 0 else None
 
             save_json(path.message_and_reply, dict_base)
+
+    def save_and_quit(self):
+        Commands.save_all_json(self)
+        self.janela.destroy()
+        MainCommands.refresh_messages(self)

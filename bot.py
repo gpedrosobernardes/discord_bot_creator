@@ -20,8 +20,11 @@ class Bot():
             for key_message in message_and_reply_json.keys():
                 
                 actual = message_and_reply_json[key_message]
-                expected_message = actual["expected message"]
 
+                try:
+                    expected_message = actual["expected message"]
+                except KeyError:
+                    expected_message = None
                 try:
                     reply = actual['reply']
                 except KeyError:
@@ -34,12 +37,22 @@ class Bot():
                     conditions = actual['conditions']
                 except KeyError:
                     conditions = None
+                try:
+                    delete = actual['delete']
+                except KeyError:
+                    delete = None
+                try:
+                    pin = actual['pin']
+                except KeyError:
+                    pin = None
                 
                 await Interpreter.message_and_reply(self,
                     conditions = conditions,
                     expected_message = expected_message,
                     message = message,
                     reply = reply,
-                    reaction = reaction)
+                    reaction = reaction,
+                    delete = delete,
+                    pin = pin)
 
         client.run(token)

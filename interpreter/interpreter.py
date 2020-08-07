@@ -3,6 +3,7 @@ import emoji
 import discord
 from functions import random_choose
 from interpreter.conditions import MessageConditions
+from interpreter.variable import Variable, apply_variable
 
 class Interpreter:
     async def message_and_reply(self,
@@ -10,7 +11,9 @@ class Interpreter:
         conditions = None,
         expected_message = None,
         reply = None,
-        reaction = None):
+        reaction = None,
+        delete = None,
+        pin = None):
 
         self.expected_message = expected_message
 
@@ -33,6 +36,8 @@ class Interpreter:
         if all_condition_is_true or conditions == None:
             await Interpreter.send_reply(self, reply, message)
             await Interpreter.send_reaction(self, reaction, message)
+            await Interpreter.remove_message(self, delete, message)
+            await Interpreter.pin_message(self, pin, message)
 
     async def send_reaction(self, reaction, message:discord.Message):
         if reaction:
@@ -51,11 +56,22 @@ class Interpreter:
                 except discord.HTTPException:
                     print(reaction)
 
-    async def send_reply(self, reply, message:discord.Message):
+    async def send_reply(self, reply, message: discord.Message):
         if reply:
+            variables = Variable(message).keys
             if type(reply) == list:
                 for each_reply in reply:
                     each_reply = random_choose(each_reply) if type(each_reply) == list else each_reply
+                    each_reply = apply_variable(each_reply, variables)
                     await message.channel.send(each_reply)
             else:
-                await message.channel.send(each_reply)
+                reply = apply_variable(reply, variables)
+                await message.channel.send(reply)
+
+    async def remove_message(self, delete, message: discord.Message):
+        if delete:
+            await message.delete()
+    
+    async def pin_message(self, pin, message: discord.Message):
+        if pin:
+            await message.pin()
