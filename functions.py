@@ -13,3 +13,15 @@ def save_json(jsonfile, dicti: dict):
 
 def random_choose(lista:list):
     return lista[random.randint(0,(len(lista)-1))]
+
+def have_in(lista:list, string:str, reverse = False):
+    if not reverse:
+        for x in lista:
+            if x in string:
+                return True
+        return False
+    else:
+        for x in lista:
+            if string in x:
+                return True
+        return False

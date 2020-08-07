@@ -1,12 +1,9 @@
 import discord, asyncio, json
 from functions import load_json, save_json
 from interpreter.interpreter import Interpreter
+import interfaces.paths as paths
 
-source_path = 'source/'
-config_path = source_path+'config.json'
-message_and_reply_path = source_path+"message and reply.json"
-
-all_config = load_json(config_path)
+all_config = load_json(paths.config)
 token = all_config["token"]
 
 class Bot():
@@ -19,7 +16,7 @@ class Bot():
             
         @client.event
         async def on_message(message):
-            message_and_reply_json = load_json(message_and_reply_path)
+            message_and_reply_json = load_json(paths.message_and_reply)
             for key_message in message_and_reply_json.keys():
                 
                 actual = message_and_reply_json[key_message]
@@ -33,16 +30,16 @@ class Bot():
                     reaction = actual['reaction']
                 except KeyError:
                     reaction = None
+                try:
+                    conditions = actual['conditions']
                 except KeyError:
-                    multi_reply = None
+                    conditions = None
                 
                 await Interpreter.message_and_reply(self,
-                    not message.author.bot,
+                    conditions = conditions,
                     expected_message = expected_message,
                     message = message,
                     reply = reply,
                     reaction = reaction)
 
         client.run(token)
-
-Bot()

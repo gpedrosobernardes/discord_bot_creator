@@ -12,12 +12,12 @@ class FrameListas:
             relief = tk.FLAT,
             bd = 10
         )
-        listbox_condictions_text = tk.Label(
+        listbox_conditions_text = tk.Label(
             master = frame_das_listas,
             text = 'Condições',
             bg = azul_frame
         )
-        self.listbox_condictions = tk.Listbox(
+        self.listbox_conditions = tk.Listbox(
             master = frame_das_listas,
             selectmode = tk.MULTIPLE,
             bg = azul_entrada,
@@ -76,12 +76,12 @@ class FrameListas:
             relief = tk.FLAT,
             borderwidth = 1
         )
-        listbox_condictions_text.grid(
+        listbox_conditions_text.grid(
             row = 0,
             column = 1,
             padx = 10
         )
-        self.listbox_condictions.grid(
+        self.listbox_conditions.grid(
             row = 1,
             column = 1,
             padx = 10
@@ -137,12 +137,12 @@ class FrameListas:
             self.listbox_messages,
             self.listbox_replys,
             self.listbox_reactions,
-            self.listbox_condictions]
+            self.listbox_conditions]
 
         self.listbox_messages.bind('<Delete>', lambda event: Commands.remove_selected_on_currently_listbox(self, self.listbox_messages))
         self.listbox_replys.bind('<Delete>', lambda event: Commands.remove_selected_on_currently_listbox(self, self.listbox_replys))
         self.listbox_reactions.bind('<Delete>', lambda event: Commands.remove_selected_on_currently_listbox(self, self.listbox_reactions))
-        self.listbox_condictions.bind('<Delete>', lambda event: Commands.remove_selected_on_currently_listbox(self, self.listbox_condictions))
+        self.listbox_conditions.bind('<Delete>', lambda event: Commands.remove_selected_on_currently_listbox(self, self.listbox_conditions))
 
         # for x in self.lista_de_listbox:
         #     x.bind('<Delete>', lambda event: Commands.remove_selected_on_currently_listbox(self, x))

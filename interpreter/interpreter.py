@@ -2,23 +2,35 @@ import asyncio
 import emoji
 import discord
 from functions import random_choose
+from interpreter.conditions import MessageConditions
 
 class Interpreter:
     async def message_and_reply(self,
-        *conditions,
-        expected_message,
         message: discord.Message,
+        conditions = None,
+        expected_message = None,
         reply = None,
         reaction = None):
 
         self.expected_message = expected_message
-        
-        all_condiction_is_true = conditions.count(True) == len(conditions)
-        all_condiction_is_false = conditions.count(False) == len(conditions)
-        
-        message_condiction = message.content == expected_message if type(expected_message) == str else message.content in expected_message
 
-        if all_condiction_is_true and message_condiction:
+        message_condition = MessageConditions(
+            message,
+            expected_message = expected_message
+        )
+
+        all_condition_is_true = False
+        if conditions:
+            if type(conditions) == list:
+                conditions_to_confirm = []
+                for each_conditions in conditions:
+                    conditions_to_confirm.append(message_condition.string_conditions[each_conditions])
+            else:
+                conditions_to_confirm = [message_condition.string_conditions[conditions]]
+            
+            all_condition_is_true = conditions_to_confirm.count(True) == len(conditions_to_confirm)
+
+        if all_condition_is_true or conditions == None:
             await Interpreter.send_reply(self, reply, message)
             await Interpreter.send_reaction(self, reaction, message)
 

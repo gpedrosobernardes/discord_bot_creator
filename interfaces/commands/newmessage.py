@@ -1,6 +1,7 @@
 import tkinter as tk
-from functions import load_json, save_json
+from functions import load_json, save_json, have_in
 import interfaces.paths as path
+import json
 
 class Commands:
     def insert_on_listbox(self, listbox:tk.Listbox, entry:tk.Entry, limit:int = 0):
@@ -45,25 +46,39 @@ class Commands:
         return list(map(lambda x: (x.get(0, tk.END)), self.lista_de_listbox))
 
     def save_all_json(self):
-        dict_base = load_json(path.message_and_reply)
-        chaves_dict_base = list(dict_base.keys())
-        chaves_dict_base.reverse()
-        if not self.load:
-            for x in chaves_dict_base:
-                try:
-                    chave = int(x)
-                except TypeError:
-                    pass
-                else:
-                    name = str(chave+1)
-                    break
-            if not name:
-                name = '1'
+        try:
+            dict_base = load_json(path.message_and_reply)
+        except json.decoder.JSONDecodeError:
+            name = '1'
+            dict_base = dict()
         else:
-            name = self.load
-        dict_base[name] = {}
-        dict_base[name]['expected message'] = self.listbox_messages.get(0, tk.END)
-        dict_base[name]['multi reply'] = self.listbox_replys.get(0, tk.END)
-        dict_base[name]['reaction'] = self.listbox_reactions.get(0, tk.END)
-        dict_base[name]['condictions'] = self.listbox_condictions.get(0, tk.END)
-        save_json(path.message_and_reply, dict_base)
+            chaves_dict_base = list(dict_base.keys())
+            chaves_dict_base.reverse()
+            if not self.load:
+                name = '1'
+                for x in chaves_dict_base:
+                    try:
+                        chave = int(x)
+                    except ValueError:
+                        pass
+                    else:
+                        name = str(chave+1)
+                        break
+            else:
+                name = self.load
+        finally:
+            dict_base[name] = {}
+
+            lista_expected_message = self.listbox_messages.get(0, tk.END)
+            dict_base[name]['expected message'] = lista_expected_message if not len(lista_expected_message) == 0 else None
+
+            lista_reply = self.listbox_replys.get(0, tk.END)
+            dict_base[name]['reply'] = list(map(lambda x: x.split('¨'), lista_reply)) if have_in(lista_reply, '¨', reverse = True) else lista_reply if not len(lista_reply) == 0 else None
+
+            lista_reactions = self.listbox_reactions.get(0, tk.END)
+            dict_base[name]['reaction'] = list(map(lambda x: x.split('¨'), lista_reactions)) if have_in(lista_reactions, '¨', reverse = True) else lista_reactions if not len(lista_reactions) == 0 else None
+
+            lista_conditions = self.listbox_conditions.get(0, tk.END)
+            dict_base[name]['conditions'] = lista_conditions if not len(lista_conditions) == 0 else None
+
+            save_json(path.message_and_reply, dict_base)

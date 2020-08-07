@@ -1,9 +1,10 @@
 import tkinter as tk
 from interfaces.fonts import *
-from functions import load_json
+from functions import load_json, save_json
 from interfaces.newmessage.main import NewMessage as nm
 import interfaces.paths as path
 import interfaces.colors as color
+import json
 
 class FrameEsquerdo:
     def main(self):
@@ -35,23 +36,47 @@ class FrameEsquerdo:
             relief = tk.FLAT,
             bg = color.azul_entrada
         )
+        remover_mensagem_button = tk.Button(
+            master = frame_esquerdo_mensagens,
+            text = 'Remover mensagem',
+            command = lambda : FrameEsquerdo.__remove_message(self),
+            font = arial,
+            relief = tk.FLAT,
+            bg = color.azul_entrada,
+        )
         frame_esquerdo_mensagens.grid(
             row = 1,
             column = 1,
             padx = 50
         )
-        self.todas_mensagens.pack()
-        editar_mensagem_button.pack(
+        self.todas_mensagens.pack(
             pady = 10
         )
-        adicionar_mensagem_button.pack()
+        editar_mensagem_button.pack()
+        adicionar_mensagem_button.pack(
+            pady = 10
+        )
+        remover_mensagem_button.pack()
 
     def __load_info_messages(self):
-        all_messages = load_json(path.message_and_reply)
-        for x in all_messages.keys():
-            self.todas_mensagens.insert(tk.END, x)
+        try:
+            all_messages = load_json(path.message_and_reply)
+        except json.decoder.JSONDecodeError:
+            pass
+        else:
+            for x in all_messages.keys():
+                self.todas_mensagens.insert(tk.END, x)
 
     def __edit_message(self):
         lista_nomes = self.todas_mensagens.get(0, tk.END)
         selecionado:str = lista_nomes[self.todas_mensagens.curselection()[0]]
         nm.main(self, selecionado)
+
+    def __remove_message(self):
+        lista_nomes = self.todas_mensagens.get(0, tk.END)
+        selecionado = self.todas_mensagens.curselection()[0]
+        nome_selecionado:str = lista_nomes[selecionado]
+        self.todas_mensagens.delete(selecionado)
+        message_and_reply_json = load_json(path.message_and_reply)
+        del message_and_reply_json[nome_selecionado]
+        save_json(path.message_and_reply, message_and_reply_json)

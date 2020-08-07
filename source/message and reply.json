@@ -1,6 +1,1 @@
-{"Example": {
-    "expected message": ["ola", "oi", "ola bot", "oi bot", "tudo bem bot?"],
-    "reply": ["oi, eu sou um bot", "bem vindo ao servidor", "como foi seu dia?"],
-    "reaction": [":smile:", ":smile:", ":smile:", ":smile:", ":smile:", ":laughing:", ":smile:", ":smile:", ":smile:", ":smile:"],
-    "condictions": []}
-}
+{"2": {"expected message": null, "reply": [["aaaaaaaaaaaaaaa ", " bbbbbbbbbbbbbbbbbbb ", " ccccccccccccc ", "ddddddddd"]], "reaction": [":smile:", ":smiley_cat:", ":smiling_imp:"], "conditions": ["number in message", "not author is bot"]}, "3": {"expected message": ["{oh my god}{omg}"], "reply": ["{testando}{testando2}{testando3}"], "reaction": [":smile:", ":blush:"], "conditions": null}}

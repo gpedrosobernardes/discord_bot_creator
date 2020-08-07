@@ -11,7 +11,6 @@ import interfaces.paths as path
 class NewMessage:
     def main(self, load:str = None):
         self.load = load
-        self.lista_condictions = ['testando','testando 2','testando 3']
 
         self.janela = tk.Toplevel(
             master = self,
@@ -47,39 +46,43 @@ class NewMessage:
                 expected_message = todas_info['expected message']
                 if type(expected_message) == str:
                     self.listbox_messages.insert(tk.END, expected_message)
+                elif expected_message == None:
+                    pass
                 else:
                     for x in expected_message:
                         self.listbox_messages.insert(tk.END, x)
             except KeyError:
                 pass
             try:
-                multi_reply = todas_info['multi reply']
-                if type(multi_reply) == str:
-                    self.listbox_replys.insert(tk.END, multi_reply)
+                reply = todas_info['reply']
+                if type(reply) == str:
+                    self.listbox_replys.insert(tk.END, reply)
+                elif reply == None:
+                    pass
                 else:
-                    for x in multi_reply:
+                    for x in reply:
                         self.listbox_replys.insert(tk.END, x)
             except KeyError:
-                try:
-                    reply = todas_info['reply']
-                    self.listbox_replys.insert(tk.END, reply)
-                except KeyError:
-                    pass
+                pass
             try:
                 reaction = todas_info['reaction']
                 if type(reaction) == str:
                     self.listbox_reactions.insert(tk.END, reaction)
+                elif reaction == None:
+                    pass
                 else:
                     for x in reaction:
                         self.listbox_reactions.insert(tk.END, x)
             except KeyError:
                 pass
             try:
-                condictions = todas_info['condictions']
-                if type(condictions) == str:
-                    self.listbox_condictions.insert(tk.END, condictions)
+                conditions = todas_info['conditions']
+                if type(conditions) == str:
+                    self.listbox_conditions.insert(tk.END, conditions)
+                elif conditions == None:
+                    pass
                 else:
-                    for x in condictions:
-                        self.lista_condictions.insert(tk.END, x)
+                    for x in conditions:
+                        self.listbox_conditions.insert(tk.END, x)
             except KeyError:
                 pass
