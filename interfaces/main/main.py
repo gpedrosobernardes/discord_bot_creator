@@ -3,7 +3,6 @@ from interfaces.main.frame_direito import FrameDireito as fd
 from interfaces.main.frame_esquerdo import FrameEsquerdo as fe
 import interfaces.colors as color
 from interfaces.fonts import *
-from interfaces.tkclasses.SearchBox import SearchBox as sb
 
 class Main(tk.Tk):
     def __init__(self):

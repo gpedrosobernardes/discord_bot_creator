@@ -1,1 +1,1 @@
-{"1": {"expected message": ["bom dia"], "reply": ["boa noite"], "reaction": [":smile:"], "conditions": ["expected message"]}, "2": {"expected message": null, "reply": ["voce mencionou alguem"], "reaction": [":anguished:"], "conditions": ["mention someone"]}, "3": {"expected message": ["testando"], "reply": ["testando"], "reaction": null, "conditions": null}}
+{"1": {"expected message": ["!remove"], "reply": null, "reaction": null, "conditions": ["expected message"], "delete": true}}

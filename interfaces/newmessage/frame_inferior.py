@@ -18,6 +18,33 @@ class FrameInferior:
             relief = tk.FLAT,
             borderwidth = 1
         )
+        frame_radiobutton = tk.Frame(
+            master = frame_inferior,
+            bg = azul_frame
+        )
+        self.pin_or_del = tk.StringVar()
+        self.pin_or_del.set('None')
+        pin = tk.Radiobutton(
+            master = frame_radiobutton,
+            text = 'Fixar',
+            variable = self.pin_or_del,
+            value = 'Fixar',
+            bg = azul_frame,
+        )
+        delete = tk.Radiobutton(
+            master = frame_radiobutton,
+            text = 'Remover',
+            variable = self.pin_or_del,
+            value = 'Remover',
+            bg = azul_frame,
+        )
+        do_nothing = tk.Radiobutton(
+            master = frame_radiobutton,
+            text = 'Fazer nada',
+            variable = self.pin_or_del,
+            value = 'None',
+            bg = azul_frame,
+        )
         save_and_quit = tk.Button(
             master = frame_inferior,
             text = 'Salvar e sair',
@@ -35,6 +62,26 @@ class FrameInferior:
         save_and_quit.grid(
             row = 2,
             column = 1,
+        )
+        frame_radiobutton.grid(
+            row = 3,
+            column = 1,
+            pady = 10
+        )
+        pin.grid(
+            row = 1,
+            column = 1,
+            sticky = tk.W
+        )
+        delete.grid(
+            row = 2,
+            column = 1,
+            sticky = tk.W
+        )
+        do_nothing.grid(
+            row = 3,
+            column = 1,
+            sticky = tk.W
         )
         frame_inferior.pack(
             side = tk.BOTTOM,

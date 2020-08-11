@@ -1,7 +1,7 @@
 import tkinter as tk
 from interfaces.fonts import *
 from interfaces.newmessage.main import NewMessage as nm
-from interfaces.commands.main import MainCommands
+from interfaces.commands.main import MainCommands as mc
 import interfaces.paths as path
 import interfaces.colors as color
 
@@ -17,7 +17,7 @@ class FrameEsquerdo:
             text = 'Editar mensagem',
             font = arial,
             relief = tk.FLAT,
-            command = lambda: MainCommands.edit_message(self),
+            command = lambda: mc.edit_message(self),
             bg = color.azul_entrada
         )
         self.todas_mensagens = tk.Listbox(
@@ -26,7 +26,7 @@ class FrameEsquerdo:
             height = 20,
             bg = color.azul_entrada
         )
-        MainCommands.load_info_messages(self)
+        mc.load_info_messages(self)
         adicionar_mensagem_button = tk.Button(
             master = frame_esquerdo_mensagens,
             text = 'Adicionar mensagem',
@@ -38,7 +38,7 @@ class FrameEsquerdo:
         remover_mensagem_button = tk.Button(
             master = frame_esquerdo_mensagens,
             text = 'Remover mensagem',
-            command = lambda : MainCommands.remove_message(self),
+            command = lambda : mc.remove_message(self),
             font = arial,
             relief = tk.FLAT,
             bg = color.azul_entrada,

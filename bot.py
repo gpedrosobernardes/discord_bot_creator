@@ -1,14 +1,12 @@
-import discord, asyncio, json
-from functions import load_json, save_json
-from interpreter.interpreter import Interpreter
+import asyncio
 import interfaces.paths as paths
-
-all_config = load_json(paths.config)
-token = all_config["token"]
 
 class Bot():
     def __init__(self):
+        from functions import load_json, save_json
+        import discord
         client = discord.Client()
+        token = load_json(paths.config)['token']
 
         @client.event
         async def on_ready():
@@ -16,6 +14,7 @@ class Bot():
             
         @client.event
         async def on_message(message):
+            from interpreter.interpreter import Interpreter
             message_and_reply_json = load_json(paths.message_and_reply)
             for key_message in message_and_reply_json.keys():
                 
@@ -56,3 +55,5 @@ class Bot():
                     pin = pin)
 
         client.run(token)
+
+Bot()
