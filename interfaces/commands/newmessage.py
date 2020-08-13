@@ -47,6 +47,7 @@ class Commands:
         '''salva toda a informação que o usuario preencheu na interface em forma de json, para que depois
         o interpretador do bot consiga interpretar'''
         import json
+        from interfaces.commands.main import MainCommands
         from functions import load_json, save_json, have_in
         try:
             dict_base = load_json(path.message_and_reply)
@@ -90,6 +91,7 @@ class Commands:
                 dict_base[name]['delete'] = True
 
             save_json(path.message_and_reply, dict_base)
+            MainCommands.refresh_messages(self)
 
     def save_and_quit(self):
         from interfaces.commands.main import MainCommands
@@ -102,59 +104,39 @@ class Commands:
         if self.load:
             messages_json:dict = load_json(path.message_and_reply)
             todas_info:dict = messages_json[self.load]
-            try:
+            if 'expected message' in todas_info:
                 expected_message = todas_info['expected message']
-                if type(expected_message) == str:
-                    self.listbox_messages.insert(tk.END, expected_message)
-                elif expected_message == None:
+                if expected_message == None:
                     pass
                 else:
                     for x in expected_message:
                         self.listbox_messages.insert(tk.END, '¨'.join(x)) if type(x) == list else self.listbox_messages.insert(tk.END, x)
-            except KeyError:
-                pass
-            try:
+            if 'reply' in todas_info:
                 reply = todas_info['reply']
-                if type(reply) == str:
-                    self.listbox_replys.insert(tk.END, reply)
-                elif reply == None:
+                if reply == None:
                     pass
                 else:
                     for x in reply:
                         self.listbox_replys.insert(tk.END, '¨'.join(x)) if type(x) == list else self.listbox_replys.insert(tk.END, x)
-            except KeyError:
-                pass
-            try:
+            if 'reaction' in todas_info:
                 reaction = todas_info['reaction']
-                if type(reaction) == str:
-                    self.listbox_reactions.insert(tk.END, reaction)
-                elif reaction == None:
+                if reaction == None:
                     pass
                 else:
                     for x in reaction:
                         self.listbox_reactions.insert(tk.END, x)
-            except KeyError:
-                pass
-            try:
+            if 'conditions' in todas_info:
                 conditions = todas_info['conditions']
-                if type(conditions) == str:
-                    self.listbox_conditions.insert(tk.END, conditions)
-                elif conditions == None:
+                if conditions == None:
                     pass
                 else:
                     for x in conditions:
                         self.listbox_conditions.insert(tk.END, x)
-            except KeyError:
-                pass
-            try:
+            if 'pin' in todas_info:
                 pin = todas_info['pin']
                 if pin == True:
                     self.pin_or_del.set('Fixar')
-            except KeyError:
-                pass
-            try:
+            if 'delete' in todas_info:
                 delete = todas_info['delete']
                 if delete == True:
                     self.pin_or_del.set('Remover')
-            except KeyError:
-                pass

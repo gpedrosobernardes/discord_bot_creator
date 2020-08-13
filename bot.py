@@ -3,14 +3,15 @@ import interfaces.paths as paths
 
 class Bot():
     def __init__(self):
-        from functions import load_json, save_json
+        from functions import load_json, save_json, write_log, clear_txt, hora_atual
         import discord
         client = discord.Client()
         token = load_json(paths.config)['token']
+        clear_txt(paths.log)
 
         @client.event
         async def on_ready():
-            print('bot rodando.')
+            write_log(hora_atual()+' Bot inicializado.', paths.log)
             
         @client.event
         async def on_message(message):
@@ -55,3 +56,5 @@ class Bot():
                     pin = pin)
 
         client.run(token)
+
+Bot()

@@ -42,7 +42,43 @@ class MainCommands:
         return load_json(path.config)['token']
 
     def init_or_finish_bot(self):
-        pass
+        import subprocess, sys, threading, time, os 
+        def _init_bot():
+            self.bot_is_running = True
+            self.process = subprocess.Popen(
+                [sys.executable, path.bot],
+            )
+            self.executar_o_bot['text'] = 'Encerrar o bot'
+        def _finish_bot():
+            self.bot_is_running = False
+            self.process.kill()
+            self.executar_o_bot['text'] = 'Executar o bot'
+        def check_if_change():
+            cached = 0
+            while True:
+                time.sleep(0.1)
+                if os.stat(path.log).st_mtime != cached:
+                    cached = os.stat(path.log).st_mtime
+                    write()
+                    
+        def write():
+            with open(path.log, 'r') as log:
+                try:
+                    string = log.readlines()[-1]
+                except IndexError:
+                    string = None
+            if string:
+                self.log_do_bot['state'] = tk.NORMAL
+                self.log_do_bot.insert(tk.END, string)
+                self.log_do_bot['state'] = tk.DISABLED
+        if not self.bot_is_running:
+            t = threading.Thread(target=_init_bot)
+            t.start()
+
+            tcc = threading.Thread(target=check_if_change)
+            tcc.start()
+        elif self.bot_is_running:
+            _finish_bot()
         # preciso achar alguma maneira de executar o bot simutaneamente a interface,
         # mas o problema é que threading e multiprocessing não funcionam :(
 

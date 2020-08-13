@@ -1,9 +1,10 @@
 import asyncio
 import emoji
 import discord
-from functions import random_choose
+from functions import random_choose, write_log, hora_atual
 from interpreter.conditions import MessageConditions
 from interpreter.variable import Variable, apply_variable
+import interfaces.paths as path
 
 class Interpreter:
     async def message_and_reply(self,
@@ -24,12 +25,9 @@ class Interpreter:
 
         all_condition_is_true = False
         if conditions:
-            if type(conditions) == list:
-                conditions_to_confirm = []
-                for each_conditions in conditions:
-                    conditions_to_confirm.append(message_condition.string_conditions[each_conditions])
-            else:
-                conditions_to_confirm = [message_condition.string_conditions[conditions]]
+            conditions_to_confirm = []
+            for each_conditions in conditions:
+                conditions_to_confirm.append(message_condition.string_conditions[each_conditions])
             
             all_condition_is_true = conditions_to_confirm.count(True) == len(conditions_to_confirm)
 
@@ -41,37 +39,31 @@ class Interpreter:
 
     async def send_reaction(self, reaction, message:discord.Message):
         if reaction:
-            if type(reaction) == list:
-                for each_reaction in reaction:
-                    each_reaction = random_choose(each_reaction) if type(each_reaction) == list else each_reaction
-                    each_reaction = emoji.emojize(each_reaction, use_aliases = True)
-                    try:
-                        await message.add_reaction(each_reaction)
-                    except discord.HTTPException:
-                        print(each_reaction)
-            else:
+            for each_reaction in reaction:
+                code_reaction = each_reaction
+                each_reaction = random_choose(each_reaction) if type(each_reaction) == list else each_reaction
+                each_reaction = emoji.emojize(each_reaction, use_aliases = True)
                 try:
-                    reaction = emoji.emojize(reaction, use_aliases = True)
-                    await message.add_reaction(reaction)
+                    await message.add_reaction(each_reaction)
+                    write_log(hora_atual()+f' Adicionando a reação "{code_reaction}" a mensagem "{message.content}" do autor {message.author}.', path.log)
                 except discord.HTTPException:
-                    print(reaction)
+                    print(each_reaction)
 
     async def send_reply(self, reply, message: discord.Message):
         if reply:
             variables = Variable(message).keys
-            if type(reply) == list:
-                for each_reply in reply:
-                    each_reply = random_choose(each_reply) if type(each_reply) == list else each_reply
-                    each_reply = apply_variable(each_reply, variables)
-                    await message.channel.send(each_reply)
-            else:
-                reply = apply_variable(reply, variables)
-                await message.channel.send(reply)
+            for each_reply in reply:
+                each_reply = random_choose(each_reply) if type(each_reply) == list else each_reply
+                each_reply = apply_variable(each_reply, variables)
+                await message.channel.send(each_reply)
+                write_log(hora_atual()+f' Enviando a resposta "{each_reply}" há mensagem "{message.content}" do author {message.author}.', path.log)
 
     async def remove_message(self, delete, message: discord.Message):
         if delete:
             await message.delete()
+            write_log(hora_atual()+f' Removendo mensagem "{message.content}" do autor {message.author}.',path.log)
     
     async def pin_message(self, pin, message: discord.Message):
         if pin:
             await message.pin()
+            write_log(hora_atual()+f' Fixando mensagem "{message.content}" do autor {message.author}.',path.log)

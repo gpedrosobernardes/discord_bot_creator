@@ -13,7 +13,7 @@ def random_choose(lista:list):
     import random
     return lista[random.randint(0,(len(lista)-1))]
 
-def have_in(lista:list, string:str, reverse = False):
+def have_in(lista:list, string:str, reverse = False) -> bool:
     if not reverse:
         for x in lista:
             if x in string:
@@ -24,3 +24,16 @@ def have_in(lista:list, string:str, reverse = False):
             if string in x:
                 return True
         return False
+
+def hora_atual() -> str:
+    from datetime import datetime
+    data_atual = datetime.now()
+    return data_atual.strftime('%H:%M:%S')
+
+def write_log(text, file, mode='a', final='\n'):
+    with open(file, mode) as log:
+        log.write(text+final)
+
+def clear_txt(file):
+    with open(file, 'w') as arquivo:
+        arquivo.write('')

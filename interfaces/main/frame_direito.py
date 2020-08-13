@@ -17,7 +17,8 @@ class FrameDireito:
             width = 50,
             bg = color.azul_entrada,
             relief = tk.FLAT,
-            state = tk.DISABLED
+            state = tk.DISABLED,
+            selectbackground = color.azul_selecionado
         )
         frame_entrada_comandos = tk.Frame(
             master = frame_direito_bot,
@@ -32,11 +33,11 @@ class FrameDireito:
         )
         button_entrada_comandos = tk.Button(
             master = frame_entrada_comandos,
-            # font = arial,
+            font = ('Arial', 8),
             text = '>',
             command = lambda : mc.entry_command(self),
             bg = color.azul_entrada,
-            relief = tk.FLAT
+            relief = tk.FLAT,
         )
         frame_inserir_token = tk.Frame(
             master = frame_direito_bot,
@@ -55,6 +56,7 @@ class FrameDireito:
         self.button_inserir_token = tk.Button(
             master = frame_inserir_token,
             bg = color.azul_entrada,
+            font = ('Arial', 7),
             relief = tk.FLAT,
             text = '>',
             command = lambda : mc.update_token(self)
@@ -81,23 +83,24 @@ class FrameDireito:
         self.log_do_bot.grid(
             row = 1,
             column = 1,
-            columnspan = 2
         )
         frame_entrada_comandos.grid(
             row = 2,
             column = 1,
             columnspan = 2,
-            sticky = tk.W+tk.E
+            sticky = tk.W+tk.E,
+            pady = 5
         )
         self.entrada_comandos.grid(
             row = 1,
             column = 1,
-            sticky = tk.W+tk.E
+            sticky = tk.NSEW
         )
         button_entrada_comandos.grid(
             row = 1,
             column = 2,
-            sticky = tk.E
+            sticky = tk.W,
+            padx = 5
         )
         self.token_atual.grid(
             row = 3,
@@ -112,10 +115,12 @@ class FrameDireito:
         self.inserir_token.grid(
             row = 1,
             column = 1,
+            sticky = tk.NSEW
         )
         self.button_inserir_token.grid(
             row = 1,
             column = 2,
+            padx = 5
         )
         self.executar_o_bot.grid(
             row = 3,

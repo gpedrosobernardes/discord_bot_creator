@@ -12,6 +12,7 @@ class Main(tk.Tk):
         self.config(
             bg = color.azul_escuro,
         )
+        self.bot_is_running = False
 
         self.minsize(
             width = 808,
