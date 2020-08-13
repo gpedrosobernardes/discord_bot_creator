@@ -24,8 +24,8 @@ class FrameEntrada:
             font = arial,
             bg= azul_entrada,
             relief = tk.FLAT,
-            borderwidth = 1
-
+            borderwidth = 1,
+            selectbackground = azul_selecionado
         )
         reply_text = tk.Label(
             master = frame_preenchimento,
@@ -38,7 +38,8 @@ class FrameEntrada:
             font = arial,
             bg = azul_entrada,
             relief = tk.FLAT,
-            borderwidth = 1
+            borderwidth = 1,
+            selectbackground = azul_selecionado
         )
         reactions_text = tk.Label(
             master = frame_preenchimento,
@@ -53,7 +54,8 @@ class FrameEntrada:
             master_overlap = self.camada_2,
             bg = azul_entrada,
             relief = tk.FLAT,
-            borderwidth = 1
+            borderwidth = 1,
+            selectbackground = azul_selecionado
         )
         conditions_text = tk.Label(
             master = frame_preenchimento,
@@ -68,7 +70,8 @@ class FrameEntrada:
             master_overlap = self.camada_2,
             bg = azul_entrada,
             relief = tk.FLAT,
-            borderwidth = 1
+            borderwidth = 1,
+            selectbackground = azul_selecionado
         )
         adicionar = tk.Button(
             master = frame_preenchimento,

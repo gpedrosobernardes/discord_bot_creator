@@ -24,7 +24,9 @@ class FrameEsquerdo:
             master = frame_esquerdo_mensagens,
             relief = tk.FLAT,
             height = 20,
-            bg = color.azul_entrada
+            bg = color.azul_entrada,
+            activestyle = 'none',
+            selectbackground = color.azul_selecionado
         )
         mc.load_info_messages(self)
         adicionar_mensagem_button = tk.Button(

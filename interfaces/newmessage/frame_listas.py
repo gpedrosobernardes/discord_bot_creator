@@ -22,7 +22,9 @@ class FrameListas:
             selectmode = tk.MULTIPLE,
             bg = azul_entrada,
             relief = tk.FLAT,
-            borderwidth = 1
+            borderwidth = 1,
+            activestyle = 'none',
+            selectbackground = azul_selecionado
         )
         listbox_reactions_text = tk.Label(
             master = frame_das_listas,
@@ -34,7 +36,9 @@ class FrameListas:
             selectmode = tk.MULTIPLE,
             bg = azul_entrada,
             relief = tk.FLAT,
-            borderwidth = 1
+            borderwidth = 1,
+            activestyle = 'none',
+            selectbackground = azul_selecionado
         )
         listbox_messages_text = tk.Label(
             master = frame_das_listas,
@@ -46,7 +50,9 @@ class FrameListas:
             selectmode = tk.MULTIPLE,
             bg =azul_entrada,
             relief = tk.FLAT,
-            borderwidth = 1
+            borderwidth = 1,
+            activestyle = 'none',
+            selectbackground = azul_selecionado
         )
         listbox_replys_text = tk.Label(
             master= frame_das_listas,
@@ -58,7 +64,9 @@ class FrameListas:
             selectmode = tk.MULTIPLE,
             bg = azul_entrada,
             relief = tk.FLAT,
-            borderwidth = 1
+            borderwidth = 1,
+            activestyle = 'none',
+            selectbackground = azul_selecionado
         )
         remover = tk.Button(
             master = frame_das_listas,

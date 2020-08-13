@@ -55,5 +55,3 @@ class Bot():
                     pin = pin)
 
         client.run(token)
-
-Bot()

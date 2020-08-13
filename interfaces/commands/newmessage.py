@@ -43,7 +43,7 @@ class Commands:
             x:tk.Listbox
             x.delete(0,tk.END)
 
-    def save_all_json(self):
+    def save_all_json(self, load):
         '''salva toda a informação que o usuario preencheu na interface em forma de json, para que depois
         o interpretador do bot consiga interpretar'''
         import json
@@ -54,10 +54,10 @@ class Commands:
             name = '1'
             dict_base = dict()
         else:
-            chaves_dict_base = list(dict_base.keys())
-            chaves_dict_base.reverse()
-            if not self.load:
+            if not load:
                 name = '1'
+                chaves_dict_base = list(dict_base.keys())
+                chaves_dict_base.reverse()
                 for x in chaves_dict_base:
                     try:
                         chave = int(x)
@@ -67,8 +67,9 @@ class Commands:
                         name = str(chave+1)
                         break
             else:
-                name = self.load
+                name = load
         finally:
+            self.load = name
             dict_base[name] = {}
 
             lista_expected_message = self.listbox_messages.get(0, tk.END)
@@ -92,7 +93,7 @@ class Commands:
 
     def save_and_quit(self):
         from interfaces.commands.main import MainCommands
-        Commands.save_all_json(self)
+        Commands.save_all_json(self, self.load)
         self.janela.destroy()
         MainCommands.refresh_messages(self)
 
@@ -109,7 +110,7 @@ class Commands:
                     pass
                 else:
                     for x in expected_message:
-                        self.listbox_messages.insert(tk.END, x)
+                        self.listbox_messages.insert(tk.END, '¨'.join(x)) if type(x) == list else self.listbox_messages.insert(tk.END, x)
             except KeyError:
                 pass
             try:
@@ -120,7 +121,7 @@ class Commands:
                     pass
                 else:
                     for x in reply:
-                        self.listbox_replys.insert(tk.END, x)
+                        self.listbox_replys.insert(tk.END, '¨'.join(x)) if type(x) == list else self.listbox_replys.insert(tk.END, x)
             except KeyError:
                 pass
             try:
@@ -143,5 +144,17 @@ class Commands:
                 else:
                     for x in conditions:
                         self.listbox_conditions.insert(tk.END, x)
+            except KeyError:
+                pass
+            try:
+                pin = todas_info['pin']
+                if pin == True:
+                    self.pin_or_del.set('Fixar')
+            except KeyError:
+                pass
+            try:
+                delete = todas_info['delete']
+                if delete == True:
+                    self.pin_or_del.set('Remover')
             except KeyError:
                 pass

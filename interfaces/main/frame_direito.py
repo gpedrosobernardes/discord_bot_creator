@@ -42,10 +42,15 @@ class FrameDireito:
             master = frame_direito_bot,
             bg = color.azul_frame
         )
+        vcmd = (frame_inserir_token.register(FrameDireito.validate_token),
+                self, '%d', '%i', '%P', '%s', '%S', '%v', '%V', '%W')
         self.inserir_token = tk.Entry(
             master = frame_inserir_token,
             bg = color.azul_entrada,
-            relief = tk.FLAT
+            relief = tk.FLAT,
+            width = 70,
+            validatecommand = vcmd,
+            validate = "key"
         )
         self.button_inserir_token = tk.Button(
             master = frame_inserir_token,
@@ -121,3 +126,12 @@ class FrameDireito:
 
         self.entrada_comandos.bind('<Return>', lambda event: mc.entry_command(self))
         self.inserir_token.bind('<Return>', lambda event: mc.update_token(self))
+
+    def validate_token(self, d, i, P, s, S, v, V, W):
+        import re
+        i = len(P)
+        validatadion = r'^[a-z0-9]{0,24}\.[a-z0-9]{0,6}\.[a-z0-9]{0,27}$' if i >= 32 else r'^[a-z0-9]{0,24}\.[a-z0-9]{0,6}$' if i >= 25 else r'^[a-z0-9]{0,24}$'
+        if re.search(validatadion, P, flags=re.IGNORECASE):
+            return True
+        else:
+            return False

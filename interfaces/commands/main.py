@@ -57,10 +57,12 @@ class MainCommands:
         '''atualiza o token no arquivo "config.json" e na interface.'''
         from functions import load_json, save_json
         entrada:str = self.inserir_token.get()
-        current_dict = load_json(path.config)
-        current_dict['token'] = entrada
-        save_json(path.config, current_dict)
-        self.token_atual['text'] = f'Seu token atual é:\n{entrada}'
+        if len(entrada) == 59:
+            self.inserir_token.delete(0, tk.END)
+            current_dict = load_json(path.config)
+            current_dict['token'] = entrada
+            save_json(path.config, current_dict)
+            self.token_atual['text'] = f'Seu token atual é:\n{entrada}'
 
     def edit_message(self):
         '''abre a interface NewMessage e carrega as informações salvas'''

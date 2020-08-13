@@ -13,7 +13,7 @@ class FrameInferior:
         save = tk.Button(
             master = frame_inferior,
             text = 'Salvar',
-            command = lambda : Commands.save_all_json(self),
+            command = lambda : Commands.save_all_json(self, self.load),
             bg = azul_entrada,
             relief = tk.FLAT,
             borderwidth = 1

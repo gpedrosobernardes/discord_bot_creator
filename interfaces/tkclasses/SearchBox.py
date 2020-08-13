@@ -53,15 +53,17 @@ class SearchBox(tk.Entry):
         rx, ry = tuple(map(lambda x: int(x), (self.winfo_rootx(),self.winfo_rooty())))
         jx, jy = tuple(map(lambda x: int(x), (self.winfo_toplevel().winfo_rootx(),self.winfo_toplevel().winfo_rooty())))
         posx, posy = rx-jx, (ry-jy)+h
-        self.master_overlap:tk.Frame
 
-        self.master_overlap.config(width=wl, height=hl)
-        self.master_overlap.place(x=posx,y=posy)
-        self.listbox.place(x=1,y=1)
+        self.master_overlap:tk.Frame
+        for child in self.master_overlap.winfo_children():
+            child.pack_forget()
+        self.master_overlap.place(x = posx, y = posy, width = w, height = 194)
+        self.listbox.pack(fill = tk.X, expand = 1)
+
         self.listbox_is_visible = True
 
     def set_listbox_invisible(self):
-        self.listbox.place_forget()
+        self.listbox.pack_forget()
         self.master_overlap.place_forget()
         self.listbox_is_visible = False
 
