@@ -9,12 +9,14 @@ import interfaces.paths as path
 class Interpreter:
     async def message_and_reply(self,
         message: discord.Message,
-        conditions = None,
-        expected_message = None,
-        reply = None,
-        reaction = None,
-        delete = None,
-        pin = None):
+        conditions,
+        expected_message,
+        reply,
+        reaction,
+        delete,
+        pin,
+        delay
+    ):
 
         self.expected_message = expected_message
 
@@ -28,14 +30,22 @@ class Interpreter:
             conditions_to_confirm = []
             for each_conditions in conditions:
                 conditions_to_confirm.append(message_condition.string_conditions[each_conditions])
+            # if expected_message:
+            #     conditions_to_confirm.append(message_condition.string_conditions['expected message'])
             
             all_condition_is_true = conditions_to_confirm.count(True) == len(conditions_to_confirm)
 
         if all_condition_is_true or conditions == None:
+            await Interpreter.apply_delay(self, delay)
             await Interpreter.send_reply(self, reply, message)
             await Interpreter.send_reaction(self, reaction, message)
             await Interpreter.remove_message(self, delete, message)
             await Interpreter.pin_message(self, pin, message)
+
+    async def apply_delay(self, delay):
+        delay = int(delay)
+        if delay:
+            await asyncio.sleep(delay)
 
     async def send_reaction(self, reaction, message:discord.Message):
         if reaction:

@@ -1,1 +1,7 @@
-15:22:41 Bot inicializado.
+13:45:17 Bot inicializado.
+13:45:28 Enviando a resposta "delay aplicado" há mensagem "!delay" do author TheVicio#3753.
+13:45:56 Enviando a resposta "delay aplicado" há mensagem "!delay" do author TheVicio#3753.
+13:46:29 Enviando a resposta "delay aplicado" há mensagem "!delay" do author TheVicio#3753.
+13:46:30 Enviando a resposta "delay aplicado" há mensagem "!delay" do author TheVicio#3753.
+13:46:31 Enviando a resposta "delay aplicado" há mensagem "!delay" do author TheVicio#3753.
+13:46:32 Enviando a resposta "delay aplicado" há mensagem "!delay" do author TheVicio#3753.

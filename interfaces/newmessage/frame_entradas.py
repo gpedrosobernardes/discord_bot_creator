@@ -13,6 +13,20 @@ class FrameEntrada:
             bg = azul_frame,
             borderwidth = 10,
         )
+        self.name_text = tk.Label(
+            master = frame_preenchimento,
+            text = f"Nome: {self.load}" if self.load else "Nome:",
+            font = arial,
+            bg = azul_frame,
+        )
+        self.name = tk.Entry(
+            master = frame_preenchimento,
+            font = arial,
+            bg = azul_entrada,
+            relief = tk.FLAT,
+            borderwidth = 1,
+            selectbackground = azul_selecionado
+        )
         expected_message_text = tk.Label(
             master = frame_preenchimento,
             text = "Mensagem esperada",
@@ -22,7 +36,7 @@ class FrameEntrada:
         expected_message = tk.Entry(
             master = frame_preenchimento,
             font = arial,
-            bg= azul_entrada,
+            bg = azul_entrada,
             relief = tk.FLAT,
             borderwidth = 1,
             selectbackground = azul_selecionado
@@ -81,6 +95,14 @@ class FrameEntrada:
             relief = tk.FLAT,
             borderwidth = 1,
         )
+        self.name_text.pack(
+            fill = tk.X,
+            expand = True
+        )
+        self.name.pack(
+            fill = tk.X,
+            expand = True
+        )
         conditions_text.pack(
             fill = tk.X,
             expand = True
@@ -124,9 +146,11 @@ class FrameEntrada:
             expand = True
         )
 
+
         expected_message.bind('<Return>', lambda event: Commands.insert_on_listbox(self, self.listbox_messages, expected_message))
         reply.bind('<Return>', lambda event: Commands.insert_on_listbox(self, self.listbox_replys, reply))
         reactions.bind('<Return>', lambda event: Commands.insert_on_listbox(self, self.listbox_reactions, reactions, limit = 19))
         conditions.bind('<Return>', lambda event: Commands.insert_on_listbox(self, self.listbox_conditions, conditions))
+        self.name.bind('<Return>', lambda event: Commands.update_name(self))
 
         self.lista_de_entradas = [expected_message, reply, reactions, conditions]

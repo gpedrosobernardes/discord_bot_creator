@@ -21,6 +21,12 @@ class Commands:
                 Commands.insert_on_listbox(self, listbox_atual, entrada_atual, limit = 19)
             else:
                 Commands.insert_on_listbox(self, listbox_atual, entrada_atual)
+        Commands.update_name(self)
+
+    def update_name(self):
+        self.load = self.name.get()
+        self.name.delete(0, tk.END)
+        self.name_text['text'] = f"Nome: {self.load}"
 
     def remove_selected_on_listbox(self):
         '''remove um item selecionado na listbox'''
@@ -43,7 +49,7 @@ class Commands:
             x:tk.Listbox
             x.delete(0,tk.END)
 
-    def save_all_json(self, load):
+    def save_all_json(self):
         '''salva toda a informação que o usuario preencheu na interface em forma de json, para que depois
         o interpretador do bot consiga interpretar'''
         import json
@@ -55,7 +61,7 @@ class Commands:
             name = '1'
             dict_base = dict()
         else:
-            if not load:
+            if not self.load:
                 name = '1'
                 chaves_dict_base = list(dict_base.keys())
                 chaves_dict_base.reverse()
@@ -68,34 +74,37 @@ class Commands:
                         name = str(chave+1)
                         break
             else:
-                name = load
-        finally:
-            self.load = name
-            dict_base[name] = {}
+                name = self.load
 
-            lista_expected_message = self.listbox_messages.get(0, tk.END)
-            dict_base[name]['expected message'] = lista_expected_message if not len(lista_expected_message) == 0 else None
+        # self.load = name
 
-            lista_reply = self.listbox_replys.get(0, tk.END)
-            dict_base[name]['reply'] = list(map(lambda x: x.split('¨'), lista_reply)) if have_in(lista_reply, '¨', reverse = True) else lista_reply if not len(lista_reply) == 0 else None
+        dict_base[name] = {}
 
-            lista_reactions = self.listbox_reactions.get(0, tk.END)
-            dict_base[name]['reaction'] = list(map(lambda x: x.split('¨'), lista_reactions)) if have_in(lista_reactions, '¨', reverse = True) else lista_reactions if not len(lista_reactions) == 0 else None
+        lista_expected_message = self.listbox_messages.get(0, tk.END)
+        dict_base[name]['expected message'] = lista_expected_message if not len(lista_expected_message) == 0 else None
 
-            lista_conditions = self.listbox_conditions.get(0, tk.END)
-            dict_base[name]['conditions'] = lista_conditions if not len(lista_conditions) == 0 else None
+        lista_reply = self.listbox_replys.get(0, tk.END)
+        dict_base[name]['reply'] = list(map(lambda x: x.split('¨'), lista_reply)) if have_in(lista_reply, '¨', reverse = True) else lista_reply if not len(lista_reply) == 0 else None
 
-            if self.pin_or_del.get() == 'Fixar':
-                dict_base[name]['pin'] = True
-            elif self.pin_or_del.get() == 'Remover':
-                dict_base[name]['delete'] = True
+        lista_reactions = self.listbox_reactions.get(0, tk.END)
+        dict_base[name]['reaction'] = list(map(lambda x: x.split('¨'), lista_reactions)) if have_in(lista_reactions, '¨', reverse = True) else lista_reactions if not len(lista_reactions) == 0 else None
 
-            save_json(path.message_and_reply, dict_base)
-            MainCommands.refresh_messages(self)
+        lista_conditions = self.listbox_conditions.get(0, tk.END)
+        dict_base[name]['conditions'] = lista_conditions if not len(lista_conditions) == 0 else None
+
+        if self.pin_or_del.get() == 'Fixar':
+            dict_base[name]['pin'] = True
+        elif self.pin_or_del.get() == 'Remover':
+            dict_base[name]['delete'] = True
+        
+        dict_base[name]['delay'] = self.delay.get() if self.delay.get() != '0' else None
+
+        save_json(path.message_and_reply, dict_base)
+        MainCommands.refresh_messages(self)
 
     def save_and_quit(self):
         from interfaces.commands.main import MainCommands
-        Commands.save_all_json(self, self.load)
+        Commands.save_all_json(self)
         self.janela.destroy()
         MainCommands.refresh_messages(self)
 
@@ -140,3 +149,7 @@ class Commands:
                 delete = todas_info['delete']
                 if delete == True:
                     self.pin_or_del.set('Remover')
+
+            if 'delay' in todas_info:
+                delay = todas_info['delay']
+                self.delay_variable.set(delay)

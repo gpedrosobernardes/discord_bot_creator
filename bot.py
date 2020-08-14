@@ -21,39 +21,32 @@ class Bot():
                 
                 actual = message_and_reply_json[key_message]
 
-                try:
-                    expected_message = actual["expected message"]
-                except KeyError:
-                    expected_message = None
-                try:
-                    reply = actual['reply']
-                except KeyError:
-                    reply = None
-                try:
-                    reaction = actual['reaction']
-                except KeyError:
-                    reaction = None
-                try:
-                    conditions = actual['conditions']
-                except KeyError:
-                    conditions = None
-                try:
-                    delete = actual['delete']
-                except KeyError:
-                    delete = None
-                try:
-                    pin = actual['pin']
-                except KeyError:
-                    pin = None
+                to_read = [
+                    'expected message',
+                    'reply',
+                    'reaction',
+                    'conditions',
+                    'delete',
+                    'pin',
+                    'delay'
+                ]
+                to_insert = dict()
+
+                for each in to_read:
+                    to_insert[each] = None
+                    if each in actual:
+                        to_insert[each] = actual[each]
                 
                 await Interpreter.message_and_reply(self,
-                    conditions = conditions,
-                    expected_message = expected_message,
                     message = message,
-                    reply = reply,
-                    reaction = reaction,
-                    delete = delete,
-                    pin = pin)
+                    conditions = to_insert['conditions'],
+                    expected_message = to_insert['expected message'],
+                    reply = to_insert['reply'],
+                    reaction = to_insert['reaction'],
+                    delete = to_insert['delete'],
+                    pin = to_insert['pin'],
+                    delay = to_insert['delay']
+                )
 
         client.run(token)
 
