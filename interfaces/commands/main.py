@@ -30,6 +30,11 @@ class MainCommands:
             message_and_reply_json = load_json(path.message_and_reply)
             del message_and_reply_json[nome_selecionado]
             save_json(path.message_and_reply, message_and_reply_json)
+    def remove_all_message(self):
+        from functions import save_json
+        self.todas_mensagens.delete(0, tk.END)
+        dict_to_save = dict()
+        save_json(path.message_and_reply, dict_to_save)
 
     def refresh_messages(self):
         '''atualiza das mensagens do listbox de mensagens.'''
@@ -45,22 +50,29 @@ class MainCommands:
         import subprocess, sys, threading, time, os 
         def _init_bot():
             self.bot_is_running = True
+            self.executar_o_bot['text'] = 'Encerrar o bot'
             self.process = subprocess.Popen(
                 [sys.executable, path.bot],
             )
-            self.executar_o_bot['text'] = 'Encerrar o bot'
+            while True:
+                time.sleep(0.1)
+                if self.process.poll() == 0:
+                    self.bot_is_running = False
+                    self.executar_o_bot['text'] = 'Executar o bot'
         def _finish_bot():
             self.bot_is_running = False
             self.process.kill()
             self.executar_o_bot['text'] = 'Executar o bot'
         def check_if_change():
             cached = 0
+            time.sleep(1)
             while True:
                 time.sleep(0.1)
                 if os.stat(path.log).st_mtime != cached:
                     cached = os.stat(path.log).st_mtime
                     write()
-                    
+                if self.bot_is_running == False:
+                    break                  
         def write():
             with open(path.log, 'r') as log:
                 try:
@@ -74,19 +86,18 @@ class MainCommands:
         if not self.bot_is_running:
             t = threading.Thread(target=_init_bot)
             t.start()
-
             tcc = threading.Thread(target=check_if_change)
             tcc.start()
         elif self.bot_is_running:
             _finish_bot()
-        # preciso achar alguma maneira de executar o bot simutaneamente a interface,
-        # mas o problema é que threading e multiprocessing não funcionam :(
 
     def entry_command(self):
         '''metodo responsavel por definir comandos para a entry do log do bot.'''
         entrada:str = self.entrada_comandos.get()
         if entrada in ['/clear','/limpar']:
+            self.log_do_bot['state'] = tk.NORMAL
             self.log_do_bot.delete("0.0", tk.END)
+            self.log_do_bot['state'] = tk.DISABLED
             self.entrada_comandos.delete(0, tk.END)
 
     def update_token(self):

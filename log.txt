@@ -1,7 +1,3 @@
-13:45:17 Bot inicializado.
-13:45:28 Enviando a resposta "delay aplicado" há mensagem "!delay" do author TheVicio#3753.
-13:45:56 Enviando a resposta "delay aplicado" há mensagem "!delay" do author TheVicio#3753.
-13:46:29 Enviando a resposta "delay aplicado" há mensagem "!delay" do author TheVicio#3753.
-13:46:30 Enviando a resposta "delay aplicado" há mensagem "!delay" do author TheVicio#3753.
-13:46:31 Enviando a resposta "delay aplicado" há mensagem "!delay" do author TheVicio#3753.
-13:46:32 Enviando a resposta "delay aplicado" há mensagem "!delay" do author TheVicio#3753.
+16:36:25 Bot inicializado.
+16:36:44 Enviando a resposta "teste" há mensagem "!teste" do author TheVicio#3753.
+16:36:44 Adicionando a reação ":smile:" a mensagem "!teste" do autor TheVicio#3753.

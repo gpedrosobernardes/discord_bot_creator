@@ -1,10 +1,10 @@
 import asyncio
 import interfaces.paths as paths
+import discord
+from functions import load_json, save_json, write_log, clear_txt, hora_atual
 
 class Bot():
     def __init__(self):
-        from functions import load_json, save_json, write_log, clear_txt, hora_atual
-        import discord
         client = discord.Client()
         token = load_json(paths.config)['token']
         clear_txt(paths.log)
@@ -50,4 +50,8 @@ class Bot():
 
         client.run(token)
 
-Bot()
+try:
+    Bot()
+except discord.errors.LoginFailure:
+    write_log(hora_atual()+' Falha no login.', paths.log)
+    

@@ -18,11 +18,13 @@ class FrameEsquerdo:
             font = arial,
             relief = tk.FLAT,
             command = lambda: mc.edit_message(self),
-            bg = color.azul_entrada
+            bg = color.azul_entrada,
+            activebackground = color.azul_pressed,
         )
         self.todas_mensagens = tk.Listbox(
             master = frame_esquerdo_mensagens,
             relief = tk.FLAT,
+            font = arial,
             height = 20,
             bg = color.azul_entrada,
             activestyle = 'none',
@@ -35,26 +37,48 @@ class FrameEsquerdo:
             font = arial,
             command = lambda : nm.main(self),
             relief = tk.FLAT,
-            bg = color.azul_entrada
+            bg = color.azul_entrada,
+            activebackground = color.azul_pressed,
         )
         remover_mensagem_button = tk.Button(
             master = frame_esquerdo_mensagens,
-            text = 'Remover mensagem',
+            text = 'Apagar mensagem',
             command = lambda : mc.remove_message(self),
             font = arial,
             relief = tk.FLAT,
             bg = color.azul_entrada,
+            activebackground = color.azul_pressed,
         )
-        frame_esquerdo_mensagens.grid(
-            row = 1,
-            column = 1,
-            padx = 50
+        remover_todas_mensagens_button = tk.Button(
+            master = frame_esquerdo_mensagens,
+            text = 'Apagar todas mensagens',
+            command = lambda : mc.remove_all_message(self),
+            font = arial,
+            relief = tk.FLAT,
+            bg = color.azul_entrada,
+            activebackground = color.azul_pressed,
+        )
+        frame_esquerdo_mensagens.pack(
+            side = tk.LEFT,
+            fill = tk.Y,
         )
         self.todas_mensagens.pack(
-            pady = 10
+            pady = 5,
+            fill = tk.X
         )
-        editar_mensagem_button.pack()
+        editar_mensagem_button.pack(
+            pady = 5,
+            fill = tk.X
+        )
         adicionar_mensagem_button.pack(
-            pady = 10
+            pady = 5,
+            fill = tk.X
         )
-        remover_mensagem_button.pack()
+        remover_mensagem_button.pack(
+            pady = 5,
+            fill = tk.X
+        )
+        remover_todas_mensagens_button.pack(
+            pady = 5,
+            fill = tk.X
+        )

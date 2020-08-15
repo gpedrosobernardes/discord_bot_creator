@@ -6,9 +6,11 @@ from interfaces.fonts import *
 
 class Main(tk.Tk):
     def __init__(self):
+        import interfaces.paths as path
         super().__init__()
-
+        self.iconbitmap(path.interface_logo)
         self.title('Bot Discord Easy Creator')
+        
         self.config(
             bg = color.azul_escuro,
         )
@@ -26,7 +28,10 @@ class Main(tk.Tk):
         self.camada_2 = tk.Frame(
             master = self,
         )
-        self.camada_1.pack()
+        self.camada_1.pack(
+            fill = tk.BOTH,
+            expand = 1
+        )
 
         fd.main(self)
         fe.main(self)

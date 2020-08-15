@@ -16,6 +16,7 @@ class NewMessage:
             master = self,
             bg = azul_escuro,
         )
+        self.janela.iconbitmap(path.interface_logo)
         self.janela.minsize(
             width = 733,
             height = 458 

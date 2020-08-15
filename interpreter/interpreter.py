@@ -43,8 +43,8 @@ class Interpreter:
             await Interpreter.pin_message(self, pin, message)
 
     async def apply_delay(self, delay):
-        delay = int(delay)
         if delay:
+            delay = int(delay)
             await asyncio.sleep(delay)
 
     async def send_reaction(self, reaction, message:discord.Message):

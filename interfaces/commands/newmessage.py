@@ -24,9 +24,9 @@ class Commands:
         Commands.update_name(self)
 
     def update_name(self):
-        self.load = self.name.get()
+        self.new_name = self.name.get()
         self.name.delete(0, tk.END)
-        self.name_text['text'] = f"Nome: {self.load}"
+        self.name_text['text'] = f"Nome: {self.new_name}"
 
     def remove_selected_on_listbox(self):
         '''remove um item selecionado na listbox'''
@@ -75,9 +75,13 @@ class Commands:
                         break
             else:
                 name = self.load
+                if self.new_name:
+                    name = self.new_name
+                    del dict_base[self.load]
 
-        # self.load = name
-
+        # anti-bug
+        self.load = name
+        
         dict_base[name] = {}
 
         lista_expected_message = self.listbox_messages.get(0, tk.END)
@@ -97,7 +101,7 @@ class Commands:
         elif self.pin_or_del.get() == 'Remover':
             dict_base[name]['delete'] = True
         
-        dict_base[name]['delay'] = self.delay.get() if self.delay.get() != '0' else None
+        dict_base[name]['delay'] = self.delay.get()
 
         save_json(path.message_and_reply, dict_base)
         MainCommands.refresh_messages(self)

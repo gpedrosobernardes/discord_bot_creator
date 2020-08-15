@@ -28,8 +28,13 @@ class FrameDireito:
             master = frame_entrada_comandos,
             font = arial,
             bg = color.azul_entrada,
-            width = 40,
+            #width = 48,
             relief = tk.FLAT
+        )
+        sep_entrada_comandos = tk.Frame(
+            master = frame_entrada_comandos,
+            width = 5,
+            bg = color.azul_frame,
         )
         button_entrada_comandos = tk.Button(
             master = frame_entrada_comandos,
@@ -38,6 +43,7 @@ class FrameDireito:
             command = lambda : mc.entry_command(self),
             bg = color.azul_entrada,
             relief = tk.FLAT,
+            activebackground = color.azul_pressed,
         )
         frame_inserir_token = tk.Frame(
             master = frame_direito_bot,
@@ -49,9 +55,13 @@ class FrameDireito:
             master = frame_inserir_token,
             bg = color.azul_entrada,
             relief = tk.FLAT,
-            width = 70,
             validatecommand = vcmd,
             validate = "key"
+        )
+        sep_inserir_token = tk.Frame(
+            master = frame_inserir_token,
+            bg = color.azul_frame,
+            width = 5
         )
         self.button_inserir_token = tk.Button(
             master = frame_inserir_token,
@@ -59,14 +69,17 @@ class FrameDireito:
             font = ('Arial', 7),
             relief = tk.FLAT,
             text = '>',
-            command = lambda : mc.update_token(self)
+            command = lambda : mc.update_token(self),
+            activebackground = color.azul_pressed,
         )
         self.token = mc.get_token(self)
         self.token_atual = tk.Label(
             master = frame_direito_bot,
-            text = 'Seu token atual é:\n'
+            text = 'Token:\n'
                    f'{self.token}',
-            bg = color.azul_frame
+            bg = color.azul_frame,
+            justify = tk.LEFT
+            
         )
         self.executar_o_bot = tk.Button(
             master = frame_direito_bot,
@@ -75,32 +88,33 @@ class FrameDireito:
             relief = tk.FLAT,
             command = lambda : mc.init_or_finish_bot(self),
             bg = color.azul_entrada,
+            activebackground = color.azul_pressed,
         )
-        frame_direito_bot.grid(
-            row = 1,
-            column = 2
+        frame_direito_bot.pack(
+            side = tk.RIGHT,
+            fill = tk.Y
         )
         self.log_do_bot.grid(
             row = 1,
             column = 1,
+            sticky = tk.W
         )
         frame_entrada_comandos.grid(
             row = 2,
             column = 1,
-            columnspan = 2,
             sticky = tk.W+tk.E,
             pady = 5
         )
-        self.entrada_comandos.grid(
-            row = 1,
-            column = 1,
-            sticky = tk.NSEW
+        self.entrada_comandos.pack(
+            side = tk.LEFT,
+            fill = tk.BOTH,
+            expand = 1
         )
-        button_entrada_comandos.grid(
-            row = 1,
-            column = 2,
-            sticky = tk.W,
-            padx = 5
+        sep_entrada_comandos.pack(
+            side = tk.LEFT,
+        )
+        button_entrada_comandos.pack(
+            side = tk.LEFT,
         )
         self.token_atual.grid(
             row = 3,
@@ -110,23 +124,24 @@ class FrameDireito:
         frame_inserir_token.grid(
             row = 4,
             column = 1,
-            sticky = tk.W
+            sticky = tk.W+tk.E
         )
-        self.inserir_token.grid(
-            row = 1,
-            column = 1,
-            sticky = tk.NSEW
+        self.inserir_token.pack(
+            side = tk.LEFT,
+            fill = tk.BOTH,
+            expand = 1
         )
-        self.button_inserir_token.grid(
-            row = 1,
-            column = 2,
-            padx = 5
+        sep_inserir_token.pack(
+            side = tk.LEFT,
+        )
+        self.button_inserir_token.pack(
+            side = tk.LEFT,
         )
         self.executar_o_bot.grid(
-            row = 3,
-            column = 2,
-            rowspan = 2,
-            # sticky = tk.E
+            row = 5,
+            column = 1,
+            pady = 10,
+            sticky = tk.E
         )
 
         self.entrada_comandos.bind('<Return>', lambda event: mc.entry_command(self))
@@ -134,9 +149,7 @@ class FrameDireito:
 
     def validate_token(self, d, i, P, s, S, v, V, W):
         import re
-        i = len(P)
-        validatadion = r'^[a-z0-9]{0,24}\.[a-z0-9]{0,6}\.[a-z0-9]{0,27}$' if i >= 32 else r'^[a-z0-9]{0,24}\.[a-z0-9]{0,6}$' if i >= 25 else r'^[a-z0-9]{0,24}$'
-        if re.search(validatadion, P, flags=re.IGNORECASE):
+        if re.search(r'^[a-z0-9]{0,24}\.[a-z0-9]{0,6}\.[a-z0-9]{0,27}$|^[a-z0-9]{0,24}\.[a-z0-9]{0,6}$|^[a-z0-9]{0,24}$', P, flags=re.IGNORECASE):
             return True
         else:
             return False

@@ -20,7 +20,7 @@ class FrameInferior:
             bg = azul_frame
         )
         self.delay_variable = tk.StringVar()
-        self.delay_variable.set('10')
+        self.delay_variable.set('0')
 
         vcmddelay = (frame_delay.register(FrameInferior.delayvalidate)
                     , self, '%d', '%i', '%P', '%s', '%S', '%v', '%V', '%W')
@@ -56,6 +56,7 @@ class FrameInferior:
             value = 'Fixar',
             bg = azul_frame,
         )
+        pin.bind('<Button-3>', lambda event: self.pin_or_del.set('None'))
         delete = tk.Radiobutton(
             master = frame_radiobutton,
             text = 'Remover',
@@ -63,13 +64,7 @@ class FrameInferior:
             value = 'Remover',
             bg = azul_frame,
         )
-        do_nothing = tk.Radiobutton(
-            master = frame_radiobutton,
-            text = 'Fazer nada',
-            variable = self.pin_or_del,
-            value = 'None',
-            bg = azul_frame,
-        )
+        delete.bind('<Button-3>', lambda event: self.pin_or_del.set('None'))
         save_and_quit = tk.Button(
             master = frame_inferior,
             text = 'Salvar e sair',
@@ -100,11 +95,6 @@ class FrameInferior:
         )
         delete.grid(
             row = 2,
-            column = 1,
-            sticky = tk.W
-        )
-        do_nothing.grid(
-            row = 3,
             column = 1,
             sticky = tk.W
         )
