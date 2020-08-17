@@ -151,6 +151,5 @@ class FrameListas:
         self.listbox_replys.bind('<Delete>', lambda event: Commands.remove_selected_on_currently_listbox(self, self.listbox_replys))
         self.listbox_reactions.bind('<Delete>', lambda event: Commands.remove_selected_on_currently_listbox(self, self.listbox_reactions))
         self.listbox_conditions.bind('<Delete>', lambda event: Commands.remove_selected_on_currently_listbox(self, self.listbox_conditions))
-
         # for x in self.lista_de_listbox:
         #     x.bind('<Delete>', lambda event: Commands.remove_selected_on_currently_listbox(self, x))

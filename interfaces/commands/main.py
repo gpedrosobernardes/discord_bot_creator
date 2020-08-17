@@ -2,6 +2,9 @@ import interfaces.paths as path
 import tkinter as tk
 
 class MainCommands:
+    def on_ready(self):
+        MainCommands.load_info_messages(self)
+    
     def load_info_messages(self):
         '''carrega todas as mensagens do arquivo "message and reply.json" e insere no listbox de 
         mensagens.'''
@@ -30,6 +33,7 @@ class MainCommands:
             message_and_reply_json = load_json(path.message_and_reply)
             del message_and_reply_json[nome_selecionado]
             save_json(path.message_and_reply, message_and_reply_json)
+
     def remove_all_message(self):
         from functions import save_json
         self.todas_mensagens.delete(0, tk.END)

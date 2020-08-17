@@ -49,13 +49,11 @@ class FrameDireito:
             master = frame_direito_bot,
             bg = color.azul_frame
         )
-        vcmd = (frame_inserir_token.register(FrameDireito.validate_token),
-                self, '%d', '%i', '%P', '%s', '%S', '%v', '%V', '%W')
         self.inserir_token = tk.Entry(
             master = frame_inserir_token,
             bg = color.azul_entrada,
             relief = tk.FLAT,
-            validatecommand = vcmd,
+            validatecommand = (frame_inserir_token.register(FrameDireito.validate_token), self, '%d', '%i', '%P', '%s', '%S', '%v', '%V', '%W'),
             validate = "key"
         )
         sep_inserir_token = tk.Frame(

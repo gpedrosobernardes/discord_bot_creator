@@ -30,7 +30,6 @@ class FrameEsquerdo:
             activestyle = 'none',
             selectbackground = color.azul_selecionado
         )
-        mc.load_info_messages(self)
         adicionar_mensagem_button = tk.Button(
             master = frame_esquerdo_mensagens,
             text = 'Adicionar mensagem',

@@ -13,13 +13,13 @@ class Variable:
             "<guild name>" : self.guild_name,
             "<day>" : self.__get_time('%d'),
             "<month>" : self.__get_time('%m'),
-            "<year>" : self.__get_time('%Y')
+            "<year>" : self.__get_time('%Y'),
+            "<d-m-y>" : self.__get_time('%d/%m/%Y'),
         }
     def __get_time(self, string:str):
         return datetime.now().strftime(string)
 
-
-def apply_variable(string:str, keys: dict):
-    for each_key in keys.keys():
-        string = string.replace(each_key, keys[each_key])
-    return string
+    def apply_variable(self, string:str):
+        for each_key in self.keys.keys():
+            string = string.replace(each_key, self.keys[each_key])
+        return string

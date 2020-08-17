@@ -22,9 +22,6 @@ class FrameInferior:
         self.delay_variable = tk.StringVar()
         self.delay_variable.set('0')
 
-        vcmddelay = (frame_delay.register(FrameInferior.delayvalidate)
-                    , self, '%d', '%i', '%P', '%s', '%S', '%v', '%V', '%W')
-
         self.delay = tk.Spinbox(
             master = frame_delay,
             bg = azul_entrada,
@@ -32,7 +29,8 @@ class FrameInferior:
             width = 10,
             from_=0,
             to= 10,
-            vcmd = vcmddelay,
+            vcmd = (frame_delay.register(FrameInferior.delayvalidate),
+                    self, '%d', '%i', '%P', '%s', '%S', '%v', '%V', '%W'),
             validate = 'key'
         )
         save = tk.Button(
@@ -56,7 +54,6 @@ class FrameInferior:
             value = 'Fixar',
             bg = azul_frame,
         )
-        pin.bind('<Button-3>', lambda event: self.pin_or_del.set('None'))
         delete = tk.Radiobutton(
             master = frame_radiobutton,
             text = 'Remover',
@@ -64,7 +61,6 @@ class FrameInferior:
             value = 'Remover',
             bg = azul_frame,
         )
-        delete.bind('<Button-3>', lambda event: self.pin_or_del.set('None'))
         save_and_quit = tk.Button(
             master = frame_inferior,
             text = 'Salvar e sair',
@@ -115,6 +111,9 @@ class FrameInferior:
             fill = tk.Y,
             expand = True
         )
+        
+        pin.bind('<Button-3>', lambda event: self.pin_or_del.set('None'))
+        delete.bind('<Button-3>', lambda event: self.pin_or_del.set('None'))
 
     def delayvalidate(self, d, i, P, s, S, v, V, W):
         import re

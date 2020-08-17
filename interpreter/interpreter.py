@@ -3,7 +3,7 @@ import emoji
 import discord
 from functions import random_choose, write_log, hora_atual
 from interpreter.conditions import MessageConditions
-from interpreter.variable import Variable, apply_variable
+from interpreter.variable import Variable
 import interfaces.paths as path
 
 class Interpreter:
@@ -24,7 +24,6 @@ class Interpreter:
             message,
             expected_message = expected_message
         )
-
         all_condition_is_true = False
         if conditions:
             conditions_to_confirm = []
@@ -34,7 +33,7 @@ class Interpreter:
             #     conditions_to_confirm.append(message_condition.string_conditions['expected message'])
             
             all_condition_is_true = conditions_to_confirm.count(True) == len(conditions_to_confirm)
-
+        
         if all_condition_is_true or conditions == None:
             await Interpreter.apply_delay(self, delay)
             await Interpreter.send_reply(self, reply, message)
@@ -55,25 +54,24 @@ class Interpreter:
                 each_reaction = emoji.emojize(each_reaction, use_aliases = True)
                 try:
                     await message.add_reaction(each_reaction)
-                    write_log(hora_atual()+f' Adicionando a reação "{code_reaction}" a mensagem "{message.content}" do autor {message.author}.', path.log)
+                    write_log(hora_atual()+f' Adicionando a reação "{code_reaction}" a mensagem "{emoji.demojize(message.content)}" do autor {message.author}.', path.log)
                 except discord.HTTPException:
                     print(each_reaction)
 
     async def send_reply(self, reply, message: discord.Message):
         if reply:
-            variables = Variable(message).keys
             for each_reply in reply:
                 each_reply = random_choose(each_reply) if type(each_reply) == list else each_reply
-                each_reply = apply_variable(each_reply, variables)
+                each_reply = Variable(message).apply_variable(each_reply)
                 await message.channel.send(each_reply)
-                write_log(hora_atual()+f' Enviando a resposta "{each_reply}" há mensagem "{message.content}" do author {message.author}.', path.log)
+                write_log(hora_atual()+f' Enviando a resposta "{each_reply}" há mensagem "{emoji.demojize(message.content)}" do author {message.author}.', path.log)
 
     async def remove_message(self, delete, message: discord.Message):
         if delete:
             await message.delete()
-            write_log(hora_atual()+f' Removendo mensagem "{message.content}" do autor {message.author}.',path.log)
+            write_log(hora_atual()+f' Removendo mensagem "{emoji.demojize(message.content)}" do autor {message.author}.',path.log)
     
     async def pin_message(self, pin, message: discord.Message):
         if pin:
             await message.pin()
-            write_log(hora_atual()+f' Fixando mensagem "{message.content}" do autor {message.author}.',path.log)
+            write_log(hora_atual()+f' Fixando mensagem "{emoji.demojize(message.content)}" do autor {message.author}.',path.log)

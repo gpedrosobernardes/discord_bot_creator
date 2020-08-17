@@ -146,7 +146,6 @@ class FrameEntrada:
             expand = True
         )
 
-
         expected_message.bind('<Return>', lambda event: Commands.insert_on_listbox(self, self.listbox_messages, expected_message))
         reply.bind('<Return>', lambda event: Commands.insert_on_listbox(self, self.listbox_replys, reply))
         reactions.bind('<Return>', lambda event: Commands.insert_on_listbox(self, self.listbox_reactions, reactions, limit = 19))

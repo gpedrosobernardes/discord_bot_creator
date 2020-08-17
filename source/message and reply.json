@@ -1,1 +1,1 @@
-{"1": {"expected message": null, "reply": null, "reaction": null, "conditions": null, "delay": "0"}}
+{"Example": {"expected message": ["!example"], "reply": null, "reaction": [[":smile:", ":kissing_closed_eyes:"]], "conditions": ["expected message", "not author is bot"], "delay": "0"}}

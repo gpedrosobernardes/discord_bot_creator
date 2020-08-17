@@ -1,7 +1,28 @@
 import discord
 from functions import have_in
+from source.emojis import emojis
+import emoji
+import re
+conditions_keys = [
+    'expected message',
+    'not expected message',
+    'mention someone',
+    'not mention someone',
+    'mention everyone',
+    'not mention everyone',
+    'pinned',
+    'not pinned',
+    'author is expected',
+    'not author is expected',
+    'author is bot',
+    'not author is bot',
+    'number in message',
+    'not number in message',
+    'symbols in message',
+    'not symbols in message',
+    'emojis in message',
+    'not emojis in message']
 
-conditions_keys = ['expected message','not expected message','mention someone','not mention someone','mention everyone','not mention everyone','pinned','not pinned','author is expected','not author is expected','author is bot','not author is bot','number in message','not number in message','symbols in message', 'not symbols in message']
 symbols = ["'",'"','!','@','#','$','%','¨','&','*','(',')','-','_','+','=','§','`','´','[','{','ª','~','^',']','}','º',',','.','<','>',':',';','?','/','°','|']
 numbers = ['1','2','3','4','5','6','7','8','9']
 
@@ -30,6 +51,8 @@ class MessageConditions:
         self.not_number_in_message = not self.number_in_message
         self.symbols_in_message = have_in(symbols, self.message.content)
         self.not_symbols_in_message = not self.symbols_in_message
+        self.emojis_in_message = True if re.search(emoji.get_emoji_regexp(), self.message.content) else False
+        self.not_emojis_in_message = not self.emojis_in_message
 
 
         self.string_conditions = {
@@ -48,5 +71,7 @@ class MessageConditions:
             'number in message' : self.number_in_message,
             'not number in message' : self.not_number_in_message,
             'symbols in message' : self.symbols_in_message,
-            'not symbols in message' : self.not_symbols_in_message
+            'not symbols in message' : self.not_symbols_in_message,
+            'emojis in message' : self.emojis_in_message,
+            'not emojis in message' : self.not_emojis_in_message,
         }

@@ -2,6 +2,9 @@ import tkinter as tk
 import interfaces.paths as path
 
 class Commands:
+    def on_ready(self):
+        Commands.load_info(self)
+        
     def insert_on_listbox(self, listbox:tk.Listbox, entry:tk.Entry, limit:int = 0):
         '''insere um valor na listbox especificada e apaga o conteudo da entry especificada,
         se um limite for expecificado ele vai checar se o limite da listbox não foi atingido '''
@@ -55,6 +58,7 @@ class Commands:
         import json
         from interfaces.commands.main import MainCommands
         from functions import load_json, save_json, have_in
+        import re
         try:
             dict_base = load_json(path.message_and_reply)
         except json.decoder.JSONDecodeError:
@@ -91,7 +95,7 @@ class Commands:
         dict_base[name]['reply'] = list(map(lambda x: x.split('¨'), lista_reply)) if have_in(lista_reply, '¨', reverse = True) else lista_reply if not len(lista_reply) == 0 else None
 
         lista_reactions = self.listbox_reactions.get(0, tk.END)
-        dict_base[name]['reaction'] = list(map(lambda x: x.split('¨'), lista_reactions)) if have_in(lista_reactions, '¨', reverse = True) else lista_reactions if not len(lista_reactions) == 0 else None
+        dict_base[name]['reaction'] = list(map(lambda x: re.findall(r':[a-zA-Z_0-9]+:',x), lista_reactions)) if not len(lista_reactions) == 0 else None
 
         lista_conditions = self.listbox_conditions.get(0, tk.END)
         dict_base[name]['conditions'] = lista_conditions if not len(lista_conditions) == 0 else None

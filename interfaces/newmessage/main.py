@@ -36,5 +36,5 @@ class NewMessage:
         fe.main(self)
         fl.main(self)
         fi.main(self)
-
-        Commands.load_info(self)
+        
+        Commands.on_ready(self)
