@@ -33,45 +33,45 @@ class MessageConditions:
         expected_message = None,
         ):
 
-        self.message = message
+        message = message
 
-        self.expected_message = False if expected_message == None else self.message.content == expected_message if type(expected_message) == str else message.content in expected_message
-        self.not_expected_message = not self.expected_message
-        self.mention_someone = True if len(self.message.mentions) >= 1 else False
-        self.not_mention_someone = not self.mention_someone
-        self.mention_everyone = self.message.mention_everyone
-        self.not_mention_everyone = not self.mention_everyone
-        self.pinned = self.message.pinned
-        self.not_pinned = not self.pinned
-        self.author_is_expected = False if expected_author == None else self.message.author == expected_author
-        self.not_author_is_expected = not self.author_is_expected
-        self.author_is_bot = self.message.author.bot
-        self.not_author_is_bot = not self.author_is_bot
-        self.number_in_message = have_in(numbers, self.message.content)
-        self.not_number_in_message = not self.number_in_message
-        self.symbols_in_message = have_in(symbols, self.message.content)
-        self.not_symbols_in_message = not self.symbols_in_message
-        self.emojis_in_message = True if re.search(emoji.get_emoji_regexp(), self.message.content) else False
-        self.not_emojis_in_message = not self.emojis_in_message
+        expected_message = False if expected_message == None else message.content == expected_message if type(expected_message) == str else message.content in expected_message
+        not_expected_message = not expected_message
+        mention_someone = True if len(message.mentions) >= 1 else False
+        not_mention_someone = not mention_someone
+        mention_everyone = message.mention_everyone
+        not_mention_everyone = not mention_everyone
+        pinned = message.pinned
+        not_pinned = not pinned
+        author_is_expected = False if expected_author == None else message.author == expected_author
+        not_author_is_expected = not author_is_expected
+        author_is_bot = message.author.bot
+        not_author_is_bot = not author_is_bot
+        number_in_message = have_in(numbers, message.content)
+        not_number_in_message = not number_in_message
+        symbols_in_message = have_in(symbols, message.content)
+        not_symbols_in_message = not symbols_in_message
+        emojis_in_message = True if re.search(emoji.get_emoji_regexp(), message.content) else False
+        not_emojis_in_message = not emojis_in_message
 
 
         self.string_conditions = {
-            'expected message' : self.expected_message,
-            'not expected message' : self.not_expected_message,
-            'mention someone' : self.mention_someone,
-            'not mention someone' : self.not_mention_someone,
-            'mention everyone' : self.mention_everyone,
-            'not mention everyone' : self.not_mention_everyone,
-            'pinned' : self.pinned,
-            'not pinned' : self.not_pinned,
-            'author is expected' : self.author_is_expected,
-            'not author is expected' : self.not_author_is_expected,
-            'author is bot' : self.author_is_bot,
-            'not author is bot' : self.not_author_is_bot,
-            'number in message' : self.number_in_message,
-            'not number in message' : self.not_number_in_message,
-            'symbols in message' : self.symbols_in_message,
-            'not symbols in message' : self.not_symbols_in_message,
-            'emojis in message' : self.emojis_in_message,
-            'not emojis in message' : self.not_emojis_in_message,
+            'expected message' : expected_message,
+            'not expected message' : not_expected_message,
+            'mention someone' : mention_someone,
+            'not mention someone' : not_mention_someone,
+            'mention everyone' : mention_everyone,
+            'not mention everyone' : not_mention_everyone,
+            'pinned' : pinned,
+            'not pinned' : not_pinned,
+            'author is expected' : author_is_expected,
+            'not author is expected' : not_author_is_expected,
+            'author is bot' : author_is_bot,
+            'not author is bot' : not_author_is_bot,
+            'number in message' : number_in_message,
+            'not number in message' : not_number_in_message,
+            'symbols in message' : symbols_in_message,
+            'not symbols in message' : not_symbols_in_message,
+            'emojis in message' : emojis_in_message,
+            'not emojis in message' : not_emojis_in_message,
         }

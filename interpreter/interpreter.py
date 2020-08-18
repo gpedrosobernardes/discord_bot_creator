@@ -15,7 +15,11 @@ class Interpreter:
         reaction,
         delete,
         pin,
-        delay
+        delay,
+        ban,
+        kick,
+        where_reply = 'group',
+        where_reaction = 'author'
     ):
 
         self.expected_message = expected_message
@@ -25,19 +29,20 @@ class Interpreter:
             expected_message = expected_message
         )
         all_condition_is_true = False
+        conditions_to_confirm = []
         if conditions:
-            conditions_to_confirm = []
             for each_conditions in conditions:
                 conditions_to_confirm.append(message_condition.string_conditions[each_conditions])
-            # if expected_message:
-            #     conditions_to_confirm.append(message_condition.string_conditions['expected message'])
-            
-            all_condition_is_true = conditions_to_confirm.count(True) == len(conditions_to_confirm)
+        # é importante adicionar a condição expected message se tiver alguma mensagem esperada porque, senão podem ocorrer erros inesperados.
+        if expected_message:
+            conditions_to_confirm.append(message.content in expected_message)
         
-        if all_condition_is_true or conditions == None:
+        all_condition_is_true = conditions_to_confirm.count(True) == len(conditions_to_confirm)
+            
+        if all_condition_is_true:
             await Interpreter.apply_delay(self, delay)
-            await Interpreter.send_reply(self, reply, message)
-            await Interpreter.send_reaction(self, reaction, message)
+            reply_sent = await Interpreter.send_reply(self, reply, message, where_reply)
+            await Interpreter.send_reaction(self, reaction, message, where_reaction, reply_sent)
             await Interpreter.remove_message(self, delete, message)
             await Interpreter.pin_message(self, pin, message)
 
@@ -46,32 +51,49 @@ class Interpreter:
             delay = int(delay)
             await asyncio.sleep(delay)
 
-    async def send_reaction(self, reaction, message:discord.Message):
+    async def send_reaction(self, reaction, message:discord.Message, where, bot_reply):
         if reaction:
-            for each_reaction in reaction:
-                code_reaction = each_reaction
-                each_reaction = random_choose(each_reaction) if type(each_reaction) == list else each_reaction
-                each_reaction = emoji.emojize(each_reaction, use_aliases = True)
+            for r in reaction:
+                code_reaction = r
+                r = random_choose(r) if isinstance(r, list) else r
+                r = emoji.emojize(r, use_aliases = True)
                 try:
-                    await message.add_reaction(each_reaction)
+                    if where == 'author':
+                        await message.add_reaction(r)
+                    elif where == 'bot' and bot_reply:
+                        await bot_reply.add_reaction(r)
                     write_log(hora_atual()+f' Adicionando a reação "{code_reaction}" a mensagem "{emoji.demojize(message.content)}" do autor {message.author}.', path.log)
                 except discord.HTTPException:
-                    print(each_reaction)
+                    print(r)
 
-    async def send_reply(self, reply, message: discord.Message):
+    async def send_reply(self, reply, message: discord.Message, where) -> discord.Message:
         if reply:
-            for each_reply in reply:
-                each_reply = random_choose(each_reply) if type(each_reply) == list else each_reply
-                each_reply = Variable(message).apply_variable(each_reply)
-                await message.channel.send(each_reply)
-                write_log(hora_atual()+f' Enviando a resposta "{each_reply}" há mensagem "{emoji.demojize(message.content)}" do author {message.author}.', path.log)
+            for r in reply:
+                r = random_choose(r) if isinstance(r, list) else r
+                r = Variable(message).apply_variable(r)
+                if where == 'group':
+                    return await message.channel.send(r)
+                elif where == 'private':
+                    DMchannel = await message.author.create_dm()
+                    return await DMchannel.send(r)
+                write_log(hora_atual()+f' Enviando a resposta "{r}" há mensagem "{emoji.demojize(message.content)}" do author {message.author}.', path.log)
 
     async def remove_message(self, delete, message: discord.Message):
-        if delete:
+        if delete and isinstance(message.channel, discord.GroupChannel):
             await message.delete()
             write_log(hora_atual()+f' Removendo mensagem "{emoji.demojize(message.content)}" do autor {message.author}.',path.log)
     
     async def pin_message(self, pin, message: discord.Message):
-        if pin:
+        if pin and isinstance(message.channel, discord.GroupChannel):
             await message.pin()
             write_log(hora_atual()+f' Fixando mensagem "{emoji.demojize(message.content)}" do autor {message.author}.',path.log)
+
+    async def kick_member(self, kick, message: discord.Message):
+        if kick and isinstance(message.channel, discord.GroupChannel):
+            await message.author.kick()
+            write_log(hora_atual()+f' Expulsando jogador "{message.author.name}".')
+    
+    async def ban_member(self, ban, message: discord.Message):
+        if ban and isinstance(message.channel, discord.GroupChannel):
+            await message.author.ban()
+            write_log(hora_atual()+f' Banindo jogador "{message.author.name}"."')

@@ -105,6 +105,10 @@ class Commands:
         elif self.pin_or_del.get() == 'Remover':
             dict_base[name]['delete'] = True
         
+        dict_base[name]['where reply'] = self.variable_where_reply.get()
+        
+        dict_base[name]['where reaction'] = self.variable_where_reaction.get()
+        
         dict_base[name]['delay'] = self.delay.get()
 
         save_json(path.message_and_reply, dict_base)
@@ -123,30 +127,21 @@ class Commands:
             todas_info:dict = messages_json[self.load]
             if 'expected message' in todas_info:
                 expected_message = todas_info['expected message']
-                if expected_message == None:
-                    pass
-                else:
+                if expected_message:
                     for x in expected_message:
-                        self.listbox_messages.insert(tk.END, '¨'.join(x)) if type(x) == list else self.listbox_messages.insert(tk.END, x)
+                        self.listbox_messages.insert(tk.END, x)
             if 'reply' in todas_info:
                 reply = todas_info['reply']
-                if reply == None:
-                    pass
-                else:
+                if reply:
                     for x in reply:
                         self.listbox_replys.insert(tk.END, '¨'.join(x)) if type(x) == list else self.listbox_replys.insert(tk.END, x)
             if 'reaction' in todas_info:
                 reaction = todas_info['reaction']
-                if reaction == None:
-                    pass
-                else:
-                    for x in reaction:
-                        self.listbox_reactions.insert(tk.END, x)
+                if reaction:
+                    list(map(lambda x : self.listbox_reactions.insert(tk.END, ' '.join(x)), reaction))
             if 'conditions' in todas_info:
                 conditions = todas_info['conditions']
-                if conditions == None:
-                    pass
-                else:
+                if conditions:
                     for x in conditions:
                         self.listbox_conditions.insert(tk.END, x)
             if 'pin' in todas_info:
@@ -161,3 +156,11 @@ class Commands:
             if 'delay' in todas_info:
                 delay = todas_info['delay']
                 self.delay_variable.set(delay)
+                
+            if 'where reply' in todas_info:
+                where_reply = todas_info['where reply']
+                self.variable_where_reply.set(where_reply)
+                
+            if 'where reaction' in todas_info:
+                where_reaction = todas_info['where reaction']
+                self.variable_where_reaction.set(where_reaction)

@@ -28,7 +28,11 @@ class Bot():
                     'conditions',
                     'delete',
                     'pin',
-                    'delay'
+                    'delay',
+                    'kick',
+                    'ban',
+                    'where reaction',
+                    'where reply'
                 ]
                 to_insert = dict()
 
@@ -45,7 +49,11 @@ class Bot():
                     reaction = to_insert['reaction'],
                     delete = to_insert['delete'],
                     pin = to_insert['pin'],
-                    delay = to_insert['delay']
+                    delay = to_insert['delay'],
+                    kick = to_insert['kick'],
+                    ban = to_insert['ban'],
+                    where_reply = to_insert['where reply'],
+                    where_reaction = to_insert['where reaction']
                 )
 
         client.run(token)
