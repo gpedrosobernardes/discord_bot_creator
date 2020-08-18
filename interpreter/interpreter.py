@@ -71,6 +71,7 @@ class Interpreter:
             for r in reply:
                 r = random_choose(r) if isinstance(r, list) else r
                 r = Variable(message).apply_variable(r)
+                print(where)
                 if where == 'group':
                     return await message.channel.send(r)
                 elif where == 'private':
@@ -84,7 +85,7 @@ class Interpreter:
             write_log(hora_atual()+f' Removendo mensagem "{emoji.demojize(message.content)}" do autor {message.author}.',path.log)
     
     async def pin_message(self, pin, message: discord.Message):
-        if pin and isinstance(message.channel, discord.GroupChannel):
+        if pin:
             await message.pin()
             write_log(hora_atual()+f' Fixando mensagem "{emoji.demojize(message.content)}" do autor {message.author}.',path.log)
 

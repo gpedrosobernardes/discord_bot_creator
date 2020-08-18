@@ -10,8 +10,8 @@ def save_json(jsonfile, dicti: dict):
         json_file.write(dict_to_save)
 
 def random_choose(lista:list):
-    import random
-    return lista[random.randint(0,(len(lista)-1))]
+    from random import choice
+    return choice(lista)
 
 def have_in(lista:list, string:str, reverse = False) -> bool:
     if not reverse:
