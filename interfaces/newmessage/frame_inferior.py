@@ -235,6 +235,8 @@ class FrameInferior:
         
         pin.bind('<Button-3>', lambda event: self.pin_or_del.set('None'))
         delete.bind('<Button-3>', lambda event: self.pin_or_del.set('None'))
+        kick.bind('<Button-3>', lambda event: self.kick_or_del.set('None'))
+        ban.bind('<Button-3>', lambda event: self.kick_or_del.set('None'))
 
     def delayvalidate(self, d, i, P, s, S, v, V, W):
         import re

@@ -147,7 +147,7 @@ class FrameDireito:
 
     def validate_token(self, d, i, P, s, S, v, V, W):
         import re
-        if re.search(r'^[a-z0-9]{0,24}\.[a-z0-9]{0,6}\.[a-z0-9]{0,27}$|^[a-z0-9]{0,24}\.[a-z0-9]{0,6}$|^[a-z0-9]{0,24}$', P, flags=re.IGNORECASE):
+        if re.search(r'^[a-z0-9]{0,24}\.[a-z0-9]{0,6}\.[a-z0-9\-_]{0,27}$|^[a-z0-9]{0,24}\.[a-z0-9]{0,6}$|^[a-z0-9]{0,24}$', P, flags=re.IGNORECASE):
             return True
         else:
             return False

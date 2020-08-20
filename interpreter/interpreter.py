@@ -41,8 +41,8 @@ class Interpreter:
             
         if all_condition_is_true:
             await Interpreter.apply_delay(self, delay)
-            reply_sent = await Interpreter.send_reply(self, reply, message, where_reply)
-            await Interpreter.send_reaction(self, reaction, message, where_reaction, reply_sent)
+            await Interpreter.send_reply(self, reply, message, where_reply)
+            await Interpreter.send_reaction(self, reaction, message, where_reaction)
             await Interpreter.remove_message(self, delete, message)
             await Interpreter.pin_message(self, pin, message)
 
@@ -51,7 +51,7 @@ class Interpreter:
             delay = int(delay)
             await asyncio.sleep(delay)
 
-    async def send_reaction(self, reaction, message:discord.Message, where, bot_reply):
+    async def send_reaction(self, reaction, message:discord.Message, where):
         if reaction:
             for r in reaction:
                 code_reaction = r
@@ -60,8 +60,8 @@ class Interpreter:
                 try:
                     if where == 'author':
                         await message.add_reaction(r)
-                    elif where == 'bot' and bot_reply:
-                        await bot_reply.add_reaction(r)
+                    elif where == 'bot' and self.Botreply:
+                        await self.Botreply.add_reaction(r)
                     write_log(hora_atual()+f' Adicionando a reação "{code_reaction}" a mensagem "{emoji.demojize(message.content)}" do autor {message.author}.', path.log)
                 except discord.HTTPException:
                     print(r)
@@ -71,12 +71,11 @@ class Interpreter:
             for r in reply:
                 r = random_choose(r) if isinstance(r, list) else r
                 r = Variable(message).apply_variable(r)
-                print(where)
                 if where == 'group':
-                    return await message.channel.send(r)
+                    self.Botreply = await message.channel.send(r)
                 elif where == 'private':
-                    DMchannel = await message.author.create_dm()
-                    return await DMchannel.send(r)
+                    self.Botreply = DMchannel = await message.author.create_dm()
+                    await DMchannel.send(r)
                 write_log(hora_atual()+f' Enviando a resposta "{r}" há mensagem "{emoji.demojize(message.content)}" do author {message.author}.', path.log)
 
     async def remove_message(self, delete, message: discord.Message):
