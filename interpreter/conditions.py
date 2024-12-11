@@ -1,6 +1,5 @@
 import discord
 from functions import have_in
-from source.emojis import emojis
 import emoji
 import re
 conditions_keys = [

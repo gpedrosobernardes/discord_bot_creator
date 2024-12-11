@@ -4,7 +4,7 @@ from interfaces.commands.newmessage import Commands
 from interfaces.colors import *
 from interfaces.fonts import *
 from interpreter.conditions import conditions_keys
-import source.emojis as emojis
+import emoji
 
 class FrameEntrada:
     def main(self):
@@ -64,7 +64,7 @@ class FrameEntrada:
         reactions = Sb(
             master = frame_preenchimento,
             font = arial,
-            lista = emojis.emojis,
+            lista = [v["en"] for v in emoji.EMOJI_DATA.values()],
             master_overlap = self.camada_2,
             bg = azul_entrada,
             relief = tk.FLAT,
