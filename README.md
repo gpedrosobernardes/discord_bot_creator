@@ -15,8 +15,7 @@ Bot Discord Easy Creator ou BDEC, tem o objetivo de ser um software gratuito pra
 ##### Instalação:
 Abra o cmd e digite:
 ```
-pip install discord.py
-pip install emoji
+pip install -r requirements.txt
 ```
 Ou execute o arquivo: install dependencies.bat
 
