@@ -20,16 +20,16 @@ pip install -r requirements.txt
 Ou execute o arquivo: install dependencies.bat
 
 #### 2º Passo: Inserindo o token
-Após você ter instalado as dependências, oque você precisa fazer é copiar o token do seu bot e inserir no arquivo config.json entre as "" áspas, por exemplo:
+Após você ter instalado as dependências, oque você precisa fazer é copiar o token do seu bot e inserir no arquivo config.yaml entre as "" áspas, por exemplo:
 ```
-{"token":" <seu token> "}
+token: <seu token>
 ```
+Esse processo pode ser realizado a partir da interface.
 #### 3º Passo: Iniciando
 Abra o cmd e digite:
 ```
 python bot.py
 ```
-Ou execute o arquivo: start bot.bat
 ### Customizando o bot:
-Para customizar seu bot é muito simples, basta executar o arquivo: start interface.bat
+Para customizar seu bot é muito simples, basta executar a interface (main.py)
 e de maneira intuitiva você poderá customizar seu bot de diversas maneiras.
