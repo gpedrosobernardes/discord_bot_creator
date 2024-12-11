@@ -1,25 +1,31 @@
 import asyncio
-import interfaces.paths as paths
-import discord
-from functions import load_json, save_json, write_log, clear_txt, hora_atual
 
-class Bot():
+import discord
+import emoji
+from discord import Intents, LoginFailure
+
+import interfaces.paths as paths
+from functions import load_json, write_log, clear_txt, hora_atual, random_choose
+from interpreter.conditions import MessageConditions
+from interpreter.variable import Variable
+
+
+class Bot:
+
     def __init__(self):
-        client = discord.Client()
-        token = load_json(paths.config)['token']
+        self.client = discord.Client(intents=Intents.all())
+        self.token = load_json(paths.config)['token']
         clear_txt(paths.log)
 
-        @client.event
+        @self.client.event
         async def on_ready():
-            write_log(hora_atual()+' Bot inicializado.', paths.log)
-            
-        @client.event
+            self.log("Bot iniciado!")
+
+        @self.client.event
         async def on_message(message):
-            from interpreter.interpreter import Interpreter
+            self.log(f'Identificada mensagem "{message.content}".')
             message_and_reply_json = load_json(paths.message_and_reply)
-            for key_message in message_and_reply_json.keys():
-                
-                actual = message_and_reply_json[key_message]
+            for key_message, actual in message_and_reply_json.items():
 
                 to_read = [
                     'expected message',
@@ -40,8 +46,8 @@ class Bot():
                     to_insert[each] = None
                     if each in actual:
                         to_insert[each] = actual[each]
-                
-                await Interpreter.message_and_reply(self,
+
+                await message_and_reply(
                     message = message,
                     conditions = to_insert['conditions'],
                     expected_message = to_insert['expected message'],
@@ -56,10 +62,133 @@ class Bot():
                     where_reaction = to_insert['where reaction']
                 )
 
-        client.run(token)
+        @self.client.event
+        async def apply_delay(delay):
+            if delay:
+                delay = int(delay)
+                self.log(f"Aguardando delay de {delay} segundos para a proxima execução!")
+                await asyncio.sleep(delay)
 
-try:
-    Bot()
-except discord.errors.LoginFailure:
-    write_log(hora_atual()+' Falha no login.', paths.log)
+        @self.client.event
+        async def send_reaction(reaction, message: discord.Message, where):
+            if reaction:
+                for r in reaction:
+                    code_reaction = r
+                    r = random_choose(r) if isinstance(r, list) else r
+                    r = emoji.emojize(r)
+                    try:
+                        if where == 'author':
+                            await message.add_reaction(r)
+                        elif where == 'bot' and message.author.bot:
+                            await message.add_reaction(r)
+                        self.log(f'Adicionando a reação "{code_reaction}" a mensagem "{emoji.demojize(message.content)}" do autor {message.author}.')
+                    except discord.HTTPException:
+                        print(r)
+
+        @self.client.event
+        async def send_reply(reply, message: discord.Message, where):
+            if reply:
+                for r in reply:
+                    r = random_choose(r) if isinstance(r, list) else r
+                    r = Variable(message).apply_variable(r)
+                    if where == 'group':
+                        await message.channel.send(r)
+                    elif where == 'private':
+                        dm_channel = await message.author.create_dm()
+                        await dm_channel.send(r)
+                    self.log(f'Enviando a resposta "{r}" há mensagem "{emoji.demojize(message.content)}" do author {message.author}.')
+
+        @self.client.event
+        async def remove_message(delete, message: discord.Message):
+            if delete and isinstance(message.channel, discord.GroupChannel):
+                await message.delete()
+                self.log(f'Removendo mensagem "{emoji.demojize(message.content)}" do autor {message.author}.')
+
+        @self.client.event
+        async def pin_message(pin, message: discord.Message):
+            if pin:
+                await message.pin()
+                self.log(f'Fixando mensagem "{emoji.demojize(message.content)}" do autor {message.author}.')
+
+        @self.client.event
+        async def kick_member(kick, message: discord.Message):
+            if kick and isinstance(message.channel, discord.GroupChannel):
+                await message.author.kick()
+                self.log(f'Expulsando jogador "{message.author.name}".')
+
+        @self.client.event
+        async def ban_member(ban, message: discord.Message):
+            if ban and isinstance(message.channel, discord.GroupChannel):
+                await message.author.ban()
+                self.log(f'Banindo jogador "{message.author.name}".')
+
+        async def message_and_reply(message: discord.Message,
+                                    conditions,
+                                    expected_message,
+                                    reply,
+                                    reaction,
+                                    delete,
+                                    pin,
+                                    delay,
+                                    ban,
+                                    kick,
+                                    where_reply='group',
+                                    where_reaction='author'
+                                    ):
+
+            message_condition = MessageConditions(
+                message,
+                expected_message=expected_message
+            )
+            all_condition_is_true = False
+            conditions_to_confirm = []
+            if conditions:
+                for each_conditions in conditions:
+                    conditions_to_confirm.append(message_condition.string_conditions[each_conditions])
+            # é importante adicionar a condição expected message se tiver alguma mensagem esperada porque, senão podem ocorrer erros inesperados.
+            if expected_message:
+                conditions_to_confirm.append(message.content in expected_message)
+
+            all_condition_is_true = conditions_to_confirm.count(True) == len(conditions_to_confirm)
+
+            self.log(f"Verificando condições {conditions_to_confirm}")
+
+            if all_condition_is_true:
+                await apply_delay(delay)
+                await send_reply(reply, message, where_reply)
+                await send_reaction(reaction, message, where_reaction)
+                await remove_message(delete, message)
+                await pin_message(pin, message)
+
+    def log(self, message):
+        formated_message = f"{hora_atual()}: {message}"
+        write_log(formated_message, paths.log)
+        return formated_message
+
+    def run(self):
+        try:
+            self.client.run(self.token)
+        except LoginFailure as e:
+            self.log(str(e))
+
+
+class IntegratedBot(Bot):
+    def __init__(self, app):
+        self.app = app
+        super().__init__()
+
+        @self.client.event
+        async def on_ready():
+            self.log("Bot iniciado!")
+            self.app.change_init_bot_button()
+
+
+    def log(self, message):
+        formated_message = super().log(message)
+        self.app.log(formated_message+"\n")
+
+
+if __name__ == '__main__':
+    bot = Bot()
+    bot.run()
     

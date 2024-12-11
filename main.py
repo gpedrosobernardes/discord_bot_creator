@@ -1,3 +1,4 @@
 from interfaces.main.main import Main
 
-Main()
+main = Main()
+main.mainloop()

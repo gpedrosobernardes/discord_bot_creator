@@ -50,7 +50,7 @@ class MessageConditions:
         not_number_in_message = not number_in_message
         symbols_in_message = have_in(symbols, message.content)
         not_symbols_in_message = not symbols_in_message
-        emojis_in_message = True if re.search(emoji.get_emoji_regexp(), message.content) else False
+        emojis_in_message = emoji.emoji_count(message.content) > 0
         not_emojis_in_message = not emojis_in_message
 
 

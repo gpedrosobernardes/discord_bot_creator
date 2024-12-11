@@ -1,3 +1,5 @@
-venv
+.venv
 __pycache__
 .idea
+log.txt
+source/config.json
