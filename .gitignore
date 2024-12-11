@@ -3,3 +3,4 @@ __pycache__
 .idea
 log.txt
 source/config.json
+config.yaml

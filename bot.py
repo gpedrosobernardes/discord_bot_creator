@@ -1,9 +1,9 @@
 import asyncio
-
+import os
 import discord
 import emoji
 from discord import Intents, LoginFailure
-
+from core.config import instance as config
 import interfaces.paths as paths
 from functions import load_json, write_log, clear_txt, hora_atual, random_choose
 from interpreter.conditions import MessageConditions
@@ -14,7 +14,6 @@ class Bot:
 
     def __init__(self):
         self.client = discord.Client(intents=Intents.all())
-        self.token = load_json(paths.config)['token']
         clear_txt(paths.log)
 
         @self.client.event
@@ -167,7 +166,7 @@ class Bot:
 
     def run(self):
         try:
-            self.client.run(self.token)
+            self.client.run(config.get("token"))
         except LoginFailure as e:
             self.log(str(e))
 

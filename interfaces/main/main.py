@@ -1,13 +1,13 @@
 import tkinter as tk
 from json import JSONDecodeError
 from threading import Thread
-
+from core.config import instance as config
 import interfaces.colors as color
 from bot import IntegratedBot
 from interfaces.fonts import *
 from interfaces import paths
 from functions import load_json, save_json
-import re
+
 
 from interfaces.newmessage.main import EditMessageWindow, NewMessageWindow
 
@@ -278,7 +278,7 @@ class Main(tk.Tk):
     @staticmethod
     def get_token():
         """retorna o token atual salvo no arquivo "config.json"."""
-        return load_json(paths.config)['token']
+        return config.get("token")
 
     def init_bot(self):
         self.bot_thread.start()
@@ -301,12 +301,11 @@ class Main(tk.Tk):
     def update_token(self):
         """atualiza o token no arquivo "config.json" e na interface."""
 
-        entrada:str = self.inserir_token.get()
+        token:str = self.inserir_token.get()
         self.inserir_token.delete(0, tk.END)
-        current_dict = load_json(paths.config)
-        current_dict['token'] = entrada
-        save_json(paths.config, current_dict)
-        self.token_atual['text'] = f'Seu token atual é:\n{entrada}'
+        config.set("token", token)
+        config.save()
+        self.token_atual['text'] = f'Seu token atual é:\n{token}'
 
     def edit_message(self):
         """abre a interface NewMessage e carrega as informações salvas"""
