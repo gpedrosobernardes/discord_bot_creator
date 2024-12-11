@@ -1,6 +1,8 @@
+import asyncio
 import tkinter as tk
 from json import JSONDecodeError
 from threading import Thread
+
 from core.config import instance as config
 import interfaces.colors as color
 from bot import IntegratedBot
@@ -20,7 +22,7 @@ class Main(tk.Tk):
         self.message_window = None
         self.bot = IntegratedBot(self)
         self.bot_thread = Thread(target=self.bot.run)
-        
+
         self.config(
             bg = color.azul_escuro,
         )
@@ -287,7 +289,10 @@ class Main(tk.Tk):
         self.executar_o_bot.config(command=self.turnoff_bot, text="Desligar o bot")
 
     def turnoff_bot(self):
-        pass
+        self.bot.client.loop.create_task(self.bot.client.close())
+        self.bot_thread.join()
+        self.executar_o_bot.config(command=self.init_bot, text="Executar o bot")
+        self.log("Bot desligado!")
 
     def entry_command(self):
         """Responsável por definir comandos para a entry do log do bot."""
