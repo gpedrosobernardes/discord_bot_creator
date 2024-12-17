@@ -1,4 +1,5 @@
 import asyncio
+import logging
 
 import discord
 import emoji
@@ -6,24 +7,26 @@ from discord import Intents, LoginFailure
 
 import interfaces.paths as paths
 from core.config import instance as config
-from core.functions import load_json, write_log, clear_txt, hora_atual, random_choose
+from core.functions import load_json, random_choose
+from interfaces.main.log_handler import LogHandler
 from interpreter.conditions import MessageConditions
 from interpreter.variable import Variable
+
+logger = logging.getLogger(__name__)
 
 
 class Bot:
 
     def __init__(self):
         self.client = discord.Client(intents=Intents.all())
-        clear_txt(paths.log)
 
         @self.client.event
         async def on_ready():
-            self.log("Bot iniciado!")
+            logger.info("Bot iniciado!")
 
         @self.client.event
         async def on_message(message):
-            self.log(f'Identificada mensagem "{message.content}".')
+            logger.info(f'Identificada mensagem "{message.content}".')
             message_and_reply_json = load_json(paths.message_and_reply)
             for key_message, actual in message_and_reply_json.items():
 
@@ -66,7 +69,7 @@ class Bot:
         async def apply_delay(delay):
             if delay:
                 delay = int(delay)
-                self.log(
+                logger.info(
                     f"Aguardando delay de {delay} segundos para a proxima execução!"
                 )
                 await asyncio.sleep(delay)
@@ -87,7 +90,7 @@ class Bot:
                             await message.add_reaction(reaction)
                         elif where == "bot" and message.author.bot:
                             await message.add_reaction(reaction)
-                        self.log(
+                        logger.info(
                             f'Adicionando a reação "{code_reaction}" a mensagem "{emoji.demojize(message.content)}" do autor {message.author}.'
                         )
                     except discord.HTTPException:
@@ -104,15 +107,15 @@ class Bot:
                     elif where == "private":
                         dm_channel = await message.author.create_dm()
                         await dm_channel.send(reply)
-                    self.log(
-                        f'Enviando a resposta "{reply}" há mensagem "{emoji.demojize(message.content)}" do author {message.author}.'
+                    logger.info(
+                        f'Enviando a resposta "{reply}" à mensagem "{emoji.demojize(message.content)}" do autor {message.author}.'
                     )
 
         @self.client.event
         async def remove_message(delete, message: discord.Message):
             if delete and isinstance(message.channel, discord.GroupChannel):
                 await message.delete()
-                self.log(
+                logger.info(
                     f'Removendo mensagem "{emoji.demojize(message.content)}" do autor {message.author}.'
                 )
 
@@ -120,7 +123,7 @@ class Bot:
         async def pin_message(pin, message: discord.Message):
             if pin:
                 await message.pin()
-                self.log(
+                logger.info(
                     f'Fixando mensagem "{emoji.demojize(message.content)}" do autor {message.author}.'
                 )
 
@@ -128,13 +131,13 @@ class Bot:
         async def kick_member(kick, message: discord.Message):
             if kick and isinstance(message.channel, discord.GroupChannel):
                 await message.author.kick()
-                self.log(f'Expulsando jogador "{message.author.name}".')
+                logger.info(f'Expulsando jogador "{message.author.name}".')
 
         @self.client.event
         async def ban_member(ban, message: discord.Message):
             if ban and isinstance(message.channel, discord.GroupChannel):
                 await message.author.ban()
-                self.log(f'Banindo jogador "{message.author.name}".')
+                logger.info(f'Banindo jogador "{message.author.name}".')
 
         async def message_and_reply(
             message: discord.Message,
@@ -169,7 +172,7 @@ class Bot:
                 conditions_to_confirm
             )
 
-            self.log(f"Verificando condições {conditions_to_confirm}")
+            logger.info(f"Verificando condições {conditions_to_confirm}")
 
             if all_condition_is_true:
                 await apply_delay(delay)
@@ -178,16 +181,11 @@ class Bot:
                 await remove_message(delete, message)
                 await pin_message(pin, message)
 
-    def log(self, message):
-        formated_message = f"{hora_atual()}: {message}"
-        write_log(formated_message, paths.log)
-        return formated_message
-
     def run(self):
         try:
             self.client.run(config.get("token"))
         except LoginFailure as exception:
-            self.log(str(exception))
+            logger.info(str(exception))
 
 
 class IntegratedBot(Bot):
@@ -195,14 +193,14 @@ class IntegratedBot(Bot):
         self.app = app
         super().__init__()
 
+        log_handler = LogHandler(self.app)
+        log_handler.setLevel(logging.INFO)
+        logger.addHandler(log_handler)
+
         @self.client.event
         async def on_ready():
-            self.log("Bot iniciado!")
+            logger.info("Bot iniciado!")
             self.app.change_init_bot_button()
-
-    def log(self, message):
-        formated_message = super().log(message)
-        self.app.log(formated_message + "\n")
 
 
 if __name__ == "__main__":

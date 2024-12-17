@@ -1,3 +1,4 @@
+import logging
 from json import JSONDecodeError
 from threading import Thread
 
@@ -20,6 +21,8 @@ from core.functions import load_json, save_json
 from interfaces import paths
 from interfaces.classes.qpassword import QPassword
 from interfaces.newmessage.main import EditMessageWindow, NewMessageWindow
+
+logger = logging.getLogger(__name__)
 
 
 class Main(QMainWindow):
@@ -179,4 +182,4 @@ class Main(QMainWindow):
         self.exec_bot_button.setText("Executar o bot")
         self.exec_bot_button.clicked.disconnect(self.turnoff_bot)
         self.exec_bot_button.clicked.connect(self.init_bot)
-        self.log("Bot desligado!")
+        logger.info("Bot desligado!")
