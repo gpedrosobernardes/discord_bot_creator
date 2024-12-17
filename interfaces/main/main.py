@@ -41,14 +41,14 @@ class Main(QMainWindow):
 
         # Right Frame for Bot Controls
         right_frame = QVBoxLayout()
-        self.log_do_bot = QTextEdit()
-        self.log_do_bot.setPlaceholderText("No momento não há logs.")
-        self.log_do_bot.setReadOnly(True)
+        self.logs_text_edit = QTextEdit()
+        self.logs_text_edit.setPlaceholderText("No momento não há logs.")
+        self.logs_text_edit.setReadOnly(True)
 
         # Command Entry Frame
-        self.entrada_comandos = QLineEdit()
-        self.entrada_comandos.setPlaceholderText("Cmd")
-        self.entrada_comandos.returnPressed.connect(self.entry_command)
+        self.cmd_line_edit = QLineEdit()
+        self.cmd_line_edit.setPlaceholderText("Cmd")
+        self.cmd_line_edit.returnPressed.connect(self.entry_command)
 
         # Token Entry Frame
         self.token_widget = QPassword()
@@ -56,39 +56,39 @@ class Main(QMainWindow):
         self.token_widget.line_edit.returnPressed.connect(self.update_token)
 
         # Execute Bot Button
-        self.executar_o_bot = QPushButton("Executar o bot")
-        self.executar_o_bot.clicked.connect(self.init_bot)
+        self.exec_bot_button = QPushButton("Executar o bot")
+        self.exec_bot_button.clicked.connect(self.init_bot)
 
         # Adding Widgets to Right Frame
-        right_frame.addWidget(self.log_do_bot)
-        right_frame.addWidget(self.entrada_comandos)
+        right_frame.addWidget(self.logs_text_edit)
+        right_frame.addWidget(self.cmd_line_edit)
         right_frame.addWidget(QLabel("Token:"))
         right_frame.addWidget(self.token_widget)
-        right_frame.addWidget(self.executar_o_bot)
+        right_frame.addWidget(self.exec_bot_button)
 
         # Left Frame for Messages
         left_frame = QVBoxLayout()
 
-        editar_mensagem_button = QPushButton("Editar mensagem")
-        editar_mensagem_button.clicked.connect(self.edit_message)
+        edit_messages_button = QPushButton("Editar mensagem")
+        edit_messages_button.clicked.connect(self.edit_message)
 
-        self.todas_mensagens = QListWidget()
+        self.messages_list_widget = QListWidget()
 
-        adicionar_mensagem_button = QPushButton("Adicionar mensagem")
-        adicionar_mensagem_button.clicked.connect(self.open_new_message_window)
+        add_message_button = QPushButton("Adicionar mensagem")
+        add_message_button.clicked.connect(self.open_new_message_window)
 
-        remover_mensagem_button = QPushButton("Apagar mensagem")
-        remover_mensagem_button.clicked.connect(self.remove_message)
+        remove_message_button = QPushButton("Apagar mensagem")
+        remove_message_button.clicked.connect(self.remove_message)
 
-        remover_todas_mensagens_button = QPushButton("Apagar todas mensagens")
-        remover_todas_mensagens_button.clicked.connect(self.remove_all_message)
+        remove_all_message_button = QPushButton("Apagar todas mensagens")
+        remove_all_message_button.clicked.connect(self.remove_all_message)
 
         # Adding Widgets to Left Frame
-        left_frame.addWidget(self.todas_mensagens)
-        left_frame.addWidget(adicionar_mensagem_button)
-        left_frame.addWidget(editar_mensagem_button)
-        left_frame.addWidget(remover_mensagem_button)
-        left_frame.addWidget(remover_todas_mensagens_button)
+        left_frame.addWidget(self.messages_list_widget)
+        left_frame.addWidget(add_message_button)
+        left_frame.addWidget(edit_messages_button)
+        left_frame.addWidget(remove_message_button)
+        left_frame.addWidget(remove_all_message_button)
 
         main_layout.addLayout(left_frame)
         main_layout.addLayout(right_frame)
@@ -111,10 +111,10 @@ class Main(QMainWindow):
 
     def entry_command(self):
         """Handles commands for the bot's log entry."""
-        entrada = self.entrada_comandos.text()
-        if entrada in ["cls", "clear"]:
-            self.log_do_bot.clear()
-            self.entrada_comandos.clear()
+        cmd = self.cmd_line_edit.text()
+        if cmd in ["cls", "clear"]:
+            self.logs_text_edit.clear()
+            self.cmd_line_edit.clear()
 
     def update_token(self):
         """Updates the token in the "config.json" file and in the interface."""
@@ -125,53 +125,53 @@ class Main(QMainWindow):
 
     def edit_message(self):
         """Opens the NewMessage interface and loads saved information."""
-        lista_nomes = [
-            self.todas_mensagens.item(i).text()
-            for i in range(self.todas_mensagens.count())
+        names = [
+            self.messages_list_widget.item(i).text()
+            for i in range(self.messages_list_widget.count())
         ]
         try:
-            selecionado = lista_nomes[self.todas_mensagens.currentRow()]
-            self.message_window = EditMessageWindow(self, selecionado)
+            selected_message = names[self.messages_list_widget.currentRow()]
+            self.message_window = EditMessageWindow(self, selected_message)
             self.message_window.janela.exec()
         except IndexError:
             pass
 
     def remove_message(self):
         """Removes the selected message from the messages list and deletes it from "message and reply.json"."""
-        selecionado = self.todas_mensagens.currentRow()
-        if selecionado >= 0:
-            nome_selecionado = self.todas_mensagens.item(selecionado).text()
-            self.todas_mensagens.takeItem(selecionado)
+        selected_row = self.messages_list_widget.currentRow()
+        if selected_row >= 0:
+            selected_message = self.messages_list_widget.item(selected_row).text()
+            self.messages_list_widget.takeItem(selected_row)
             message_and_reply_json = load_json(paths.message_and_reply)
-            del message_and_reply_json[nome_selecionado]
+            del message_and_reply_json[selected_message]
             save_json(paths.message_and_reply, message_and_reply_json)
 
     def remove_all_message(self):
         """Removes all messages from the list."""
-        self.todas_mensagens.clear()
+        self.messages_list_widget.clear()
         save_json(paths.message_and_reply, {})
 
     def load_info_messages(self):
         """Loads all messages from "message and reply.json" and inserts them into the messages list."""
         try:
             all_messages = load_json(paths.message_and_reply)
-            for x in all_messages.keys():
-                self.todas_mensagens.addItem(x)
+            for message_name in all_messages.keys():
+                self.messages_list_widget.addItem(message_name)
         except JSONDecodeError:
             pass
 
     def log(self, message):
-        self.log_do_bot.insertPlainText(message)
+        self.logs_text_edit.insertPlainText(message)
 
     def change_init_bot_button(self):
-        self.executar_o_bot.setText("Desligar o bot")
-        self.executar_o_bot.clicked.disconnect(self.init_bot)
-        self.executar_o_bot.clicked.connect(self.turnoff_bot)
+        self.exec_bot_button.setText("Desligar o bot")
+        self.exec_bot_button.clicked.disconnect(self.init_bot)
+        self.exec_bot_button.clicked.connect(self.turnoff_bot)
 
     def turnoff_bot(self):
         self.bot.client.loop.create_task(self.bot.client.close())
         self.bot_thread.join()
-        self.executar_o_bot.setText("Executar o bot")
-        self.executar_o_bot.clicked.disconnect(self.turnoff_bot)
-        self.executar_o_bot.clicked.connect(self.init_bot)
+        self.exec_bot_button.setText("Executar o bot")
+        self.exec_bot_button.clicked.disconnect(self.turnoff_bot)
+        self.exec_bot_button.clicked.connect(self.init_bot)
         self.log("Bot desligado!")
