@@ -1,11 +1,12 @@
 import asyncio
-import os
+
 import discord
 import emoji
 from discord import Intents, LoginFailure
-from core.config import instance as config
+
 import interfaces.paths as paths
-from functions import load_json, write_log, clear_txt, hora_atual, random_choose
+from core.config import instance as config
+from core.functions import load_json, write_log, clear_txt, hora_atual, random_choose
 from interpreter.conditions import MessageConditions
 from interpreter.variable import Variable
 
@@ -69,33 +70,33 @@ class Bot:
                 await asyncio.sleep(delay)
 
         @self.client.event
-        async def send_reaction(reaction, message: discord.Message, where):
-            if reaction:
-                for r in reaction:
-                    code_reaction = r
-                    r = random_choose(r) if isinstance(r, list) else r
-                    r = emoji.emojize(r)
+        async def send_reaction(reactions, message: discord.Message, where):
+            if reactions:
+                for reaction in reactions:
+                    code_reaction = reaction
+                    reaction = random_choose(reaction) if isinstance(reaction, list) else reaction
+                    reaction = emoji.emojize(reaction)
                     try:
                         if where == 'author':
-                            await message.add_reaction(r)
+                            await message.add_reaction(reaction)
                         elif where == 'bot' and message.author.bot:
-                            await message.add_reaction(r)
+                            await message.add_reaction(reaction)
                         self.log(f'Adicionando a reação "{code_reaction}" a mensagem "{emoji.demojize(message.content)}" do autor {message.author}.')
                     except discord.HTTPException:
-                        print(r)
+                        print(reaction)
 
         @self.client.event
-        async def send_reply(reply, message: discord.Message, where):
-            if reply:
-                for r in reply:
-                    r = random_choose(r) if isinstance(r, list) else r
-                    r = Variable(message).apply_variable(r)
+        async def send_reply(replies, message: discord.Message, where):
+            if replies:
+                for reply in replies:
+                    reply = random_choose(reply) if isinstance(reply, list) else reply
+                    reply = Variable(message).apply_variable(reply)
                     if where == 'group':
-                        await message.channel.send(r)
+                        await message.channel.send(reply)
                     elif where == 'private':
                         dm_channel = await message.author.create_dm()
-                        await dm_channel.send(r)
-                    self.log(f'Enviando a resposta "{r}" há mensagem "{emoji.demojize(message.content)}" do author {message.author}.')
+                        await dm_channel.send(reply)
+                    self.log(f'Enviando a resposta "{reply}" há mensagem "{emoji.demojize(message.content)}" do author {message.author}.')
 
         @self.client.event
         async def remove_message(delete, message: discord.Message):

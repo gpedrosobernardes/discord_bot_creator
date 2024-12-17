@@ -20,7 +20,7 @@ from PySide6.QtWidgets import (
 )
 
 import interfaces.paths as path
-from functions import load_json, save_json, have_in
+from core.functions import load_json, save_json, have_in
 from interpreter.conditions import conditions_keys
 
 

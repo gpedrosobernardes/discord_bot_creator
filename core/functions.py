@@ -1,3 +1,6 @@
+from datetime import datetime
+
+
 def load_json(jsonfile) -> dict:
     import json
     with open(jsonfile, 'r') as json_file:
@@ -37,3 +40,6 @@ def write_log(text, file, mode='a', final='\n'):
 def clear_txt(file):
     with open(file, 'w') as arquivo:
         arquivo.write('')
+
+def get_time(string: str):
+    return datetime.now().strftime(string)

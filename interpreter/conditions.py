@@ -1,7 +1,8 @@
 import discord
-from functions import have_in
 import emoji
-import re
+
+from core.functions import have_in
+
 conditions_keys = [
     'expected message',
     'not expected message',
@@ -34,7 +35,7 @@ class MessageConditions:
 
         message = message
 
-        expected_message = False if expected_message == None else message.content == expected_message if type(expected_message) == str else message.content in expected_message
+        expected_message = False if expected_message is None else message.content == expected_message if type(expected_message) == str else message.content in expected_message
         not_expected_message = not expected_message
         mention_someone = True if len(message.mentions) >= 1 else False
         not_mention_someone = not mention_someone

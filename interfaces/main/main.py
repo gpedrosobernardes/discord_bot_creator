@@ -16,7 +16,7 @@ from PySide6.QtWidgets import (
 
 from bot import IntegratedBot
 from core.config import instance as config
-from functions import load_json, save_json
+from core.functions import load_json, save_json
 from interfaces import paths
 from interfaces.classes.qpassword import QPassword
 from interfaces.newmessage.main import EditMessageWindow, NewMessageWindow
