@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+<svg width="81.255" height="81.255" version="1.1" viewBox="0 0 81.255 81.255" xmlns="http://www.w3.org/2000/svg">
+ <g transform="translate(-26.034 -14.872)">
+  <g transform="translate(5.5085,17.709)">
+   <g transform="translate(-.48048 -117.7)" stroke="#000">
+    <rect x="31.07" y="141.23" width="61.154" height="37.795" fill="#405875" stroke-width="1.8898"/>
+    <g fill="#758ba7" stroke-width="1.8898">
+     <path transform="translate(-6.5424,93.463)" x="52.761402" y="38.493771" width="30.856936" height="9.2567329" d="m62.018 38.494h12.343a9.2567 9.2567 45 0 1 9.2567 9.2567v1e-6h-30.857v-1e-6a9.2567 9.2567 135 0 1 9.2567-9.2567z"/>
+     <rect transform="rotate(90)" x="152.68" y="-31.019" width="14.908" height="9.0682"/>
+     <rect transform="rotate(90)" x="152.68" y="-101.32" width="14.908" height="9.0682"/>
+    </g>
+    <g fill="#fff" stroke-width="1.1339">
+     <circle cx="46.745" cy="154.41" r="5.0795"/>
+     <circle cx="76.55" cy="154.41" r="5.0795"/>
+    </g>
+    <rect x="47.274" y="163.06" width="28.747" height="7.5814" fill="#758ba7" stroke-width="1.1339"/>
+   </g>
+  </g>
+ </g>
+</svg>
