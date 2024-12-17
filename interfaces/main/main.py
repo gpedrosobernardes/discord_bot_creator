@@ -97,9 +97,9 @@ class Main(QMainWindow):
 
     def open_new_message_window(self):
         if self.message_window:
-            self.message_window.janela.reject()
+            self.message_window.window.reject()
         self.message_window = NewMessageWindow(self)
-        self.message_window.janela.exec()
+        self.message_window.window.exec()
 
     @staticmethod
     def get_token():
@@ -132,7 +132,7 @@ class Main(QMainWindow):
         try:
             selected_message = names[self.messages_list_widget.currentRow()]
             self.message_window = EditMessageWindow(self, selected_message)
-            self.message_window.janela.exec()
+            self.message_window.window.exec()
         except IndexError:
             pass
 
