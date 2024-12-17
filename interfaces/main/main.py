@@ -19,7 +19,6 @@ from core.config import instance as config
 from functions import load_json, save_json
 from interfaces import paths
 from interfaces.classes.qpassword import QPassword
-from interfaces.fonts import *
 from interfaces.newmessage.main import EditMessageWindow, NewMessageWindow
 
 
@@ -43,18 +42,13 @@ class Main(QMainWindow):
         # Right Frame for Bot Controls
         right_frame = QVBoxLayout()
         self.log_do_bot = QTextEdit()
-        self.log_do_bot.setFont(arial)
+        self.log_do_bot.setPlaceholderText("No momento não há logs.")
         self.log_do_bot.setReadOnly(True)
 
         # Command Entry Frame
-        command_frame = QHBoxLayout()
         self.entrada_comandos = QLineEdit()
-        self.entrada_comandos.setFont(arial)
-        command_button = QPushButton(">")
-        command_button.clicked.connect(self.entry_command)
-
-        command_frame.addWidget(self.entrada_comandos)
-        command_frame.addWidget(command_button)
+        self.entrada_comandos.setPlaceholderText("Cmd")
+        self.entrada_comandos.returnPressed.connect(self.entry_command)
 
         # Token Entry Frame
         self.token_widget = QPassword()
@@ -67,7 +61,7 @@ class Main(QMainWindow):
 
         # Adding Widgets to Right Frame
         right_frame.addWidget(self.log_do_bot)
-        right_frame.addLayout(command_frame)
+        right_frame.addWidget(self.entrada_comandos)
         right_frame.addWidget(QLabel("Token:"))
         right_frame.addWidget(self.token_widget)
         right_frame.addWidget(self.executar_o_bot)
@@ -118,7 +112,7 @@ class Main(QMainWindow):
     def entry_command(self):
         """Handles commands for the bot's log entry."""
         entrada = self.entrada_comandos.text()
-        if entrada in ["/clear", "/limpar"]:
+        if entrada in ["cls", "clear"]:
             self.log_do_bot.clear()
             self.entrada_comandos.clear()
 
