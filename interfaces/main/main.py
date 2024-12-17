@@ -31,7 +31,7 @@ class Main(QMainWindow):
 
         self.message_window = None
         self.bot = IntegratedBot(self)
-        self.bot_thread = Thread(target=self.bot.run)
+        self.bot_thread = None
 
         # Central Widget and Layouts
         central_widget = QWidget()
@@ -107,6 +107,7 @@ class Main(QMainWindow):
         return config.get("token")
 
     def init_bot(self):
+        self.bot_thread = Thread(target=self.bot.run)
         self.bot_thread.start()
 
     def entry_command(self):
