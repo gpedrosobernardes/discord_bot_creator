@@ -30,7 +30,7 @@ class Main(QMainWindow):
         self.setWindowIcon(QIcon("source/icons/window-icon.svg"))
 
         self.message_window = None
-        self.bot = IntegratedBot(self)
+        self.bot = None
         self.bot_thread = None
 
         # Central Widget and Layouts
@@ -106,8 +106,12 @@ class Main(QMainWindow):
         """Returns the current token saved in the "config.json" file."""
         return config.get("token")
 
+    def __run_bot(self):
+        self.bot = IntegratedBot(self)
+        self.bot.run()
+
     def init_bot(self):
-        self.bot_thread = Thread(target=self.bot.run)
+        self.bot_thread = Thread(target=self.__run_bot)
         self.bot_thread.start()
 
     def entry_command(self):
