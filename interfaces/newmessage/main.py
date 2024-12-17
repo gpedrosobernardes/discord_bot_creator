@@ -1,14 +1,12 @@
-import tkinter as tk
+import typing
+
+from PySide6.QtWidgets import (QVBoxLayout, QHBoxLayout, QDialog, QGroupBox, QLabel, QFrame, QComboBox, QPushButton,
+                               QListWidget, QRadioButton, QSpinBox, QLineEdit)
 from json import JSONDecodeError
 import re
-
 from functions import load_json, save_json, have_in
-from interfaces.colors import *
-from interfaces.fonts import *
 import interfaces.paths as path
 import emoji
-
-from interfaces.tkclasses.SearchBox import SearchBox
 from interpreter.conditions import conditions_keys
 
 
@@ -16,552 +14,139 @@ class MessageWindow:
     def __init__(self, app):
         self.app = app
         self.name = None
-        self.variable_where_reaction = tk.StringVar()
+        self.janela = QDialog()
+        self.janela.setMinimumSize(800, 600)
+        self.janela.setWindowTitle("Mensagem")
 
-        self.janela = tk.Toplevel(
-            bg = azul_escuro,
-        )
-        self.janela.iconbitmap(path.interface_logo)
-        self.janela.minsize(
-            width = 733,
-            height = 458 
-        )
-        self.camada_1 = tk.Frame(
-            master = self.janela,
-            bg = azul_escuro
-        )
-        self.camada_2 = tk.Frame(
-            master = self.janela
-        )
-        self.camada_1.pack(
-            fill = tk.BOTH,
-            expand = True
-        )
+        left_layout = QVBoxLayout()
+        mid_layout = QVBoxLayout()
+        right_layout = QVBoxLayout()
 
-        frame_preenchimento = tk.Frame(
-            master = self.camada_1,
-            bg = azul_frame,
-            borderwidth = 10,
-        )
-        self.name_text = tk.Label(
-            master = frame_preenchimento,
-            text = "Nome:",
-            font = arial,
-            bg = azul_frame,
-        )
-        self.name_entry = tk.Entry(
-            master = frame_preenchimento,
-            font = arial,
-            bg = azul_entrada,
-            relief = tk.FLAT,
-            borderwidth = 1,
-            selectbackground = azul_selecionado
-        )
-        expected_message_text = tk.Label(
-            master = frame_preenchimento,
-            text = "Mensagem esperada",
-            font = arial,
-            bg = azul_frame,
-        )
-        expected_message = tk.Entry(
-            master = frame_preenchimento,
-            font = arial,
-            bg = azul_entrada,
-            relief = tk.FLAT,
-            borderwidth = 1,
-            selectbackground = azul_selecionado
-        )
-        reply_text = tk.Label(
-            master = frame_preenchimento,
-            text = 'Resposta',
-            font = arial,
-            bg = azul_frame,
-        )
-        reply = tk.Entry(
-            master = frame_preenchimento,
-            font = arial,
-            bg = azul_entrada,
-            relief = tk.FLAT,
-            borderwidth = 1,
-            selectbackground = azul_selecionado
-        )
-        reactions_text = tk.Label(
-            master = frame_preenchimento,
-            text = 'Reações',
-            font = arial,
-            bg= azul_frame,
-        )
-        reactions = SearchBox(
-            master = frame_preenchimento,
-            font = arial,
-            lista = [v["en"] for v in emoji.EMOJI_DATA.values()],
-            master_overlap = self.camada_2,
-            bg = azul_entrada,
-            relief = tk.FLAT,
-            borderwidth = 1,
-            selectbackground = azul_selecionado
-        )
-        conditions_text = tk.Label(
-            master = frame_preenchimento,
-            text = 'Condições',
-            font = arial,
-            bg = azul_frame,
-        )
-        conditions = SearchBox(
-            master = frame_preenchimento,
-            font = arial,
-            lista = conditions_keys,
-            master_overlap = self.camada_2,
-            bg = azul_entrada,
-            relief = tk.FLAT,
-            borderwidth = 1,
-            selectbackground = azul_selecionado
-        )
-        adicionar = tk.Button(
-            master = frame_preenchimento,
-            text = 'Adicionar',
-            command = self.insert_any_on_listbox,
-            bg = azul_entrada,
-            relief = tk.FLAT,
-            borderwidth = 1,
-        )
-        self.name_text.pack(
-            fill = tk.X,
-            expand = True
-        )
-        self.name_entry.pack(
-            fill = tk.X,
-            expand = True
-        )
-        conditions_text.pack(
-            fill = tk.X,
-            expand = True
-        )
-        conditions.pack(
-            fill = tk.X,
-            expand = True
-        )
-        expected_message_text.pack(
-            fill = tk.X,
-            expand = True
-        )
-        expected_message.pack(
-            fill = tk.X,
-            expand = True
-        )
-        reply_text.pack(
-            fill = tk.X,
-            expand = True
-        )
-        reply.pack(
-            fill = tk.X,
-            expand = True
-        )
-        reactions_text.pack(
-            fill = tk.X,
-            expand = True
-        )
-        reactions.pack(
-            fill = tk.X,
-            expand = True
-        )
-        adicionar.pack(
-            fill = tk.X,
-            expand = True,
-            pady = 10
-        )
-        frame_preenchimento.pack(
-            side = tk.LEFT,
-            fill = tk.BOTH,
-            expand = True
-        )
+        # Layouts
+        frame_preenchimento = QFrame(self.janela)
+        frame_preenchimento.setContentsMargins(10, 10, 10, 10)
 
-        expected_message.bind('<Return>', lambda event: self.insert_on_listbox(self.listbox_messages, expected_message))
-        reply.bind('<Return>', lambda event: self.insert_on_listbox(self.listbox_replys, reply))
-        reactions.bind('<Return>', lambda event: self.insert_on_listbox(self.listbox_reactions, reactions, limit = 19))
-        conditions.bind('<Return>', lambda event: self.insert_on_listbox(self.listbox_conditions, conditions))
-        self.name_entry.bind('<Return>', lambda event: self.update_name())
+        # Widgets
+        self.name_text = QLabel("Nome:", frame_preenchimento)
+        self.name_entry = QLineEdit(frame_preenchimento)
 
-        self.lista_de_entradas = [expected_message, reply, reactions, conditions]
+        expected_message_text = QLabel("Mensagem esperada", frame_preenchimento)
+        self.expected_message = QLineEdit(frame_preenchimento)
 
-        frame_das_listas = tk.LabelFrame(
-            master = self.camada_1,
-            text = 'Listas',
-            bg = azul_frame,
-            relief = tk.FLAT,
-            bd = 10
-        )
-        listbox_conditions_text = tk.Label(
-            master = frame_das_listas,
-            text = 'Condições',
-            bg = azul_frame
-        )
-        self.listbox_conditions = tk.Listbox(
-            master = frame_das_listas,
-            selectmode = tk.MULTIPLE,
-            bg = azul_entrada,
-            relief = tk.FLAT,
-            borderwidth = 1,
-            activestyle = 'none',
-            selectbackground = azul_selecionado
-        )
-        listbox_reactions_text = tk.Label(
-            master = frame_das_listas,
-            text = 'Reações',
-            bg = azul_frame
-        )
-        self.listbox_reactions = tk.Listbox(
-            master = frame_das_listas,
-            selectmode = tk.MULTIPLE,
-            bg = azul_entrada,
-            relief = tk.FLAT,
-            borderwidth = 1,
-            activestyle = 'none',
-            selectbackground = azul_selecionado
-        )
-        listbox_messages_text = tk.Label(
-            master = frame_das_listas,
-            text = 'Mensagens',
-            bg = azul_frame
-        )
-        self.listbox_messages = tk.Listbox(
-            master = frame_das_listas,
-            selectmode = tk.MULTIPLE,
-            bg =azul_entrada,
-            relief = tk.FLAT,
-            borderwidth = 1,
-            activestyle = 'none',
-            selectbackground = azul_selecionado
-        )
-        listbox_replys_text = tk.Label(
-            master= frame_das_listas,
-            text = 'Respostas',
-            bg= azul_frame,
-        )
-        self.listbox_replys = tk.Listbox(
-            master = frame_das_listas,
-            selectmode = tk.MULTIPLE,
-            bg = azul_entrada,
-            relief = tk.FLAT,
-            borderwidth = 1,
-            activestyle = 'none',
-            selectbackground = azul_selecionado
-        )
-        remover = tk.Button(
-            master = frame_das_listas,
-            text = 'Remover',
-            command = self.remove_selected_on_listbox,
-            bg = azul_entrada,
-            relief = tk.FLAT,
-            borderwidth = 1
-        )
-        remover_todos = tk.Button(
-            master = frame_das_listas,
-            text = 'Remover todos',
-            command = self.remove_all_on_listbox,
-            bg = azul_entrada,
-            relief = tk.FLAT,
-            borderwidth = 1
-        )
-        listbox_conditions_text.grid(
-            row = 0,
-            column = 1,
-            padx = 10
-        )
-        self.listbox_conditions.grid(
-            row = 1,
-            column = 1,
-            padx = 10
-        )
-        listbox_replys_text.grid(
-            row = 2,
-            column = 1,
-            padx = 10
-        )
-        self.listbox_replys.grid(
-            row = 3,
-            column = 1,
-            padx = 10
-        )
-        listbox_messages_text.grid(
-            row = 0,
-            column = 2,
-            padx = 10
-        )
-        self.listbox_messages.grid(
-            row = 1,
-            column = 2,
-            padx = 10
-        )
-        listbox_reactions_text.grid(
-            row = 2,
-            column = 2,
-            padx = 10
-        )
-        self.listbox_reactions.grid(
-            row = 3,
-            column = 2,
-            padx = 10
-        )
-        remover.grid(
-            row = 4,
-            column = 1,
-            pady = 10
-        )
-        remover_todos.grid(
-            row = 4,
-            column = 2,
-            pady = 10
-        )
-        frame_das_listas.pack(
-            padx = 50,
-            side = tk.LEFT,
-            fill = tk.Y,
-            expand = True
-        )
+        reply_text = QLabel('Resposta', frame_preenchimento)
+        self.reply = QLineEdit(frame_preenchimento)
 
-        self.lista_de_listbox = [
-            self.listbox_messages,
-            self.listbox_replys,
-            self.listbox_reactions,
-            self.listbox_conditions]
+        reactions_text = QLabel('Reações', frame_preenchimento)
+        self.reactions = QComboBox()
+        self.reactions.addItems([""] + [v["en"] for v in emoji.EMOJI_DATA.values()])
 
-        self.listbox_messages.bind('<Delete>', lambda event: self.remove_selected_on_currently_listbox(self.listbox_messages))
-        self.listbox_replys.bind('<Delete>', lambda event: self.remove_selected_on_currently_listbox(self.listbox_replys))
-        self.listbox_reactions.bind('<Delete>', lambda event: self.remove_selected_on_currently_listbox(self.listbox_reactions))
-        self.listbox_conditions.bind('<Delete>', lambda event: self.remove_selected_on_currently_listbox(self.listbox_conditions))
+        conditions_text = QLabel('Condições', frame_preenchimento)
+        self.conditions = QComboBox()
+        self.conditions.addItems([""] + conditions_keys)
 
-        frame_inferior = tk.Frame(
-            master=self.camada_1,
-            bg=azul_frame,
-            bd=10
-        )
-        frame_delay = tk.Frame(
-            master=frame_inferior,
-            bg=azul_frame
-        )
-        delay_text = tk.Label(
-            master=frame_delay,
-            text='Delay',
-            bg=azul_frame
-        )
-        self.delay_variable = tk.StringVar()
-        self.delay_variable.set('0')
+        adicionar = QPushButton('Adicionar', frame_preenchimento)
 
-        self.delay = tk.Spinbox(
-            master=frame_delay,
-            bg=azul_entrada,
-            textvariable=self.delay_variable,
-            width=10,
-            from_=0,
-            to=10,
-            vcmd=(frame_delay.register(self.delayvalidate), '%P'),
-            validate='key'
-        )
-        save = tk.Button(
-            master=frame_inferior,
-            text='Salvar',
-            command=self.on_save,
-            bg=azul_entrada,
-            relief=tk.FLAT,
-            borderwidth=1
-        )
-        frame_pin_or_del = tk.Frame(
-            master=frame_inferior,
-            bg=azul_frame
-        )
-        self.pin_or_del = tk.StringVar()
-        self.pin_or_del.set('None')
-        pin = tk.Radiobutton(
-            master=frame_pin_or_del,
-            text='Fixar',
-            variable=self.pin_or_del,
-            value='Fixar',
-            bg=azul_frame,
-        )
-        delete = tk.Radiobutton(
-            master=frame_pin_or_del,
-            text='Remover',
-            variable=self.pin_or_del,
-            value='Remover',
-            bg=azul_frame,
-        )
-        frame_kick_or_ban = tk.Frame(
-            master=frame_inferior,
-            bg=azul_frame
-        )
-        self.kick_or_del = tk.StringVar()
-        self.kick_or_del.set('None')
-        kick = tk.Radiobutton(
-            master=frame_kick_or_ban,
-            text='Expulsar',
-            variable=self.kick_or_del,
-            value='Expulsar',
-            bg=azul_frame
-        )
-        ban = tk.Radiobutton(
-            master=frame_kick_or_ban,
-            text='Banir',
-            variable=self.kick_or_del,
-            value='Banir',
-            bg=azul_frame
-        )
-        self.variable_where_reply = tk.StringVar()
-        self.variable_where_reply.set('group')
-        frame_where_reply = tk.Frame(
-            master=frame_inferior,
-            bg=azul_frame
-        )
-        label_where_reply = tk.Label(
-            master=frame_where_reply,
-            text='Onde responder',
-            bg=azul_frame,
-        )
-        group = tk.Radiobutton(
-            master=frame_where_reply,
-            text='Grupo',
-            bg=azul_frame,
-            variable=self.variable_where_reply,
-            value='group'
-        )
-        private = tk.Radiobutton(
-            master=frame_where_reply,
-            text='Privada',
-            bg=azul_frame,
-            variable=self.variable_where_reply,
-            value='private'
-        )
+        # Layout setup
+        for widget in [self.name_text, self.name_entry, expected_message_text, self.expected_message,
+                       reply_text, self.reply, reactions_text, self.reactions, conditions_text, self.conditions]:
+            left_layout.addWidget(widget)
 
-        self.variable_where_reaction.set('author')
-        frame_where_reaction = tk.Frame(
-            master=frame_inferior,
-            bg=azul_frame
-        )
-        label_where_reaction = tk.Label(
-            master=frame_where_reaction,
-            text='Onde reagir',
-            bg=azul_frame,
-        )
-        bot = tk.Radiobutton(
-            master=frame_where_reaction,
-            text='Bot',
-            variable=self.variable_where_reaction,
-            bg=azul_frame,
-            value='bot',
-        )
-        author = tk.Radiobutton(
-            master=frame_where_reaction,
-            text='Autor',
-            variable=self.variable_where_reaction,
-            bg=azul_frame,
-            value='author'
-        )
-        save_and_quit = tk.Button(
-            master=frame_inferior,
-            text='Salvar e sair',
-            command=self.on_save_and_quit,
-            bg=azul_entrada,
-            relief=tk.FLAT,
-            borderwidth=1,
-        )
-        save.grid(
-            row=1,
-            column=1,
-            padx=10,
-            pady=10
-        )
-        save_and_quit.grid(
-            row=2,
-            column=1,
-        )
-        frame_pin_or_del.grid(
-            row=3,
-            column=1,
-            pady=10
-        )
-        pin.grid(
-            row=1,
-            column=1,
-            sticky=tk.W
-        )
-        delete.grid(
-            row=2,
-            column=1,
-            sticky=tk.W
-        )
-        frame_kick_or_ban.grid(
-            row=4,
-            column=1,
-        )
-        kick.grid(
-            row=1,
-            column=1,
-            sticky=tk.W
-        )
-        ban.grid(
-            row=2,
-            column=1,
-            sticky=tk.W
-        )
-        frame_where_reply.grid(
-            row=5,
-            column=1
-        )
-        label_where_reply.grid(
-            row=1,
-            column=1
-        )
-        group.grid(
-            row=2,
-            column=1,
-            sticky=tk.W
-        )
-        private.grid(
-            row=3,
-            column=1,
-            sticky=tk.W
-        )
-        frame_where_reaction.grid(
-            row=6,
-            column=1
-        )
-        label_where_reaction.grid(
-            row=1,
-            column=1
-        )
-        bot.grid(
-            row=2,
-            column=1,
-            sticky=tk.W
-        )
-        author.grid(
-            row=3,
-            column=1,
-            sticky=tk.W
-        )
-        frame_delay.grid(
-            row=7,
-            column=1,
-            pady=10
-        )
-        delay_text.grid(
-            row=1,
-            column=1
-        )
-        self.delay.grid(
-            row=2,
-            column=1
-        )
-        frame_inferior.pack(
-            side=tk.BOTTOM,
-            fill=tk.Y,
-            expand=True
-        )
+        left_layout.addStretch()
+        left_layout.addWidget(adicionar)
 
-        pin.bind('<Button-3>', lambda event: self.pin_or_del.set('None'))
-        delete.bind('<Button-3>', lambda event: self.pin_or_del.set('None'))
-        kick.bind('<Button-3>', lambda event: self.kick_or_del.set('None'))
-        ban.bind('<Button-3>', lambda event: self.kick_or_del.set('None'))
+        # Listboxes setup
+        frame_das_listas = QFrame(self.janela)
+
+        listbox_conditions_text = QLabel('Condições', frame_das_listas)
+        self.listbox_conditions = QListWidget(frame_das_listas)
+
+        listbox_reactions_text = QLabel('Reações', frame_das_listas)
+        self.listbox_reactions = QListWidget(frame_das_listas)
+
+        listbox_messages_text = QLabel('Mensagens', frame_das_listas)
+        self.listbox_messages = QListWidget(frame_das_listas)
+
+        listbox_replies_text = QLabel('Respostas', frame_das_listas)
+        self.listbox_replies = QListWidget(frame_das_listas)
+
+        remover = QPushButton('Remover', frame_das_listas)
+        remover_todos = QPushButton('Remover todos', frame_das_listas)
+
+        # Adding widgets to layout
+        for widget in [listbox_conditions_text, self.listbox_conditions,
+                       listbox_replies_text, self.listbox_replies,
+                       listbox_messages_text, self.listbox_messages,
+                       listbox_reactions_text, self.listbox_reactions,
+                       remover, remover_todos]:
+            mid_layout.addWidget(widget)
+
+        frame_options = QFrame(self.janela)
+
+        # Pin or delete options using QCheckBox instead of QRadioButton
+        self.group_pin_or_del = QGroupBox('Tratativa', frame_options)
+        layout_pin_or_del = QVBoxLayout(self.group_pin_or_del)
+
+        self.pin_checkbox = QRadioButton('Fixar')
+
+        layout_pin_or_del.addWidget(self.pin_checkbox)
+        self.delete_checkbox = QRadioButton('Remover')
+        layout_pin_or_del.addWidget(self.delete_checkbox)
+
+        # Kick or ban options using QCheckBox instead of QRadioButton
+        self.group_kick_or_ban = QGroupBox('Penalidade', frame_options)
+        layout_kick_or_ban = QVBoxLayout(self.group_kick_or_ban)
+
+        self.kick_checkbox = QRadioButton('Expulsar')
+        layout_kick_or_ban.addWidget(self.kick_checkbox)
+        self.ban_checkbox = QRadioButton('Banir')
+        layout_kick_or_ban.addWidget(self.ban_checkbox)
+
+        # Where to reply options using QCheckBox instead of QRadioButton
+        self.group_where_reply = QGroupBox('Onde responder', frame_options)
+        layout_frame_where_reply = QVBoxLayout(self.group_where_reply)
+
+        self.group_checkbox = QRadioButton('Grupo')
+        self.group_checkbox.setObjectName("group")
+        layout_frame_where_reply.addWidget(self.group_checkbox)
+        self.private_checkbox = QRadioButton('Privada')
+        self.private_checkbox.setObjectName("private")
+        layout_frame_where_reply.addWidget(self.private_checkbox)
+
+        # Where to react options using QCheckBox instead of QRadioButton
+        self.group_where_react = QGroupBox('Onde reagir')
+        layout_where_reaction = QVBoxLayout(self.group_where_react)
+
+        self.bot_checkbox = QRadioButton('Bot')
+        self.bot_checkbox.setObjectName("bot")
+        layout_where_reaction.addWidget(self.bot_checkbox)
+        self.author_checkbox = QRadioButton('Autor')
+        self.author_checkbox.setObjectName("author")
+        layout_where_reaction.addWidget(self.author_checkbox)
+
+        delay_label = QLabel("Delay:")
+        self.delay = QSpinBox()
+
+        # Save and quit button
+        save_and_quit_button = QPushButton('Salvar e sair', frame_options)
+
+        for widget in (self.group_pin_or_del, self.group_kick_or_ban, self.group_where_reply, self.group_where_react,
+                       delay_label, self.delay):
+            right_layout.addWidget(widget)
+
+        right_layout.addStretch()
+        right_layout.addWidget(save_and_quit_button)
+
+        main_layout = QHBoxLayout()
+        main_layout.addLayout(left_layout)
+        main_layout.addLayout(mid_layout)
+        main_layout.addLayout(right_layout)
+
+        self.janela.setLayout(main_layout)
+
+        remover.clicked.connect(self.remove_all_selected_on_listbox)
+        remover_todos.clicked.connect(self.remove_all_on_listbox)
+        save_and_quit_button.clicked.connect(self.on_save_and_quit)
+        adicionar.clicked.connect(self.insert_any_on_listbox)
 
     def on_save_and_quit(self):
         self.save_and_quit()
@@ -570,60 +155,49 @@ class MessageWindow:
         self.save()
 
     @staticmethod
-    def delayvalidate(P):
-        if re.search(r'^[0-9]?$|^10$', P):
-            return True
-        else:
-            return False
-
-    @staticmethod
-    def insert_on_listbox(listbox: tk.Listbox, entry: tk.Entry, limit: int = 0):
+    def insert_on_listbox(listbox: QListWidget, entry: typing.Union[QLineEdit, QComboBox], limit: int = 0):
         """insere um valor na listbox especificada e apaga o conteúdo da entry especificada,
         se um limite for especificado ele vai checar se o limite da listbox não foi atingido """
-        if not entry.get() == '':
-            tamanho_listbox = len(set(listbox.get(0, tk.END)))
+        value = entry.text() if isinstance(entry, QLineEdit) else entry.currentText()
+        if value:
+            tamanho_listbox = listbox.count()
             if not tamanho_listbox > limit or limit == 0:
-                listbox.insert(tk.END, entry.get())
-                entry.delete(0, tk.END)
+                listbox.addItem(value)
+                entry.clear()
 
     def insert_any_on_listbox(self):
-        for x in range(4):
-            entrada_atual: tk.Entry = self.lista_de_entradas[x]
-            listbox_atual: tk.Listbox = self.lista_de_listbox[x]
-            if x == 2:
-                # x = 2 se refere ao listbox de reactions no discord o limite de reações por mensagem é de 20
-                # ou seja a gente precisa limitar a quantidade de reactions.
-                self.insert_on_listbox(listbox_atual, entrada_atual, limit=19)
-            else:
-                self.insert_on_listbox(listbox_atual, entrada_atual)
-        self.update_name()
+        for listbox, entrada in zip(self.__all_listbox(), self.__all_entries()):
+            # se for o reactions, no discord o limite de reações por mensagem é de 20,
+            # ou seja, a gente precisa limitar a quantidade de reactions.
+            self.insert_on_listbox(listbox, entrada, limit=19 if entrada == self.reactions else 0)
 
     def update_name(self):
-        self.name = self.name_entry.get()
-        self.name_entry.delete(0, tk.END)
-        self.name_text['text'] = f"Nome: {self.name}"
-
-    def remove_selected_on_listbox(self):
-        """remove um item selecionado na listbox"""
-        for lb in self.lista_de_listbox:
-            lb: tk.Listbox
-            if len(lb.curselection()) > 0:
-                selecionados = lb.curselection()
-                for x in selecionados:
-                    lb.delete(x - selecionados.index(x))
+        self.name = self.name_entry.text()
+        self.name_entry.clear()
+        self.name_text.setText(f"Nome: {self.name}")
 
     @staticmethod
-    def remove_selected_on_currently_listbox(lb: tk.Listbox):
-        """remove os items da listbox especificada"""
-        selecionados = lb.curselection()
-        for x in selecionados:
-            lb.delete(x - selecionados.index(x))
+    def remove_selected_on_listbox(listbox: QListWidget):
+        """remove um item selecionado na listbox"""
+        for item in listbox.selectedItems():
+            listbox.takeItem(listbox.indexFromItem(item).row())
+
+    def remove_all_selected_on_listbox(self):
+        for listbox in self.__all_listbox():
+            self.remove_selected_on_listbox(listbox)
 
     def remove_all_on_listbox(self):
         """remove todos os items em todas listbox"""
-        for x in self.lista_de_listbox:
-            x: tk.Listbox
-            x.delete(0, tk.END)
+        for listbox in self.__all_listbox():
+            listbox: QListWidget
+            listbox.clear()
+
+    def __all_listbox(self):
+        return self.listbox_messages, self.listbox_replies, self.listbox_reactions, self.listbox_conditions
+
+    def __all_entries(self):
+        return self.expected_message, self.reply, self.reactions, self.conditions
+
 
     def save(self):
         """salva toda a informação que o usuário preencheu na interface em forma de json, para que depois
@@ -658,32 +232,34 @@ class MessageWindow:
 
         dict_base[name] = {}
 
-        lista_expected_message = self.listbox_messages.get(0, tk.END)
+        lista_expected_message = [self.listbox_messages.item(i).text() for i in range(self.listbox_messages.count())]
         dict_base[name]['expected message'] = lista_expected_message if not len(lista_expected_message) == 0 else None
 
-        lista_reply = self.listbox_replys.get(0, tk.END)
-        dict_base[name]['reply'] = list(map(lambda x: x.split('¨'), lista_reply)) if have_in(lista_reply, '¨',
-                                                                                             reverse=True) else lista_reply if not len(
-            lista_reply) == 0 else None
+        lista_reply = [self.listbox_replies.item(i).text() for i in range(self.listbox_replies.count())]
+        dict_base[name]['reply'] = list(
+            map(lambda x: x.split('¨'), lista_reply)
+        ) if have_in(lista_reply, '¨', reverse=True) else lista_reply if not len(lista_reply) == 0 else None
 
-        lista_reactions = self.listbox_reactions.get(0, tk.END)
+        lista_reactions = [self.listbox_reactions.item(i).text() for i in range(self.listbox_reactions.count())]
         dict_base[name]['reaction'] = list(
             map(lambda x: re.findall(r':[a-zA-Z_0-9]+:', x), lista_reactions)) if not len(
             lista_reactions) == 0 else None
 
-        lista_conditions = self.listbox_conditions.get(0, tk.END)
+        lista_conditions = [self.listbox_conditions.item(i).text() for i in range(self.listbox_conditions.count())]
         dict_base[name]['conditions'] = lista_conditions if not len(lista_conditions) == 0 else None
 
-        if self.pin_or_del.get() == 'Fixar':
+        if self.pin_checkbox.isChecked():
             dict_base[name]['pin'] = True
-        elif self.pin_or_del.get() == 'Remover':
+        elif self.delete_checkbox.isChecked():
             dict_base[name]['delete'] = True
 
-        dict_base[name]['where reply'] = self.variable_where_reply.get()
+        selected_where_reply = self.__get_checked(self.group_where_reply)
+        if selected_where_reply: dict_base[name]['where reply'] = selected_where_reply.objectName()
 
-        dict_base[name]['where reaction'] = self.variable_where_reaction.get()
+        selected_where_react = self.__get_checked(self.group_where_react)
+        if selected_where_react: dict_base[name]['where reaction'] = selected_where_react.objectName()
 
-        dict_base[name]['delay'] = self.delay.get()
+        dict_base[name]['delay'] = self.delay.value()
 
         save_json(path.message_and_reply, dict_base)
 
@@ -691,13 +267,22 @@ class MessageWindow:
         self.save()
         self.janela.destroy()
 
+    @staticmethod
+    def __get_checked(groupbox: QGroupBox):
+        """Returns the checked radio button from the groupbox"""
+
+        for child in groupbox.layout().children():
+            child: QRadioButton
+            if child.isChecked():
+                return child
+
 
 class EditMessageWindow(MessageWindow):
     def __init__(self, app, load):
         super().__init__(app)
         self.name = load
-        self.name_entry.insert(0, self.name)
-        self.name_entry.config(state=tk.DISABLED)
+        self.name_entry.setText(self.name)
+        self.name_entry.setEnabled(False)
         self.load_info()
 
     def load_info(self):
@@ -708,42 +293,48 @@ class EditMessageWindow(MessageWindow):
                 expected_message = todas_info['expected message']
                 if expected_message:
                     for x in expected_message:
-                        self.listbox_messages.insert(tk.END, x)
+                        self.listbox_messages.addItem(x)
             if 'reply' in todas_info:
                 reply = todas_info['reply']
                 if reply:
                     for x in reply:
-                        self.listbox_replys.insert(tk.END, '¨'.join(x)) if type(
-                            x) == list else self.listbox_replys.insert(tk.END, x)
+                        self.listbox_replies.addItem('¨'.join(x)) if type(
+                            x) == list else self.listbox_replies.addItem(x)
             if 'reaction' in todas_info:
                 reaction = todas_info['reaction']
                 if reaction:
-                    list(map(lambda x: self.listbox_reactions.insert(tk.END, ' '.join(x)), reaction))
+                    list(map(lambda x: self.listbox_reactions.addItem(' '.join(x)), reaction))
             if 'conditions' in todas_info:
                 conditions = todas_info['conditions']
                 if conditions:
                     for x in conditions:
-                        self.listbox_conditions.insert(tk.END, x)
+                        self.listbox_conditions.addItem(x)
             if 'pin' in todas_info:
                 pin = todas_info['pin']
                 if pin:
-                    self.pin_or_del.set('Fixar')
+                    self.pin_checkbox.setChecked(True)
             if 'delete' in todas_info:
                 delete = todas_info['delete']
                 if delete:
-                    self.pin_or_del.set('Remover')
+                    self.delete_checkbox.setChecked(True)
 
             if 'delay' in todas_info:
-                delay = todas_info['delay']
-                self.delay_variable.set(delay)
+                delay = int(todas_info['delay'])
+                self.delay.setValue(delay)
 
             if 'where reply' in todas_info:
                 where_reply = todas_info['where reply']
-                self.variable_where_reply.set(where_reply)
+                if where_reply == "group":
+                    self.group_checkbox.setChecked(True)
+                else:
+                    self.private_checkbox.setChecked(True)
 
             if 'where reaction' in todas_info:
                 where_reaction = todas_info['where reaction']
-                self.variable_where_reaction.set(where_reaction)
+                if where_reaction == "author":
+                    self.author_checkbox.setChecked(True)
+                else:
+                    self.bot_checkbox.setChecked(True)
 
 
 class NewMessageWindow(MessageWindow):
