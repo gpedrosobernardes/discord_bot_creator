@@ -29,7 +29,7 @@ class MessageWindow:
         self.app = app
         self.name = None
         self.janela = QDialog()
-        self.janela.setWindowIcon(QIcon("source/img/window-icon.svg"))
+        self.janela.setWindowIcon(QIcon("source/icons/window-icon.svg"))
         self.janela.setMinimumSize(800, 600)
         self.janela.setWindowTitle("Mensagem")
 

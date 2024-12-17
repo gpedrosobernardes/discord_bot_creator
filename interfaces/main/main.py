@@ -8,16 +8,17 @@ from PySide6.QtWidgets import (
     QVBoxLayout,
     QHBoxLayout,
     QPushButton,
-    QLabel,
     QLineEdit,
     QTextEdit,
     QListWidget,
+    QLabel,
 )
 
 from bot import IntegratedBot
 from core.config import instance as config
 from functions import load_json, save_json
 from interfaces import paths
+from interfaces.classes.qpassword import QPassword
 from interfaces.fonts import *
 from interfaces.newmessage.main import EditMessageWindow, NewMessageWindow
 
@@ -27,7 +28,7 @@ class Main(QMainWindow):
         super().__init__()
         self.setWindowTitle("Bot Discord Easy Creator")
         self.setMinimumSize(800, 600)
-        self.setWindowIcon(QIcon("source/img/window-icon.svg"))
+        self.setWindowIcon(QIcon("source/icons/window-icon.svg"))
 
         self.message_window = None
         self.bot = IntegratedBot(self)
@@ -56,13 +57,9 @@ class Main(QMainWindow):
         command_frame.addWidget(command_button)
 
         # Token Entry Frame
-        token_frame = QHBoxLayout()
-        self.inserir_token = QLineEdit()
-        token_button = QPushButton(">")
-        token_button.clicked.connect(self.update_token)
-
-        token_frame.addWidget(self.inserir_token)
-        token_frame.addWidget(token_button)
+        self.token_widget = QPassword()
+        self.token_widget.line_edit.setText(config.get("token"))
+        self.token_widget.line_edit.returnPressed.connect(self.update_token)
 
         # Execute Bot Button
         self.executar_o_bot = QPushButton("Executar o bot")
@@ -71,11 +68,8 @@ class Main(QMainWindow):
         # Adding Widgets to Right Frame
         right_frame.addWidget(self.log_do_bot)
         right_frame.addLayout(command_frame)
-        right_frame.addLayout(token_frame)
-
-        self.token_label = QLabel(f"Token:\n{self.get_token()}")
-
-        right_frame.addWidget(self.token_label)
+        right_frame.addWidget(QLabel("Token:"))
+        right_frame.addWidget(self.token_widget)
         right_frame.addWidget(self.executar_o_bot)
 
         # Left Frame for Messages
@@ -130,8 +124,7 @@ class Main(QMainWindow):
 
     def update_token(self):
         """Updates the token in the "config.json" file and in the interface."""
-        token = self.inserir_token.text()
-        self.token_label.setText(f"Token:\n{token}")
+        token = self.token_widget.line_edit.text()
         config.set("token", token)
         config.save()
         # Update label with new token (assuming you have a QLabel for it)

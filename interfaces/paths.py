@@ -1,7 +1,7 @@
-source = 'source/'
-img = source+'img/'
-message_and_reply = source+'message and reply.json'
-config = source+'config.json'
-bot = 'bot.py'
-log = 'log.txt'
-interface_logo = img+'logo.ico'
+source = "source/"
+img = source + "icons/"
+message_and_reply = source + "message and reply.json"
+config = source + "config.json"
+bot = "bot.py"
+log = "log.txt"
+interface_logo = img + "logo.ico"
