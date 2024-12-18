@@ -1,6 +1,5 @@
 import logging
 import typing
-from json import JSONDecodeError
 from threading import Thread
 
 from PySide6.QtGui import QIcon
@@ -18,8 +17,7 @@ from PySide6.QtWidgets import (
 
 from bot import IntegratedBot
 from core.config import instance as config
-from core.functions import load_json, save_json
-from interfaces import paths
+from core.messages import messages
 from interfaces.classes.qpassword import QPassword
 from interfaces.newmessage.main import EditMessageWindow, NewMessageWindow
 
@@ -74,18 +72,18 @@ class Main(QMainWindow):
         left_frame = QVBoxLayout()
 
         edit_messages_button = QPushButton("Editar mensagem")
-        edit_messages_button.clicked.connect(self.edit_message)
+        edit_messages_button.clicked.connect(self.edit_selected_message)
 
         self.messages_list_widget = QListWidget()
 
         add_message_button = QPushButton("Adicionar mensagem")
-        add_message_button.clicked.connect(self.open_new_message_window)
+        add_message_button.clicked.connect(self.new_message)
 
         remove_message_button = QPushButton("Apagar mensagem")
-        remove_message_button.clicked.connect(self.remove_message)
+        remove_message_button.clicked.connect(self.remove_selected_message)
 
         remove_all_message_button = QPushButton("Apagar todas mensagens")
-        remove_all_message_button.clicked.connect(self.remove_all_message)
+        remove_all_message_button.clicked.connect(self.clear_messages)
 
         # Adding Widgets to Left Frame
         left_frame.addWidget(self.messages_list_widget)
@@ -97,12 +95,17 @@ class Main(QMainWindow):
         main_layout.addLayout(left_frame)
         main_layout.addLayout(right_frame)
 
-        self.load_info_messages()
+        self.load_messages()
 
-    def open_new_message_window(self):
+    def new_message(self):
         if self.message_window:
             self.message_window.window.reject()
         self.message_window = NewMessageWindow(self)
+        self.message_window.window.accepted.connect(
+            lambda: self.accepted_new_message(
+                self.message_window.get_name(), self.message_window.get_data()
+            )
+        )
         self.message_window.window.exec()
 
     @staticmethod
@@ -130,23 +133,41 @@ class Main(QMainWindow):
         token = self.token_widget.line_edit.text()
         config.set("token", token)
         config.save()
-        # Update label with new token (assuming you have a QLabel for it)
 
-    def edit_message(self):
+    def edit_selected_message(self):
         """Opens the NewMessage interface and loads saved information."""
         try:
             _, selected_message = self.__get_selected_message()
         except IndexError:
             pass
         else:
-            self.message_window = EditMessageWindow(self, selected_message)
+            self.message_window = EditMessageWindow(
+                self, selected_message, messages.get(selected_message)
+            )
+            self.message_window.window.accepted.connect(
+                lambda: self.accepted_edit_selected_message(
+                    selected_message, self.message_window.get_data()
+                )
+            )
             self.message_window.window.exec()
+
+    @staticmethod
+    def accepted_edit_selected_message(message_name: str, message_data: dict):
+        messages.set(message_name, message_data)
+        messages.save()
+
+    def accepted_new_message(self, message_name: str, message_data: dict):
+        if not message_name:
+            message_name = messages.new_id()
+        messages.set(message_name, message_data)
+        messages.save()
+        self.messages_list_widget.addItem(message_name)
 
     def __get_selected_message(self) -> typing.Tuple[int, str]:
         index = self.messages_list_widget.selectedIndexes()[0].row()
         return index, self.messages_list_widget.item(index).text()
 
-    def remove_message(self):
+    def remove_selected_message(self):
         """Removes the selected message from the messages list and deletes it from "message and reply.json"."""
         try:
             selected_row, selected_message = self.__get_selected_message()
@@ -154,23 +175,20 @@ class Main(QMainWindow):
             pass
         else:
             self.messages_list_widget.takeItem(selected_row)
-            message_and_reply_json = load_json(paths.message_and_reply)
-            del message_and_reply_json[selected_message]
-            save_json(paths.message_and_reply, message_and_reply_json)
+            messages.delete(selected_message)
+            messages.save()
 
-    def remove_all_message(self):
+    def clear_messages(self):
         """Removes all messages from the list."""
         self.messages_list_widget.clear()
-        save_json(paths.message_and_reply, {})
+        messages.clear()
+        messages.save()
 
-    def load_info_messages(self):
+    def load_messages(self):
         """Loads all messages from "message and reply.json" and inserts them into the messages list."""
-        try:
-            all_messages = load_json(paths.message_and_reply)
-            for message_name in all_messages.keys():
-                self.messages_list_widget.addItem(message_name)
-        except JSONDecodeError:
-            pass
+        messages.load()
+        for message_name in messages.message_names():
+            self.messages_list_widget.addItem(message_name)
 
     def log(self, message):
         self.logs_text_edit.insertPlainText(message)

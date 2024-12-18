@@ -5,9 +5,9 @@ import discord
 import emoji
 from discord import Intents, LoginFailure
 
-import interfaces.paths as paths
 from core.config import instance as config
-from core.functions import load_json, random_choose
+from core.functions import random_choose
+from core.messages import messages
 from interfaces.main.log_handler import LogHandler
 from interpreter.conditions import MessageConditions
 from interpreter.variable import Variable
@@ -27,42 +27,21 @@ class Bot:
         @self.client.event
         async def on_message(message):
             logger.info(f'Identificada mensagem "{message.content}".')
-            message_and_reply_json = load_json(paths.message_and_reply)
-            for key_message, actual in message_and_reply_json.items():
 
-                to_read = [
-                    "expected message",
-                    "reply",
-                    "reaction",
-                    "conditions",
-                    "delete",
-                    "pin",
-                    "delay",
-                    "kick",
-                    "ban",
-                    "where reaction",
-                    "where reply",
-                ]
-                to_insert = dict()
-
-                for each in to_read:
-                    to_insert[each] = None
-                    if each in actual:
-                        to_insert[each] = actual[each]
-
+            for message_name, message_data in messages.content().items():
                 await message_and_reply(
                     message=message,
-                    conditions=to_insert["conditions"],
-                    expected_message=to_insert["expected message"],
-                    reply=to_insert["reply"],
-                    reaction=to_insert["reaction"],
-                    delete=to_insert["delete"],
-                    pin=to_insert["pin"],
-                    delay=to_insert["delay"],
-                    kick=to_insert["kick"],
-                    ban=to_insert["ban"],
-                    where_reply=to_insert["where reply"],
-                    where_reaction=to_insert["where reaction"],
+                    conditions=message_data.get("conditions"),
+                    expected_message=message_data.get("expected message"),
+                    reply=message_data.get("reply"),
+                    reaction=message_data.get("reaction"),
+                    delete=message_data.get("delete"),
+                    pin=message_data.get("pin"),
+                    delay=message_data.get("delay"),
+                    kick=message_data.get("kick"),
+                    ban=message_data.get("ban"),
+                    where_reply=message_data.get("where reply"),
+                    where_reaction=message_data.get("where reaction"),
                 )
 
         @self.client.event

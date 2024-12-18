@@ -1,6 +1,5 @@
 import re
 import typing
-from json import JSONDecodeError
 
 import emoji
 from PySide6.QtGui import QIcon
@@ -19,15 +18,13 @@ from PySide6.QtWidgets import (
     QLineEdit,
 )
 
-import interfaces.paths as path
-from core.functions import load_json, save_json, have_in
+from core.functions import have_in
 from interpreter.conditions import conditions_keys
 
 
 class MessageWindow:
     def __init__(self, app):
         self.app = app
-        self.name = None
         self.window = QDialog()
         self.window.setWindowIcon(QIcon("source/icons/window-icon.svg"))
         self.window.setMinimumSize(800, 600)
@@ -183,10 +180,11 @@ class MessageWindow:
         add_button.clicked.connect(self.insert_any_on_listbox)
 
     def on_save_and_quit(self):
-        self.save_and_quit()
+        # Adicionar validação de campos
+        self.window.accept()
 
-    def on_save(self):
-        self.save()
+    def get_name(self):
+        return self.name_entry.text()
 
     @staticmethod
     def insert_on_listbox(
@@ -209,11 +207,6 @@ class MessageWindow:
             self.insert_on_listbox(
                 listbox, entry, limit=19 if entry == self.reactions else 0
             )
-
-    def update_name(self):
-        self.name = self.name_entry.text()
-        self.name_entry.clear()
-        self.name_text.setText(f"Nome: {self.name}")
 
     @staticmethod
     def remove_selected_on_listbox(listbox: QListWidget):
@@ -242,44 +235,14 @@ class MessageWindow:
     def __all_entries(self):
         return self.expected_message, self.reply, self.reactions, self.conditions
 
-    def save(self):
-        """salva toda a informação que o usuário preencheu na interface em forma de json, para que depois
-        o interpretador do bot consiga interpretar"""
-        try:
-            dict_base = load_json(path.message_and_reply)
-        except JSONDecodeError:
-            name = "1"
-            dict_base = dict()
-        else:
-            # talvez possamos passar essa responsabilidade para uma funcao apartada e no início da classe
-            if not self.name:
-                name = "1"
-                all_keys = list(dict_base.keys())
-                all_keys.reverse()
-                for x in all_keys:
-                    try:
-                        key = int(x)
-                    except ValueError:
-                        pass
-                    else:
-                        name = str(key + 1)
-                        break
-            else:
-                name = self.name
-                if self.name:
-                    name = self.name
-                    del dict_base[self.name]
-
-        # anti-bug
-        self.name = name
-
-        dict_base[name] = {}
+    def get_data(self):
+        result = {}
 
         expected_message_list = [
             self.listbox_messages.item(i).text()
             for i in range(self.listbox_messages.count())
         ]
-        dict_base[name]["expected message"] = (
+        result["expected message"] = (
             expected_message_list if not len(expected_message_list) == 0 else None
         )
 
@@ -287,8 +250,8 @@ class MessageWindow:
             self.listbox_replies.item(i).text()
             for i in range(self.listbox_replies.count())
         ]
-        dict_base[name]["reply"] = (
-            list(map(lambda x: x.split("¨"), reply_list))
+        result["reply"] = (
+            list(map(lambda replies: replies.split("¨"), reply_list))
             if have_in(reply_list, "¨", reverse=True)
             else reply_list if not len(reply_list) == 0 else None
         )
@@ -297,8 +260,13 @@ class MessageWindow:
             self.listbox_reactions.item(i).text()
             for i in range(self.listbox_reactions.count())
         ]
-        dict_base[name]["reaction"] = (
-            list(map(lambda x: re.findall(r":[a-zA-Z_0-9]+:", x), reactions_list))
+        result["reaction"] = (
+            list(
+                map(
+                    lambda reactions: re.findall(r":[a-zA-Z_0-9]+:", reactions),
+                    reactions_list,
+                )
+            )
             if not len(reactions_list) == 0
             else None
         )
@@ -307,114 +275,102 @@ class MessageWindow:
             self.listbox_conditions.item(i).text()
             for i in range(self.listbox_conditions.count())
         ]
-        dict_base[name]["conditions"] = (
+        result["conditions"] = (
             conditions_list if not len(conditions_list) == 0 else None
         )
 
         if self.pin_checkbox.isChecked():
-            dict_base[name]["pin"] = True
+            result["pin"] = True
         elif self.delete_checkbox.isChecked():
-            dict_base[name]["delete"] = True
+            result["delete"] = True
 
         selected_where_reply = self.__get_checked(self.group_where_reply)
         if selected_where_reply:
-            dict_base[name]["where reply"] = selected_where_reply.objectName()
+            result["where reply"] = selected_where_reply.objectName()
 
         selected_where_react = self.__get_checked(self.group_where_react)
         if selected_where_react:
-            dict_base[name]["where reaction"] = selected_where_react.objectName()
+            result["where reaction"] = selected_where_react.objectName()
 
-        dict_base[name]["delay"] = self.delay.value()
+        result["delay"] = self.delay.value()
 
-        save_json(path.message_and_reply, dict_base)
-
-    def save_and_quit(self):
-        self.save()
-        self.window.destroy()
+        return result
 
     @staticmethod
     def __get_checked(groupbox: QGroupBox):
         """Returns the checked radio button from the groupbox"""
 
-        for child in groupbox.layout().children():
+        for child in groupbox.findChildren(QRadioButton):
             child: QRadioButton
             if child.isChecked():
                 return child
 
 
 class EditMessageWindow(MessageWindow):
-    def __init__(self, app, load):
+    def __init__(self, app, name: str, data: dict):
         super().__init__(app)
-        self.name = load
-        self.name_entry.setText(self.name)
+        self.name_entry.setText(name)
         self.name_entry.setEnabled(False)
-        self.load_info()
 
-    def load_info(self):
-        if self.name:
-            messages_json: dict = load_json(path.message_and_reply)
-            data: dict = messages_json[self.name]
-            if "expected message" in data:
-                expected_messages = data["expected message"]
-                if expected_messages:
-                    for expected_message in expected_messages:
-                        self.listbox_messages.addItem(expected_message)
-            if "reply" in data:
-                replies = data["reply"]
-                if replies:
-                    for reply in replies:
-                        (
-                            self.listbox_replies.addItem("¨".join(reply))
-                            if type(reply) == list
-                            else self.listbox_replies.addItem(reply)
-                        )
-            if "reaction" in data:
-                reaction = data["reaction"]
-                if reaction:
-                    list(
-                        map(
-                            lambda x: self.listbox_reactions.addItem(" ".join(x)),
-                            reaction,
-                        )
+        if "expected message" in data:
+            expected_messages = data["expected message"]
+            if expected_messages:
+                for expected_message in expected_messages:
+                    self.listbox_messages.addItem(expected_message)
+
+        if "reply" in data:
+            replies = data["reply"]
+            if replies:
+                for reply in replies:
+                    (
+                        self.listbox_replies.addItem("¨".join(reply))
+                        if type(reply) == list
+                        else self.listbox_replies.addItem(reply)
                     )
-            if "conditions" in data:
-                conditions = data["conditions"]
-                if conditions:
-                    for condition in conditions:
-                        self.listbox_conditions.addItem(condition)
-            if "pin" in data:
-                pin = data["pin"]
-                if pin:
-                    self.pin_checkbox.setChecked(True)
-            if "delete" in data:
-                delete = data["delete"]
-                if delete:
-                    self.delete_checkbox.setChecked(True)
 
-            if "delay" in data:
-                delay = int(data["delay"])
-                self.delay.setValue(delay)
+        if "reaction" in data:
+            reaction = data["reaction"]
+            if reaction:
+                list(
+                    map(
+                        lambda x: self.listbox_reactions.addItem(" ".join(x)),
+                        reaction,
+                    )
+                )
+        if "conditions" in data:
+            conditions = data["conditions"]
+            if conditions:
+                for condition in conditions:
+                    self.listbox_conditions.addItem(condition)
 
-            if "where reply" in data:
-                where_reply = data["where reply"]
-                if where_reply == "group":
-                    self.group_checkbox.setChecked(True)
-                else:
-                    self.private_checkbox.setChecked(True)
+        if "pin" in data:
+            pin = data["pin"]
+            if pin:
+                self.pin_checkbox.setChecked(True)
 
-            if "where reaction" in data:
-                where_reaction = data["where reaction"]
-                if where_reaction == "author":
-                    self.author_checkbox.setChecked(True)
-                else:
-                    self.bot_checkbox.setChecked(True)
+        if "delete" in data:
+            delete = data["delete"]
+            if delete:
+                self.delete_checkbox.setChecked(True)
+
+        if "delay" in data:
+            delay = int(data["delay"])
+            self.delay.setValue(delay)
+
+        if "where reply" in data:
+            where_reply = data["where reply"]
+            if where_reply == "group":
+                self.group_checkbox.setChecked(True)
+            else:
+                self.private_checkbox.setChecked(True)
+
+        if "where reaction" in data:
+            where_reaction = data["where reaction"]
+            if where_reaction == "author":
+                self.author_checkbox.setChecked(True)
+            else:
+                self.bot_checkbox.setChecked(True)
 
 
 class NewMessageWindow(MessageWindow):
-    def on_save(self):
-        super().on_save()
-        self.app.add_message(self.name)
-
-    def on_save_and_quit(self):
-        super().on_save_and_quit()
-        self.app.add_message(self.name)
+    pass
