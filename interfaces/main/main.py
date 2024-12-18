@@ -1,4 +1,5 @@
 import logging
+import typing
 from json import JSONDecodeError
 from threading import Thread
 
@@ -133,22 +134,25 @@ class Main(QMainWindow):
 
     def edit_message(self):
         """Opens the NewMessage interface and loads saved information."""
-        names = [
-            self.messages_list_widget.item(i).text()
-            for i in range(self.messages_list_widget.count())
-        ]
         try:
-            selected_message = names[self.messages_list_widget.currentRow()]
-            self.message_window = EditMessageWindow(self, selected_message)
-            self.message_window.window.exec()
+            _, selected_message = self.__get_selected_message()
         except IndexError:
             pass
+        else:
+            self.message_window = EditMessageWindow(self, selected_message)
+            self.message_window.window.exec()
+
+    def __get_selected_message(self) -> typing.Tuple[int, str]:
+        index = self.messages_list_widget.selectedIndexes()[0].row()
+        return index, self.messages_list_widget.item(index).text()
 
     def remove_message(self):
         """Removes the selected message from the messages list and deletes it from "message and reply.json"."""
-        selected_row = self.messages_list_widget.currentRow()
-        if selected_row >= 0:
-            selected_message = self.messages_list_widget.item(selected_row).text()
+        try:
+            selected_row, selected_message = self.__get_selected_message()
+        except IndexError:
+            pass
+        else:
             self.messages_list_widget.takeItem(selected_row)
             message_and_reply_json = load_json(paths.message_and_reply)
             del message_and_reply_json[selected_message]
