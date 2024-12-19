@@ -95,6 +95,8 @@ class Main(QMainWindow):
         main_layout.addLayout(left_frame)
         main_layout.addLayout(right_frame)
 
+        main_layout.setStretch(1, 1)
+
         self.load_messages()
 
     def new_message(self):
