@@ -11,7 +11,7 @@ from PySide6.QtWidgets import (
     QSplitter,
 )
 from extra_qwidgets.utils import colorize_icon
-from qfluentwidgets import PasswordLineEdit, PushButton, SplashScreen
+from qfluentwidgets import PasswordLineEdit, PushButton, SplashScreen, SearchLineEdit
 
 from core.config import Config
 from widgets.custom_button import ColoredPushButton
@@ -63,11 +63,15 @@ class MainView:
             colorize_icon(qtawesome.icon("fa6s.stop"), "#FFFFFF")
         )
 
+        self.search_groups = SearchLineEdit()
+        self.search_groups.searchButton.setDisabled(True)
         self.groups_list_widget = QGroupsList()
         self.config_group_button = PushButton()
         self.config_group_button.setText(translate("MainWindow", "Config"))
         self.quit_group_button = PushButton()
         self.quit_group_button.setText(translate("MainWindow", "Quit"))
+        self.search_messages = SearchLineEdit()
+        self.search_messages.searchButton.setDisabled(True)
         self.messages_list_widget = QMessagesList()
         self.new_message_button = PushButton()
         self.new_message_button.setText(translate("MainWindow", "New"))
@@ -115,6 +119,7 @@ class MainView:
         groups_widget.setContentsMargins(5, 5, 5, 5)
         groups_layout = QVBoxLayout()
         groups_widget.setLayout(groups_layout)
+        groups_layout.addWidget(self.search_groups)
         groups_layout.addWidget(self.groups_list_widget)
         groups_layout.addWidget(self.config_group_button)
         groups_layout.addWidget(self.quit_group_button)
@@ -127,6 +132,7 @@ class MainView:
         left_widget.addTab(messages_widget, translate("MainWindow", "Messages"))
         left_widget.addTab(groups_widget, translate("MainWindow", "Groups"))
         for widget in [
+            self.search_messages,
             self.messages_list_widget,
             self.new_message_button,
             self.edit_messages_button,

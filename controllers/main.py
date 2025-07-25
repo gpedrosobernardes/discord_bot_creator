@@ -2,8 +2,8 @@ import os
 import typing
 from pathlib import Path
 
-from PySide6.QtCore import Qt, QCoreApplication
-from PySide6.QtGui import QCloseEvent
+from PySide6.QtCore import Qt, QCoreApplication, QStringListModel, QSortFilterProxyModel
+from PySide6.QtGui import QCloseEvent, QStandardItemModel, QStandardItem
 from PySide6.QtWidgets import QListWidgetItem, QFileDialog
 from qfluentwidgets import MessageBox
 
@@ -19,10 +19,27 @@ translate = QCoreApplication.translate
 class MainController:
     def __init__(self, database: Database, bot_thread: QBotThread):
         self.view = MainView()
+        self.messages_model = QStringListModel()
+        self.messages_proxy_model = QSortFilterProxyModel()
+        self.groups_model = QStandardItemModel()
+        self.groups_proxy_model = QSortFilterProxyModel()
+        self.view.messages_list_widget.setModel(self.messages_proxy_model)
+        self.view.groups_list_widget.setModel(self.groups_proxy_model)
         self.database = database
         self.bot_thread = bot_thread
         self.setup_binds()
+        self.setup_filter_proxys()
         self.update_bot_button()
+
+    def setup_filter_proxys(self):
+        self.messages_proxy_model.setSourceModel(self.messages_model)
+        self.messages_proxy_model.setFilterCaseSensitivity(
+            Qt.CaseSensitivity.CaseInsensitive
+        )
+        self.groups_proxy_model.setSourceModel(self.groups_model)
+        self.groups_proxy_model.setFilterCaseSensitivity(
+            Qt.CaseSensitivity.CaseInsensitive
+        )
 
     def setup_binds(self):
         self.view.remove_message_button.clicked.connect(
@@ -41,6 +58,18 @@ class MainController:
         )
         self.view.quit_group_button.clicked.connect(self.quit_selected_group)
         self.view.token_widget.textEdited.connect(self.update_token)
+        self.view.search_messages.textEdited.connect(
+            self.messages_proxy_model.setFilterFixedString
+        )
+        self.view.search_messages.clearSignal.connect(
+            lambda: self.messages_proxy_model.setFilterFixedString("")
+        )
+        self.view.search_groups.textEdited.connect(
+            self.groups_proxy_model.setFilterFixedString
+        )
+        self.view.search_groups.clearSignal.connect(
+            lambda: self.groups_proxy_model.setFilterFixedString("")
+        )
         # noinspection PyUnresolvedReferences
         self.view.cmd_combobox.lineEdit().returnPressed.connect(self.entry_command)
         self.view.window.close_event = self.close_event
@@ -73,18 +102,18 @@ class MainController:
 
     def quit_selected_group(self):
         selection = self.view.groups_list_widget.selectedIndexes()
-        if bool(selection):
-            item = self.view.groups_list_widget.item(selection[0].row())
-            group_id = item.data(Qt.ItemDataRole.UserRole)
-            self.view.groups_list_widget.takeItem(selection[0].row())
+        if selection:
+            selected = self.groups_proxy_model.mapToSource(selection[0])
+            group_id = self.groups_model.data(selected, Qt.ItemDataRole.UserRole)
+            self.groups_model.removeRow(selected.row())
             self.bot_thread.leave_group(group_id)
 
     def update_groups(self):
-        self.view.groups_list_widget.clear()
+        self.groups_model.clear()
         for group_id, group in self.bot_thread.groups().items():
-            group = QListWidgetItem(group.name)
-            group.setData(Qt.ItemDataRole.UserRole, group_id)
-            self.view.groups_list_widget.addItem(group)
+            item = QStandardItem(group.name)
+            item.setData(group_id, Qt.ItemDataRole.UserRole)
+            self.groups_model.appendRow(item)
 
     def on_login_failure(self):
         self.information_message_box(
@@ -171,16 +200,10 @@ class MainController:
         Config.set("token", self.view.token_widget.text())
         Config.save()
 
-    def get_selected_message(self) -> typing.Optional[str]:
-        if bool(self.view.messages_list_widget.selectedIndexes()):
-            return self.view.messages_list_widget.selectedItems()[0].text()
-        return None
-
     def __get_list_item_message(self, message: str) -> typing.Optional[QListWidgetItem]:
         for i in self.view.messages_list_widget.selectedItems():
             if i.text() == message:
                 return i
-            return None
         return None
 
     def update_bot_button(self):
@@ -190,14 +213,16 @@ class MainController:
 
     def remove_selected_message(self):
         """Removes the selected message from the message list and deletes it from "message and reply.json"."""
-        selected_messages = self.view.messages_list_widget.selectedItems()
+        selected_messages = self.view.messages_list_widget.selectedIndexes()
         if selected_messages:
-            message = self.database.get_message(selected_messages[0].text())
+            selected_message = selected_messages[0]
+            message_text = self.messages_model.data(selected_message)
+            message = self.database.get_message(message_text)
             self.database.delete(message)
-            row = self.view.messages_list_widget.indexFromItem(
-                selected_messages[0]
-            ).row()
-            self.view.messages_list_widget.takeItem(row)
+            data = self.messages_model.stringList()
+            data.pop(selected_message.row())
+            self.messages_model.setStringList(data)
+            self.update_window_title()
 
     def confirm_remove_selected_message(self):
         """Asks the user if they want to remove the selected message."""
@@ -225,17 +250,16 @@ class MainController:
 
     def remove_messages(self):
         """Removes all messages from the list."""
-        self.view.messages_list_widget.clear()
+        self.messages_model.setStringList([])
         self.database.delete_messages()
+        self.update_window_title()
 
     def load_data(self):
         """
         Loads all messages from the database and inserts them into the message list.
         """
         self.update_window_title()
-        self.view.messages_list_widget.clear()
-        for message_name in self.database.message_names():
-            self.view.messages_list_widget.addItem(message_name)
+        self.messages_model.setStringList(self.database.message_names())
 
     def file_dont_exists_message_box(self):
         self.information_message_box(
@@ -250,7 +274,9 @@ class MainController:
         self.update_window_title()
 
     def accepted_new_message(self, message_name: str):
-        self.view.messages_list_widget.addItem(message_name)
+        data = self.messages_model.stringList()
+        data.append(message_name)
+        self.messages_model.setStringList(data)
         self.update_window_title()
 
     def turn_off_bot(self):

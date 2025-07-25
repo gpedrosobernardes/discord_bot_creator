@@ -107,21 +107,20 @@ class Application(QApplication):
         main_view.messages_list_widget.edit_action.triggered.connect(
             self.edit_selected_message
         )
-        main_view.messages_list_widget.itemDoubleClicked.connect(
-            self.edit_selected_message
-        )
+        main_view.messages_list_widget.doubleClicked.connect(self.edit_selected_message)
         main_view.groups_list_widget.config_action.triggered.connect(
             self.config_selected_group
         )
-        main_view.groups_list_widget.itemDoubleClicked.connect(
-            self.config_selected_group
-        )
+        main_view.groups_list_widget.doubleClicked.connect(self.config_selected_group)
         main_view.config_group_button.clicked.connect(self.config_selected_group)
 
     def config_selected_group(self):
-        if bool(self.main_controller.view.groups_list_widget.selectedIndexes()):
-            group_item = self.main_controller.view.groups_list_widget.selectedItems()[0]
-            selected_group_id = group_item.data(Qt.ItemDataRole.UserRole)
+        selection = self.main_controller.view.groups_list_widget.selectedIndexes()
+        if selection:
+            selected = self.main_controller.groups_proxy_model.mapToSource(selection[0])
+            selected_group_id = self.main_controller.groups_model.data(
+                selected, Qt.ItemDataRole.UserRole
+            )
             group = self.bot_thread.groups()[selected_group_id]
             group_interaction = self.database.get_group(group.id)
             self.group_controller.config(
@@ -144,10 +143,9 @@ class Application(QApplication):
 
     def edit_selected_message(self):
         """Opens the NewMessage interface and loads saved information."""
-        if bool(self.main_controller.view.messages_list_widget.selectedIndexes()):
-            selected_message = (
-                self.main_controller.view.messages_list_widget.selectedItems()[0].text()
-            )
+        selection = self.main_controller.view.messages_list_widget.selectedIndexes()
+        if selection:
+            selected_message = self.main_controller.messages_model.data(selection[0])
             self.message_controller.config(self.database.get_message(selected_message))
             result = self.message_controller.view.window.exec()
             if result == 2:

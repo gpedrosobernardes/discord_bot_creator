@@ -1,16 +1,18 @@
 from PySide6.QtCore import QPoint, Qt, QCoreApplication
 from PySide6.QtGui import QAction
-from qfluentwidgets import ListWidget, RoundMenu
+from PySide6.QtWidgets import QAbstractItemView
+from qfluentwidgets import RoundMenu, ListView
 
 translate = QCoreApplication.translate
 
 
-class QGroupsList(ListWidget):
+class QGroupsList(ListView):
     def __init__(self):
         super().__init__()
 
         self.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.customContextMenuRequested.connect(self.group_context_menu_event)
+        self.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
 
         self.config_action = QAction(translate("MainWindow", "Config group"), self)
         self.quit_action = QAction(translate("MainWindow", "Quit group"), self)

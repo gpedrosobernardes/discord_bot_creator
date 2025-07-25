@@ -1,16 +1,18 @@
 from PySide6.QtCore import QCoreApplication, QPoint
 from PySide6.QtGui import QAction, Qt
-from qfluentwidgets import ListWidget, RoundMenu
+from PySide6.QtWidgets import QAbstractItemView
+from qfluentwidgets import RoundMenu, ListView
 
 translate = QCoreApplication.translate
 
 
-class QMessagesList(ListWidget):
+class QMessagesList(ListView):
     def __init__(self):
         super().__init__()
 
         self.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.customContextMenuRequested.connect(self.message_context_menu_event)
+        self.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
 
         self.new_action = QAction(translate("MainWindow", "New message"), self)
         self.new_action.setShortcut("Ctrl+N")
