@@ -54,7 +54,10 @@ class Bot(discord.Client):
             )
 
     async def on_message(self, discord_message: discord.Message):
-        if discord_message.author != self.user and discord_message.type == MessageType.default:
+        if (
+            discord_message.author != self.user
+            and discord_message.type == MessageType.default
+        ):
             logger.info(
                 translate("Bot", 'Identified message "{}".').format(
                     discord_message.clean_content
@@ -216,15 +219,24 @@ class Bot(discord.Client):
     @staticmethod
     async def ban_member(member: discord.Member):
         try:
-            await member.ban()
+            if isinstance(member, discord.Member):
+                await member.ban()
+                logger.info(
+                    translate("Bot", 'Banning member "{}".').format(member.name)
+                )
+            elif isinstance(member, discord.User):
+                logger.warning(
+                    translate(
+                        "Bot",
+                        'Cannot ban member "{}": message is not associated with any group.',
+                    ).format(member.name)
+                )
         except discord.Forbidden:
             logger.error(
                 translate("Bot", 'Don\'t have permission to ban "{}".').format(
                     member.name
                 )
             )
-        else:
-            logger.info(translate("Bot", 'Banning member "{}".').format(member.name))
 
     async def close(self):
         await super().close()
