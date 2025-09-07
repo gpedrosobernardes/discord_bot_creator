@@ -29,6 +29,7 @@ FIELDS_TRANSLATIONS = {
     "mentions": Translator.translate("Field", "Mentions"),
     "bot author": Translator.translate("Field", "Bot Author"),
     "emojis": Translator.translate("Field", "Emojis"),
+    "channel type": Translator.translate("Field", "Channel Type"),
 }
 
 OPERATORS_TRANSLATIONS = {
@@ -45,6 +46,20 @@ OPERATORS_TRANSLATIONS = {
         "Operator", "Is greater or equal to"
     ),
     "is less or equal to": Translator.translate("Operator", "Is less or equal to"),
+}
+
+ENUMS_TRANSLATIONS = {
+    "channel type": {
+        "TextChannel": Translator.translate("ChannelTypeEnum", "Text Channel"),
+        "StageChannel": Translator.translate("ChannelTypeEnum", "Stage Channel"),
+        "VoiceChannel": Translator.translate("ChannelTypeEnum", "Voice Channel"),
+        "Thread": Translator.translate("ChannelTypeEnum", "Voice Channel"),
+        "DMChannel": Translator.translate("ChannelTypeEnum", "DM Channel"),
+        "GroupChannel": Translator.translate("ChannelTypeEnum", "Group Channel"),
+        "PartialMessageable": Translator.translate(
+            "ChannelTypeEnum", "Partial Messageable"
+        ),
+    }
 }
 
 LOGGING_TRANSLATIONS = {

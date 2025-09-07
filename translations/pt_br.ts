@@ -4,12 +4,12 @@
 <context>
     <name>Boolean</name>
     <message>
-        <location filename="../core/translator.py" line="59"/>
+        <location filename="../core/translator.py" line="74"/>
         <source>True</source>
         <translation>Verdadeiro</translation>
     </message>
     <message>
-        <location filename="../core/translator.py" line="60"/>
+        <location filename="../core/translator.py" line="75"/>
         <source>False</source>
         <translation>Falso</translation>
     </message>
@@ -95,27 +95,27 @@
         <translation>Expulsando membro &quot;{}&quot;.</translation>
     </message>
     <message>
-        <location filename="../core/bot.py" line="229"/>
+        <location filename="../core/bot.py" line="232"/>
         <source>Cannot ban member &quot;{}&quot;: message is not associated with any group.</source>
         <translation>Não pode banir membro &quot;{}&quot;: a mensagem não está associada a nenhum grupo.</translation>
     </message>
     <message>
-        <location filename="../core/bot.py" line="233"/>
+        <location filename="../core/bot.py" line="236"/>
         <source>Don&apos;t have permission to ban &quot;{}&quot;.</source>
         <translation>Não tem permissão para banir &quot;{}&quot;.</translation>
     </message>
     <message>
-        <location filename="../core/bot.py" line="238"/>
+        <location filename="../core/bot.py" line="225"/>
         <source>Banning member &quot;{}&quot;.</source>
         <translation>Banindo membro &quot;{}&quot;.</translation>
     </message>
     <message>
-        <location filename="../core/bot.py" line="242"/>
+        <location filename="../core/bot.py" line="243"/>
         <source>Bot finished!</source>
         <translation>Bot desligado!</translation>
     </message>
     <message>
-        <location filename="../core/bot.py" line="247"/>
+        <location filename="../core/bot.py" line="248"/>
         <source>Leaving guild &quot;{}&quot;</source>
         <translation>Saindo do grupo &quot;{}&quot;</translation>
     </message>
@@ -139,6 +139,40 @@
     </message>
 </context>
 <context>
+    <name>ChannelTypeEnum</name>
+    <message>
+        <location filename="../core/translator.py" line="53"/>
+        <source>Text Channel</source>
+        <translation>Canal de Texto</translation>
+    </message>
+    <message>
+        <location filename="../core/translator.py" line="54"/>
+        <source>Stage Channel</source>
+        <translation>Canal de Palco</translation>
+    </message>
+    <message>
+        <location filename="../core/translator.py" line="55"/>
+        <location filename="../core/translator.py" line="56"/>
+        <source>Voice Channel</source>
+        <translation>Canal de Voz</translation>
+    </message>
+    <message>
+        <location filename="../core/translator.py" line="57"/>
+        <source>DM Channel</source>
+        <translation>Canal DM</translation>
+    </message>
+    <message>
+        <location filename="../core/translator.py" line="58"/>
+        <source>Group Channel</source>
+        <translation>Canal de Grupo</translation>
+    </message>
+    <message>
+        <location filename="../core/translator.py" line="61"/>
+        <source>Partial Messageable</source>
+        <translation>Mensageável Parcial</translation>
+    </message>
+</context>
+<context>
     <name>ConditionValidator</name>
     <message>
         <source>Validating condition ({}/{}) field {}: {} {} {} ({})</source>
@@ -149,17 +183,17 @@
         <translation type="vanished">Validando condição ({}/{}): campo {} {} {} {} ({})</translation>
     </message>
     <message>
-        <location filename="../interpreter/conditions.py" line="142"/>
+        <location filename="../interpreter/conditions.py" line="131"/>
         <source>Case insensitive</source>
         <translation>Ignora maiúsculas/minúsculas</translation>
     </message>
     <message>
-        <location filename="../interpreter/conditions.py" line="146"/>
+        <location filename="../interpreter/conditions.py" line="135"/>
         <source>Validating condition ({conditions_validated}/{conditions_count}): field {field} {value} {case_insensitive} {operator} {condition_value} ({result})</source>
         <translation>Validando condição ({conditions_validated}/{conditions_count}): campo {field} {value} {case_insensitive} {operator} {condition_value} ({result})</translation>
     </message>
     <message>
-        <location filename="../interpreter/conditions.py" line="151"/>
+        <location filename="../interpreter/conditions.py" line="140"/>
         <source>Validating condition ({conditions_validated}/{conditions_count}): field {field} {value} {operator} {condition_value} ({result})</source>
         <translation>Validando condição ({conditions_validated}/{conditions_count}): campo {field} {value} {operator} {condition_value} ({result})</translation>
     </message>
@@ -273,6 +307,11 @@
         <source>Emojis</source>
         <translation>Emojis</translation>
     </message>
+    <message>
+        <location filename="../core/translator.py" line="32"/>
+        <source>Channel Type</source>
+        <translation>Tipo do Canal</translation>
+    </message>
 </context>
 <context>
     <name>GroupWindow</name>
@@ -344,27 +383,27 @@
 <context>
     <name>Logging</name>
     <message>
-        <location filename="../core/translator.py" line="51"/>
+        <location filename="../core/translator.py" line="66"/>
         <source>Info</source>
         <translation>Informação</translation>
     </message>
     <message>
-        <location filename="../core/translator.py" line="52"/>
+        <location filename="../core/translator.py" line="67"/>
         <source>Warning</source>
         <translation>Aviso</translation>
     </message>
     <message>
-        <location filename="../core/translator.py" line="53"/>
+        <location filename="../core/translator.py" line="68"/>
         <source>Error</source>
         <translation>Erro</translation>
     </message>
     <message>
-        <location filename="../core/translator.py" line="54"/>
+        <location filename="../core/translator.py" line="69"/>
         <source>Critical</source>
         <translation>Crítico</translation>
     </message>
     <message>
-        <location filename="../core/translator.py" line="55"/>
+        <location filename="../core/translator.py" line="70"/>
         <source>Debug</source>
         <translation>Debug</translation>
     </message>
@@ -825,57 +864,57 @@
 <context>
     <name>Operator</name>
     <message>
-        <location filename="../core/translator.py" line="35"/>
+        <location filename="../core/translator.py" line="36"/>
         <source>Equal to</source>
         <translation>Igual a</translation>
     </message>
     <message>
-        <location filename="../core/translator.py" line="36"/>
+        <location filename="../core/translator.py" line="37"/>
         <source>Not equal to</source>
         <translation>Não igual a</translation>
     </message>
     <message>
-        <location filename="../core/translator.py" line="37"/>
+        <location filename="../core/translator.py" line="38"/>
         <source>Contains</source>
         <translation>Contém</translation>
     </message>
     <message>
-        <location filename="../core/translator.py" line="38"/>
+        <location filename="../core/translator.py" line="39"/>
         <source>Not contains</source>
         <translation>Não contém</translation>
     </message>
     <message>
-        <location filename="../core/translator.py" line="39"/>
+        <location filename="../core/translator.py" line="40"/>
         <source>Starts with</source>
         <translation>Começa com</translation>
     </message>
     <message>
-        <location filename="../core/translator.py" line="40"/>
+        <location filename="../core/translator.py" line="41"/>
         <source>Ends with</source>
         <translation>Termina com</translation>
     </message>
     <message>
-        <location filename="../core/translator.py" line="41"/>
+        <location filename="../core/translator.py" line="42"/>
         <source>Regex</source>
         <translation>Regex</translation>
     </message>
     <message>
-        <location filename="../core/translator.py" line="42"/>
+        <location filename="../core/translator.py" line="43"/>
         <source>Is greater than</source>
         <translation>É maior que</translation>
     </message>
     <message>
-        <location filename="../core/translator.py" line="43"/>
+        <location filename="../core/translator.py" line="44"/>
         <source>Is less than</source>
         <translation>É menor que</translation>
     </message>
     <message>
-        <location filename="../core/translator.py" line="46"/>
+        <location filename="../core/translator.py" line="47"/>
         <source>Is greater or equal to</source>
         <translation>É maior ou igual a</translation>
     </message>
     <message>
-        <location filename="../core/translator.py" line="47"/>
+        <location filename="../core/translator.py" line="48"/>
         <source>Is less or equal to</source>
         <translation>É menor ou igual a</translation>
     </message>
@@ -959,41 +998,41 @@
         <translation type="vanished">É menor ou igual a</translation>
     </message>
     <message>
-        <location filename="../widgets/condition_listbox.py" line="42"/>
+        <location filename="../widgets/condition_listbox.py" line="46"/>
         <source>Remove</source>
         <translation>Remover</translation>
     </message>
     <message>
-        <location filename="../widgets/condition_listbox.py" line="46"/>
-        <location filename="../widgets/condition_listbox.py" line="186"/>
+        <location filename="../widgets/condition_listbox.py" line="50"/>
+        <location filename="../widgets/condition_listbox.py" line="207"/>
         <source>Case insensitive</source>
         <translation>Ignora maiúsculas/minúsculas</translation>
     </message>
     <message>
-        <location filename="../widgets/condition_listbox.py" line="133"/>
-        <location filename="../widgets/condition_listbox.py" line="232"/>
+        <location filename="../widgets/condition_listbox.py" line="154"/>
+        <location filename="../widgets/condition_listbox.py" line="253"/>
         <source>Yes</source>
         <translation>Sim</translation>
     </message>
     <message>
-        <location filename="../widgets/condition_listbox.py" line="134"/>
-        <location filename="../widgets/condition_listbox.py" line="233"/>
+        <location filename="../widgets/condition_listbox.py" line="155"/>
+        <location filename="../widgets/condition_listbox.py" line="254"/>
         <source>No</source>
         <translation>Não</translation>
     </message>
     <message>
-        <location filename="../widgets/condition_listbox.py" line="184"/>
+        <location filename="../widgets/condition_listbox.py" line="205"/>
         <source>Field</source>
         <translation>Campo</translation>
     </message>
     <message>
-        <location filename="../widgets/condition_listbox.py" line="185"/>
+        <location filename="../widgets/condition_listbox.py" line="206"/>
         <source>Operator</source>
         <translation>Operador</translation>
     </message>
     <message>
-        <location filename="../widgets/condition_listbox.py" line="52"/>
-        <location filename="../widgets/condition_listbox.py" line="187"/>
+        <location filename="../widgets/condition_listbox.py" line="56"/>
+        <location filename="../widgets/condition_listbox.py" line="208"/>
         <source>Value</source>
         <translation>Valor</translation>
     </message>

@@ -1,6 +1,7 @@
 import logging
 import re
 import typing
+from abc import ABC, abstractmethod
 
 import discord
 import emojis
@@ -33,6 +34,7 @@ class MessageConditionValidator:
         "bot author",
         "emojis",
     )
+    ENUM_FIELDS = ("channel type",)
     STR_OPERATORS = (
         "equal to",
         "not equal to",
@@ -50,6 +52,7 @@ class MessageConditionValidator:
         "is greater or equal to",
         "is less or equal to",
     )
+    ENUM_OPERATORS = ("equal to",)
 
     def __init__(
         self,
@@ -63,80 +66,66 @@ class MessageConditionValidator:
 
     def is_valid(self, condition: MessageCondition) -> bool:
         if condition.field == "message":
-            return self._validate_str_condition(
+            return StringConditionValidator(
                 condition, str(self.message.clean_content)
-            )
+            ).is_valid()
         elif condition.field == "author name":
-            return self._validate_str_condition(condition, self.message.author.name)
+            return StringConditionValidator(
+                condition, self.message.author.name
+            ).is_valid()
         elif condition.field == "channel name":
-            return self._validate_str_condition(condition, self.message.channel.name)
+            return StringConditionValidator(
+                condition, self.message.channel.name
+            ).is_valid()
         elif condition.field == "guild name":
-            return self._validate_str_condition(condition, self.message.guild.name)
+            return StringConditionValidator(
+                condition, self.message.guild.name
+            ).is_valid()
         elif condition.field == "mentions to bot":
-            return self._validate_int_condition(
+            return IntegerConditionValidator(
                 condition, len(list(user.bot for user in self.message.mentions))
-            )
+            ).is_valid()
         elif condition.field == "mentions":
-            return self._validate_int_condition(condition, len(self.message.mentions))
+            return IntegerConditionValidator(
+                condition, len(self.message.mentions)
+            ).is_valid()
         elif condition.field == "bot author":
-            return self._validate_int_condition(condition, int(self.message.author.bot))
+            return IntegerConditionValidator(
+                condition, int(self.message.author.bot)
+            ).is_valid()
         elif condition.field == "emojis":
-            return self._validate_int_condition(
+            return IntegerConditionValidator(
                 condition, emojis.count(self.message.clean_content)
-            )
+            ).is_valid()
+        elif condition.field == "channel type":
+            channel_type = type(self.message.channel.type).__name__
+            return EnumConditionValidator(
+                condition,
+                channel_type,
+            ).is_valid()
         else:
             raise ValueError(f"Invalid field: {condition.field}")
 
     def is_valid_all(self) -> bool:
         return all(self.is_valid(condition) for condition in self.conditions)
 
-    def _validate_str_condition(self, condition: MessageCondition, value: str) -> bool:
-        new_value = value
-        condition_value = condition.value
-        if condition.case_insensitive:
-            new_value = value.lower()
-            condition_value = condition_value.lower()
-        if condition.operator == "equal to":
-            result = new_value == condition_value
-        elif condition.operator == "not equal to":
-            result = new_value != condition_value
-        elif condition.operator == "contains":
-            result = condition_value in new_value
-        elif condition.operator == "not contains":
-            result = condition_value not in new_value
-        elif condition.operator == "starts with":
-            result = new_value.startswith(condition_value)
-        elif condition.operator == "ends with":
-            result = new_value.endswith(condition_value)
-        elif condition.operator == "regex":
-            flag = re.IGNORECASE if condition.case_insensitive else 0
-            result = re.match(condition.value, value, flag) is not None
-        else:
-            raise ValueError(f"Invalid operator: {condition.operator}")
-        self.conditions_validated += 1
-        self._validate_condition_log(
-            condition, condition.value, value, result, condition.case_insensitive
-        )
-        return result
-
-    def _validate_condition_log(
+    def log(
         self,
         condition: MessageCondition,
         condition_value: typing.Union[str, int],
-        value: typing.Union[str, int],
         result: bool,
-        case_insensitive: typing.Optional[bool] = None,
+        value: typing.Union[str, int],
     ) -> None:
         format_kwargs = dict(
             conditions_validated=self.conditions_validated,
             conditions_count=self.conditions_count,
             field=FIELDS_TRANSLATIONS[condition.field],
-            value=repr(value),
+            value=value,
             operator=OPERATORS_TRANSLATIONS[condition.operator].lower(),
             condition_value=repr(condition_value),
             result=BOOL_TRANSLATIONS[result],
         )
-        if case_insensitive:
+        if condition.case_insensitive:
             format_kwargs["case_insensitive"] = Translator.translate(
                 "ConditionValidator", "Case insensitive"
             ).lower()
@@ -151,22 +140,64 @@ class MessageConditionValidator:
             ).format(**format_kwargs)
         logger.debug(log)
 
-    def _validate_int_condition(self, condition: MessageCondition, value: int) -> bool:
-        condition_value = int(condition.value)
-        if condition.operator == "equal to":
-            result = condition_value == value
-        elif condition.operator == "not equal to":
-            result = condition_value != value
-        elif condition.operator == "is greater than":
-            result = condition_value > value
-        elif condition.operator == "is less than":
-            result = condition_value < value
-        elif condition.operator == "is greater or equal to":
-            result = condition_value >= value
-        elif condition.operator == "is less or equal to":
-            result = condition_value <= value
+
+class ConditionValidator(ABC):
+    def __init__(
+        self, condition: MessageCondition, value: typing.Union[str, int]
+    ) -> None:
+        self.condition = condition
+        self.value = value
+
+    @abstractmethod
+    def is_valid(self) -> bool:
+        pass
+
+
+class StringConditionValidator(ConditionValidator):
+    def is_valid(self) -> bool:
+        new_value = self.value
+        condition_value = self.condition.value
+        if self.condition.case_insensitive:
+            new_value = self.value.lower()
+            condition_value = condition_value.lower()
+        if self.condition.operator == "equal to":
+            return new_value == condition_value
+        elif self.condition.operator == "not equal to":
+            return new_value != condition_value
+        elif self.condition.operator == "contains":
+            return condition_value in new_value
+        elif self.condition.operator == "not contains":
+            return condition_value not in new_value
+        elif self.condition.operator == "starts with":
+            return new_value.startswith(condition_value)
+        elif self.condition.operator == "ends with":
+            return new_value.endswith(condition_value)
+        elif self.condition.operator == "regex":
+            flag = re.IGNORECASE if self.condition.case_insensitive else 0
+            return re.match(self.condition.value, self.value, flag) is not None
         else:
-            raise ValueError(f"Invalid operator: {condition.operator}")
-        self.conditions_validated += 1
-        self._validate_condition_log(condition, condition_value, value, result)
-        return result
+            raise ValueError(f"Invalid operator: {self.condition.operator}")
+
+
+class IntegerConditionValidator(ConditionValidator):
+    def is_valid(self) -> bool:
+        condition_value = int(self.condition.value)
+        if self.condition.operator == "equal to":
+            return condition_value == self.value
+        elif self.condition.operator == "not equal to":
+            return condition_value != self.value
+        elif self.condition.operator == "is greater than":
+            return condition_value > self.value
+        elif self.condition.operator == "is less than":
+            return condition_value < self.value
+        elif self.condition.operator == "is greater or equal to":
+            return condition_value >= self.value
+        elif self.condition.operator == "is less or equal to":
+            return condition_value <= self.value
+        else:
+            raise ValueError(f"Invalid operator: {self.condition.operator}")
+
+
+class EnumConditionValidator(ConditionValidator):
+    def is_valid(self) -> bool:
+        return self.condition.value == self.value

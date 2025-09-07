@@ -20,13 +20,17 @@ from extra_qwidgets.fluent_widgets.theme_responsive_transparent_tool_button impo
 )
 from qfluentwidgets import (
     TableWidget,
-    LineEdit,
     ComboBox,
-    TransparentToolButton,
     RoundMenu,
+    EditableComboBox,
 )
 
-from core.translator import Translator, FIELDS_TRANSLATIONS, OPERATORS_TRANSLATIONS
+from core.translator import (
+    Translator,
+    FIELDS_TRANSLATIONS,
+    OPERATORS_TRANSLATIONS,
+    ENUMS_TRANSLATIONS,
+)
 from interpreter.conditions import MessageConditionValidator
 from models.condition import MessageCondition
 
@@ -46,8 +50,8 @@ class QConditionListbox(QScrollArea):
         self.case_insensitive_checkbutton.setToolTip(self.tr("Case insensitive"))
         self.case_insensitive_checkbutton.setIcon(qtawesome.icon("fa6s.font"))
         self.case_insensitive_checkbutton.setIconSize(QSize(20, 20))
-        self.value_lineedit = LineEdit()
-        self.value_lineedit.setPlaceholderText(
+        self.value_combobox = EditableComboBox()
+        self.value_combobox.setPlaceholderText(
             Translator.translate("QConditionListbox", "Value")
         )
         self.__add_button = ThemeResponsiveTransparentToolButton()
@@ -73,7 +77,7 @@ class QConditionListbox(QScrollArea):
         fields_layout.addWidget(self.field_combobox, stretch=1)
         fields_layout.addWidget(self.operator_combobox, stretch=1)
         fields_layout.addWidget(self.case_insensitive_checkbutton)
-        fields_layout.addWidget(self.value_lineedit, stretch=1)
+        fields_layout.addWidget(self.value_combobox, stretch=1)
         fields_layout.addWidget(self.__add_button)
         content_widget = QWidget()
         main_layout = QVBoxLayout(content_widget)
@@ -92,37 +96,54 @@ class QConditionListbox(QScrollArea):
 
     def on_field_changed(self):
         self.operator_combobox.clear()
-        self.value_lineedit.clear()
-        self._add_operators_options()
-        self._setup_value_validator()
+        self.value_combobox.clear()
+        self._update_operators()
+        self._update_value_validator()
+        self._update_drop_button_state()
+        self._update_case_sensitive_checkbutton_state()
+        self._update_value_options()
+
+    def _update_value_options(self):
+        if self.is_current_field_enum():
+            field_data = self.get_field_data()
+            for data, value in ENUMS_TRANSLATIONS[field_data].items():
+                self.value_combobox.addItem(value, userData=data)
+
+    def get_field_data(self):
+        return self.field_combobox.itemData(self.field_combobox.currentIndex())
 
     def _add_fields_options(self):
         for data, text in FIELDS_TRANSLATIONS.items():
             self.field_combobox.addItem(text, userData=data)
 
     def _is_current_field_str(self) -> bool:
-        field_data = self.field_combobox.itemData(self.field_combobox.currentIndex())
-        return field_data in MessageConditionValidator.STR_FIELDS
+        return self.get_field_data() in MessageConditionValidator.STR_FIELDS
 
-    def _add_operators_options(self):
+    def is_current_field_enum(self) -> bool:
+        return self.get_field_data() in MessageConditionValidator.ENUM_FIELDS
+
+    def _update_operators(self):
         if self._is_current_field_str():
             operators = MessageConditionValidator.STR_OPERATORS
-            self.case_insensitive_checkbutton.setDisabled(False)
+        elif self.is_current_field_enum():
+            operators = MessageConditionValidator.ENUM_OPERATORS
         else:
             operators = MessageConditionValidator.INT_OPERATORS
-            self.case_insensitive_checkbutton.setDisabled(True)
         for i in operators:
             self.operator_combobox.addItem(OPERATORS_TRANSLATIONS[i], userData=i)
 
-    def _setup_value_validator(self):
-        if self._is_current_field_str():
-            self.value_lineedit.setValidator(None)
+    def _update_drop_button_state(self):
+        self.value_combobox.dropButton.setVisible(self.is_current_field_enum())
+
+    def _update_value_validator(self):
+        if self._is_current_field_str() or self.is_current_field_enum():
+            self.value_combobox.setValidator(None)
         else:
-            self.value_lineedit.setValidator(QIntValidator())
+            self.value_combobox.setValidator(QIntValidator())
 
     def on_add_condition(self):
         field = self.field_combobox.currentText()
-        field_data = self.field_combobox.itemData(self.field_combobox.currentIndex())
+        field_data = self.get_field_data()
         operator = self.operator_combobox.currentText()
         operator_data = self.operator_combobox.itemData(
             self.operator_combobox.currentIndex()
@@ -135,7 +156,7 @@ class QConditionListbox(QScrollArea):
         else:
             case_insensitive_data = None
             case_insensitive = "N/A"
-        value = self.value_lineedit.text()
+        value = self.value_combobox.text()
         self._add_condition(
             field,
             field_data,
@@ -193,7 +214,7 @@ class QConditionListbox(QScrollArea):
         self.table.setRowCount(0)
         self.field_combobox.clear()
         self.operator_combobox.clear()
-        self.value_lineedit.clear()
+        self.value_combobox.clear()
         self._add_fields_options()
 
     def get_data(self, message_id: int) -> typing.List[MessageCondition]:
@@ -241,3 +262,6 @@ class QConditionListbox(QScrollArea):
                 case_insensitive_data,
                 value_text,
             )
+
+    def _update_case_sensitive_checkbutton_state(self):
+        self.case_insensitive_checkbutton.setDisabled(not self._is_current_field_str())
