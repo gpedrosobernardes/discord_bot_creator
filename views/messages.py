@@ -1,4 +1,3 @@
-import qtawesome
 from PySide6.QtCore import (
     Qt,
     QCoreApplication,
@@ -13,17 +12,18 @@ from PySide6.QtWidgets import (
     QHBoxLayout,
     QDialog,
     QLabel,
+    QPushButton,
+    QLineEdit,
+    QSpinBox,
+    QButtonGroup,
+    QGroupBox,
 )
-from extra_qwidgets.fluent_widgets.collapse_group import CollapseGroup
-from extra_qwidgets.utils import colorize_icon
-from extra_qwidgets.validators.emoji_validator import QEmojiValidator
-from extra_qwidgets.widgets.checkboxes import QCheckBoxes
-from qfluentwidgets import PushButton, CaptionLabel, LineEdit, SpinBox
+from qextrawidgets import QColorButton, QAccordion, QEmojiPicker
+from qextrawidgets.icons import QThemeResponsiveIcon
 
 from widgets.condition_listbox import QConditionListbox
-from widgets.custom_button import ColoredPushButton
-from widgets.custom_checkbox import QCustomCheckBox
-from widgets.emoji_picker import QEmojiPickerPopup
+from widgets.custom_checkbox import QCustomRadioButton
+
 from widgets.listbox import QListBox
 
 translate = QCoreApplication.translate
@@ -40,11 +40,9 @@ class MessageView:
         self.window.resize(1000, 800)
         self.window.setWindowTitle(translate("MessageWindow", "Message"))
 
-        self.emoji_picker_popup = QEmojiPickerPopup()
-
-        self.name_text = CaptionLabel()
+        self.name_text = QLabel()
         self.name_text.setText(translate("MessageWindow", "Name"))
-        self.name_entry = LineEdit()
+        self.name_entry = QLineEdit()
         self.name_entry.setToolTip(
             translate(
                 "MessageWindow",
@@ -58,64 +56,114 @@ class MessageView:
         self.name_entry.setValidator(name_entry_validator)
         self.listbox_conditions = QConditionListbox()
         self.listbox_reactions = QListBox()
-        emoji_validator = QEmojiValidator()
-        self.listbox_reactions.line_edit().setValidator(emoji_validator)
         self.listbox_replies = QListBox()
-        self.collapse_group = CollapseGroup()
-        self.collapse_group.addCollapse(
+        self.collapse_group = QAccordion()
+        self.collapse_group.addSection(
             translate("MessageWindow", "Conditions"), self.listbox_conditions
         )
-        self.collapse_group.addCollapse(
+        self.collapse_group.addSection(
             translate("MessageWindow", "Reactions"),
             self.listbox_reactions,
         )
-        self.collapse_group.addCollapse(
+        self.collapse_group.addSection(
             translate("MessageWindow", "Replies"), self.listbox_replies
         )
 
-        self.group_pin_or_del = QCheckBoxes(
-            QLabel(translate("MessageWindow", "Action"))
-        )
-        self.del_checkbox = QCustomCheckBox(
+        self.group_pin_or_del = QGroupBox(translate("MessageWindow", "Action"))
+        self.group_pin_or_del_layout = QVBoxLayout()
+        self.group_pin_or_del.setLayout(self.group_pin_or_del_layout)
+        self.pin_or_del_button_group = QButtonGroup(self.window)
+        self.pin_or_del_button_group.setExclusive(True)
+        self.pin_checkbox = QCustomRadioButton("pin", translate("MessageWindow", "Pin"))
+        self.del_checkbox = QCustomRadioButton(
             "delete", translate("MessageWindow", "Delete")
         )
-        self.group_pin_or_del.addCheckboxes(
-            QCustomCheckBox("pin", translate("MessageWindow", "Pin")), self.del_checkbox
+        self.none_action_checkbox = QCustomRadioButton(
+            "none", translate("MessageWindow", "None")
         )
-        self.group_kick_or_ban = QCheckBoxes(
-            QLabel(translate("MessageWindow", "Penalty"))
+        self.none_action_checkbox.setChecked(True)
+        self.pin_or_del_button_group.addButton(self.pin_checkbox)
+        self.pin_or_del_button_group.addButton(self.del_checkbox)
+        self.pin_or_del_button_group.addButton(self.none_action_checkbox)
+        self.group_pin_or_del_layout.addWidget(self.pin_checkbox)
+        self.group_pin_or_del_layout.addWidget(self.del_checkbox)
+        self.group_pin_or_del_layout.addWidget(self.none_action_checkbox)
+
+        self.group_kick_or_ban = QGroupBox(translate("MessageWindow", "Penalty"))
+        self.group_kick_or_ban_layout = QVBoxLayout()
+        self.group_kick_or_ban.setLayout(self.group_kick_or_ban_layout)
+        self.kick_or_ban_button_group = QButtonGroup(self.window)
+        self.kick_or_ban_button_group.setExclusive(True)
+        self.kick_checkbox = QCustomRadioButton(
+            "kick", translate("MessageWindow", "Kick")
         )
-        self.group_kick_or_ban.addCheckboxes(
-            QCustomCheckBox("kick", translate("MessageWindow", "Kick")),
-            QCustomCheckBox("ban", translate("MessageWindow", "Ban")),
+        self.ban_checkbox = QCustomRadioButton("ban", translate("MessageWindow", "Ban"))
+        self.none_penalty_checkbox = QCustomRadioButton(
+            "none", translate("MessageWindow", "None")
         )
-        self.group_where_reply = QCheckBoxes(
-            QLabel(translate("MessageWindow", "Where reply"))
+        self.none_penalty_checkbox.setChecked(True)
+        self.kick_or_ban_button_group.addButton(self.kick_checkbox)
+        self.kick_or_ban_button_group.addButton(self.ban_checkbox)
+        self.kick_or_ban_button_group.addButton(self.none_penalty_checkbox)
+        self.group_kick_or_ban_layout.addWidget(self.kick_checkbox)
+        self.group_kick_or_ban_layout.addWidget(self.ban_checkbox)
+        self.group_kick_or_ban_layout.addWidget(self.none_penalty_checkbox)
+
+        self.group_where_reply = QGroupBox(translate("MessageWindow", "Where reply"))
+        self.group_where_reply_layout = QVBoxLayout()
+        self.group_where_reply.setLayout(self.group_where_reply_layout)
+        self.where_reply_button_group = QButtonGroup(self.window)
+        self.where_reply_button_group.setExclusive(True)
+        self.group_reply_checkbox = QCustomRadioButton(
+            "group", translate("MessageWindow", "Group")
         )
-        self.group_where_reply.addCheckboxes(
-            QCustomCheckBox("group", translate("MessageWindow", "Group")),
-            QCustomCheckBox("private", translate("MessageWindow", "Private")),
+        self.private_reply_checkbox = QCustomRadioButton(
+            "private", translate("MessageWindow", "Private")
         )
-        self.group_where_react = QCheckBoxes(
-            QLabel(translate("MessageWindow", "Where react"))
+        self.none_reply_checkbox = QCustomRadioButton(
+            "none", translate("MessageWindow", "None")
         )
-        self.author_checkbox = QCustomCheckBox(
+        self.none_reply_checkbox.setChecked(True)
+        self.where_reply_button_group.addButton(self.group_reply_checkbox)
+        self.where_reply_button_group.addButton(self.private_reply_checkbox)
+        self.where_reply_button_group.addButton(self.none_reply_checkbox)
+        self.group_where_reply_layout.addWidget(self.group_reply_checkbox)
+        self.group_where_reply_layout.addWidget(self.private_reply_checkbox)
+        self.group_where_reply_layout.addWidget(self.none_reply_checkbox)
+
+        self.group_where_react = QGroupBox(translate("MessageWindow", "Where react"))
+        self.group_where_react_layout = QVBoxLayout()
+        self.group_where_react.setLayout(self.group_where_react_layout)
+        self.where_react_button_group = QButtonGroup(self.window)
+        self.where_react_button_group.setExclusive(True)
+        self.author_checkbox = QCustomRadioButton(
             "author", translate("MessageWindow", "Author")
         )
-        self.group_where_react.addCheckboxes(
-            self.author_checkbox,
-            QCustomCheckBox("bot", translate("MessageWindow", "Bot")),
+        self.bot_checkbox = QCustomRadioButton("bot", translate("MessageWindow", "Bot"))
+        self.none_react_checkbox = QCustomRadioButton(
+            "none", translate("MessageWindow", "None")
         )
+        self.none_react_checkbox.setChecked(True)
+        self.where_react_button_group.addButton(self.author_checkbox)
+        self.where_react_button_group.addButton(self.bot_checkbox)
+        self.where_react_button_group.addButton(self.none_react_checkbox)
+        self.group_where_react_layout.addWidget(self.author_checkbox)
+        self.group_where_react_layout.addWidget(self.bot_checkbox)
+        self.group_where_react_layout.addWidget(self.none_react_checkbox)
+
         self.delay_label = QLabel(translate("MessageWindow", "Delay"))
-        self.delay = SpinBox()
-        self.confirm = PushButton()
+        self.delay = QSpinBox()
+        self.confirm = QPushButton()
         self.confirm.setText(translate("MessageWindow", "Confirm"))
-        self.confirm_and_save = ColoredPushButton("#3DCC61", self.window)
-        self.confirm_and_save.setText(translate("MessageWindow", "Confirm and save"))
+        self.confirm_and_save = QColorButton(
+            translate("MessageWindow", "Confirm and save"),
+            "#3DCC61",
+            parent=self.window,
+        )
         self.confirm_and_save.setAutoDefault(False)
         self.confirm_and_save.setDefault(False)
         self.confirm_and_save.setIcon(
-            colorize_icon(qtawesome.icon("fa6s.floppy-disk"), "#FFFFFF")
+            QThemeResponsiveIcon.fromAwesome("fa6s.floppy-disk")
         )
         self.setup_layout()
 

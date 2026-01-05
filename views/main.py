@@ -1,5 +1,4 @@
-import qtawesome
-from PySide6.QtCore import QCoreApplication, QSize
+from PySide6.QtCore import QCoreApplication
 from PySide6.QtGui import QIcon, Qt
 from PySide6.QtWidgets import (
     QWidget,
@@ -9,12 +8,11 @@ from PySide6.QtWidgets import (
     QMainWindow,
     QTabWidget,
     QSplitter,
+    QPushButton,
 )
-from extra_qwidgets.utils import colorize_icon
-from qfluentwidgets import PasswordLineEdit, PushButton, SplashScreen, SearchLineEdit
+from qextrawidgets import QColorButton, QPasswordLineEdit, QSearchLineEdit
+from qextrawidgets.icons import QThemeResponsiveIcon
 
-from core.config import Config
-from widgets.custom_button import ColoredPushButton
 from widgets.groups_list import QGroupsList
 from widgets.log_textedit import QLogTextEdit
 from widgets.menu_bar import MenuBar
@@ -32,13 +30,12 @@ class MainView:
         self.window.setWindowTitle("Discord Bot Creator")
         self.menu_bar = MenuBar(self.window)
 
-        self.splash = SplashScreen(QIcon("source/icons/icon.svg"), self.window)
-        self.splash.setIconSize(QSize(192, 192))
-        self.splash.titleBar.minBtn.hide()
-        self.splash.titleBar.maxBtn.hide()
-        self.splash.titleBar.closeBtn.hide()
-        self.splash.show()
-        self.window.show()
+        # self.splash = SplashScreen(QIcon("source/icons/icon.svg"), self.window)
+        # self.splash.setIconSize(QSize(192, 192))
+        # self.splash.titleBar.minBtn.hide()
+        # self.splash.titleBar.maxBtn.hide()
+        # self.splash.titleBar.closeBtn.hide()
+        # self.splash.show()
 
         self.logs_text_edit = QLogTextEdit()
 
@@ -48,39 +45,39 @@ class MainView:
         self.cmd_combobox.lineEdit().clear()
         self.cmd_combobox.lineEdit().setPlaceholderText("Cmd")
 
-        self.token_widget = PasswordLineEdit()
-        self.token_widget.setText(Config.get("token"))
+        self.token_widget = QPasswordLineEdit()
         self.token_widget.setMaxLength(100)
 
-        self.turn_on_bot_button = ColoredPushButton("#3A81F1", self.window)
-        self.turn_on_bot_button.setText(translate("MainWindow", "Turn on bot"))
-        self.turn_on_bot_button.setIcon(
-            colorize_icon(qtawesome.icon("fa6s.play"), "#FFFFFF")
+        self.turn_on_bot_button = QColorButton(
+            translate("MainWindow", "Turn on bot"), "#3A81F1"
         )
-        self.turn_off_bot_button = ColoredPushButton("#d8315b", self.window)
-        self.turn_off_bot_button.setText(translate("MainWindow", "Turn off bot"))
-        self.turn_off_bot_button.setIcon(
-            colorize_icon(qtawesome.icon("fa6s.stop"), "#FFFFFF")
+        self.turn_on_bot_button.setIcon(QThemeResponsiveIcon.fromAwesome("fa6s.play"))
+        self.turn_off_bot_button = QColorButton(
+            translate("MainWindow", "Turn off bot"), "#d8315b"
         )
+        self.turn_off_bot_button.setIcon(QThemeResponsiveIcon.fromAwesome("fa6s.stop"))
 
-        self.search_groups = SearchLineEdit()
-        self.search_groups.searchButton.setDisabled(True)
+        self.search_groups = QSearchLineEdit()
+        # self.search_groups.searchButton.setDisabled(True)
         self.groups_list_widget = QGroupsList()
-        self.config_group_button = PushButton()
+        self.config_group_button = QPushButton()
         self.config_group_button.setText(translate("MainWindow", "Config"))
-        self.quit_group_button = PushButton()
+        self.quit_group_button = QPushButton()
         self.quit_group_button.setText(translate("MainWindow", "Quit"))
-        self.search_messages = SearchLineEdit()
-        self.search_messages.searchButton.setDisabled(True)
+        self.search_messages = QSearchLineEdit()
+        # self.search_messages.searchButton.setDisabled(True)
         self.messages_list_widget = QMessagesList()
-        self.new_message_button = PushButton()
+        self.new_message_button = QPushButton()
         self.new_message_button.setText(translate("MainWindow", "New"))
-        self.edit_messages_button = PushButton()
+        self.edit_messages_button = QPushButton()
         self.edit_messages_button.setText(translate("MainWindow", "Edit"))
-        self.remove_message_button = PushButton()
+        self.remove_message_button = QPushButton()
         self.remove_message_button.setText(translate("MainWindow", "Remove"))
-        self.remove_all_message_button = PushButton()
+        self.remove_all_message_button = QPushButton()
         self.remove_all_message_button.setText(translate("MainWindow", "Remove all"))
+        self.setup_menus()
+        self.setup_layout()
+        self.window.show()
 
     def setup_menus(self):
         self.window.setMenuBar(self.menu_bar)

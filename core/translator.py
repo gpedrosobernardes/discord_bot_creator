@@ -2,14 +2,13 @@ import logging
 
 from PySide6.QtCore import QTranslator
 
-from core.config import Config
 from core.singleton import SingletonMeta
 
 
 class Translator(metaclass=SingletonMeta):
     def __init__(self):
         self.__instance = QTranslator()
-        self.__instance.load(f"translations/build/{Config.get("language")}.qm")
+        self.__instance.load(f"translations/build/en_us.qm")
 
     @classmethod
     def translate(cls, context: str, text: str) -> str:

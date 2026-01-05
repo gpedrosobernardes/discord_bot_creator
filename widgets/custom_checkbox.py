@@ -1,8 +1,8 @@
 from PySide6.QtCore import Qt
-from qfluentwidgets import CheckBox
+from PySide6.QtWidgets import QRadioButton
 
 
-class QCustomCheckBox(CheckBox):
+class QCustomRadioButton(QRadioButton):
     def __init__(self, name: str, text: str):
         super().__init__()
         self.setText(text)

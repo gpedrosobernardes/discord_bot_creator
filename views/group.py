@@ -1,4 +1,3 @@
-import qtawesome
 from PySide6.QtCore import QCoreApplication, Qt, QSize
 from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import (
@@ -8,15 +7,14 @@ from PySide6.QtWidgets import (
     QFormLayout,
     QSpacerItem,
     QSizePolicy,
+    QToolButton,
+    QComboBox,
+    QPlainTextEdit,
 )
-from extra_qwidgets.fluent_widgets.theme_responsive_tool_button import (
-    ThemeResponsiveToolButton,
-)
-from extra_qwidgets.utils import colorize_icon
-from qfluentwidgets import ComboBox, PlainTextEdit
+from qextrawidgets import QColorButton
+from qextrawidgets.icons import QThemeResponsiveIcon
 
 from widgets.channel_dialog import ChannelDialog
-from widgets.custom_button import ColoredPushButton
 
 translate = QCoreApplication.translate
 
@@ -33,27 +31,28 @@ class GroupView:
 
         self.channel_pick_dialog = ChannelDialog()
 
-        self.welcome_message_channels = ComboBox()
-        self.welcome_message_textedit = PlainTextEdit()
+        self.welcome_message_channels = QComboBox()
+        self.welcome_message_textedit = QPlainTextEdit()
         self.welcome_message_textedit.setMaximumHeight(300)
-        self.welcome_message_pick_button = ThemeResponsiveToolButton(
-            qtawesome.icon("fa6s.list")
+        self.welcome_message_pick_button = QToolButton()
+        self.welcome_message_pick_button.setIcon(
+            QThemeResponsiveIcon.fromAwesome("fa6s.list")
         )
         self.welcome_message_pick_button.setIconSize(QSize(19, 19))
 
-        self.goodbye_message_channels = ComboBox()
-        self.goodbye_message_textedit = PlainTextEdit()
+        self.goodbye_message_channels = QComboBox()
+        self.goodbye_message_textedit = QPlainTextEdit()
         self.goodbye_message_textedit.setMaximumHeight(300)
-        self.goodbye_message_pick_button = ThemeResponsiveToolButton(
-            qtawesome.icon("fa6s.list")
+
+        self.goodbye_message_pick_button = QToolButton()
+        self.goodbye_message_pick_button.setIcon(
+            QThemeResponsiveIcon.fromAwesome("fa6s.list")
         )
         self.goodbye_message_pick_button.setIconSize(QSize(19, 19))
 
-        self.save_button = ColoredPushButton("#3DCC61", self.window)
+        self.save_button = QColorButton(self.window, "#3DCC61")
         self.save_button.setText(translate("MessageWindow", "Confirm and save"))
-        self.save_button.setIcon(
-            colorize_icon(qtawesome.icon("fa6s.floppy-disk"), "#FFFFFF")
-        )
+        self.save_button.setIcon(QThemeResponsiveIcon.fromAwesome("fa6s.floppy-disk"))
 
         self.setup_layout()
 

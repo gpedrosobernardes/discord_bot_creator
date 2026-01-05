@@ -4,16 +4,14 @@ from PySide6.QtWidgets import (
     QVBoxLayout,
     QHBoxLayout,
     QSizePolicy,
+    QLineEdit,
+    QComboBox,
+    QDateEdit,
+    QPushButton,
+    QTableView,
+    QLabel,
 )
-from extra_qwidgets.fluent_widgets.pager import Pager
-from qfluentwidgets import (
-    TableView,
-    ComboBox,
-    FastCalendarPicker,
-    PushButton,
-    StrongBodyLabel,
-    LineEdit,
-)
+from qextrawidgets import QPager
 
 from core.translator import Translator
 
@@ -25,26 +23,25 @@ class LogsView:
         self.window.setMinimumSize(800, 600)
         self.window.resize(1000, 800)
         self.window.setWindowIcon(QIcon("source/icons/window-icon.svg"))
-        self.message_filter = LineEdit()
+        self.message_filter = QLineEdit()
         self.message_filter.setPlaceholderText(
             Translator.translate("LogsWindow", "Message")
         )
-        self.level_filter = ComboBox()
-        self.date_filter = FastCalendarPicker()
-        self.date_filter.setText(Translator.translate("LogsWindow", "Date"))
-        self.date_filter.setDateFormat(Qt.DateFormat.TextDate)
-        self.filter_button = PushButton()
+        self.level_filter = QComboBox()
+        self.date_filter = QDateEdit()
+        self.date_filter.setDisplayFormat(Qt.DateFormat.TextDate.name) # Or a specific format string
+        self.filter_button = QPushButton()
         self.filter_button.setText(Translator.translate("LogsWindow", "Filter"))
-        self.reset_filter_button = PushButton()
+        self.reset_filter_button = QPushButton()
         self.reset_filter_button.setText(Translator.translate("LogsWindow", "Reset"))
-        self.update_button = PushButton()
+        self.update_button = QPushButton()
         self.update_button.setText(Translator.translate("LogsWindow", "Update"))
-        self.logs_table = TableView()
+        self.logs_table = QTableView()
         self.logs_table.setSizePolicy(
             QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred
         )
-        self.pager = Pager()
-        self.rows_count = StrongBodyLabel()
+        self.pager = QPager()
+        self.rows_count = QLabel()
         self._setup_layout()
 
     def _setup_layout(self):

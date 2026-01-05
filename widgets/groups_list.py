@@ -1,12 +1,11 @@
 from PySide6.QtCore import QPoint, Qt, QCoreApplication
 from PySide6.QtGui import QAction
-from PySide6.QtWidgets import QAbstractItemView
-from qfluentwidgets import RoundMenu, ListView
+from PySide6.QtWidgets import QAbstractItemView, QListView, QMenu
 
 translate = QCoreApplication.translate
 
 
-class QGroupsList(ListView):
+class QGroupsList(QListView):
     def __init__(self):
         super().__init__()
 
@@ -19,7 +18,7 @@ class QGroupsList(ListView):
 
     def group_context_menu_event(self, position: QPoint):
         if bool(self.selectedIndexes()):
-            context_menu = RoundMenu()
+            context_menu = QMenu()
             context_menu.addAction(self.config_action)
             context_menu.addAction(self.quit_action)
             context_menu.exec(self.mapToGlobal(position))

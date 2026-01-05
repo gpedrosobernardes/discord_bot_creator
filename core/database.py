@@ -7,7 +7,6 @@ from pathlib import Path
 from sqlalchemy import create_engine, text, func
 from sqlalchemy.orm import sessionmaker, Session, Query
 
-from core.config import Config
 from core.singleton import SingletonMeta
 from models.base import Base
 from models.group import Group
