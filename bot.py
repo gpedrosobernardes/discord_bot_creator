@@ -1,6 +1,5 @@
 import logging
 from core.bot import Bot
-from core.config import Config
 
 
 if __name__ == "__main__":

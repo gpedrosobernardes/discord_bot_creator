@@ -5,19 +5,11 @@ import typing
 import discord
 import emojis
 
-from core.translator import (
-    Translator,
-    FIELDS_TRANSLATIONS,
-    OPERATORS_TRANSLATIONS,
-    BOOL_TRANSLATIONS,
-)
-from models.condition import MessageCondition
 from core.log_handler import LogHandler
 
 
 logger = logging.getLogger(__name__)
 logger.addHandler(LogHandler())
-translate = Translator.translate
 
 
 class MessageConditionValidator:
@@ -53,7 +45,7 @@ class MessageConditionValidator:
 
     def __init__(
         self,
-        conditions: list[MessageCondition],
+        conditions: list,
         message: discord.Message,
     ):
         self.conditions = conditions
@@ -61,7 +53,7 @@ class MessageConditionValidator:
         self.conditions_count = len(conditions)
         self.conditions_validated = 0
 
-    def is_valid(self, condition: MessageCondition) -> bool:
+    def is_valid(self, condition) -> bool:
         if condition.field == "message":
             return self._validate_str_condition(
                 condition, str(self.message.clean_content)
@@ -90,7 +82,7 @@ class MessageConditionValidator:
     def is_valid_all(self) -> bool:
         return all(self.is_valid(condition) for condition in self.conditions)
 
-    def _validate_str_condition(self, condition: MessageCondition, value: str) -> bool:
+    def _validate_str_condition(self, condition, value: str) -> bool:
         new_value = value
         condition_value = condition.value
         if condition.case_insensitive:
@@ -121,7 +113,7 @@ class MessageConditionValidator:
 
     def _validate_condition_log(
         self,
-        condition: MessageCondition,
+        condition,
         condition_value: typing.Union[str, int],
         value: typing.Union[str, int],
         result: bool,
@@ -151,7 +143,7 @@ class MessageConditionValidator:
             ).format(**format_kwargs)
         logger.debug(log)
 
-    def _validate_int_condition(self, condition: MessageCondition, value: int) -> bool:
+    def _validate_int_condition(self, condition, value: int) -> bool:
         condition_value = int(condition.value)
         if condition.operator == "equal to":
             result = condition_value == value

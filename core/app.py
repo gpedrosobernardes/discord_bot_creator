@@ -2,48 +2,77 @@ import locale
 import logging
 import sys
 
-from PySide6.QtCore import QSettings
+from PySide6.QtCore import QSettings, QTranslator
 from PySide6.QtWidgets import QApplication
 
+from controllers.config import ConfigController
 from controllers.credits import CreditsController
 from controllers.group import GroupController
 from controllers.logs import LogsController
 from controllers.main import MainController
-from controllers.message import MessageController
+from core.constants import Language
+from core.database import DatabaseController
 from core.log_handler import LogHandler
-from core.translator import Translator
 
 logger = logging.getLogger(__name__)
 logger.addHandler(LogHandler())
 
 
-class Application(QApplication):
+class Application:
     def __init__(self):
-        super().__init__(sys.argv)
-        self.settings = self.create_settings()
+        self.application = QApplication(sys.argv)
+
+        self.user_settings = self.create_user_settings()
+
+        self.translator = QTranslator()
+        lang = self.user_settings.value("language")
+        self.translator.load(f"translations/build/{lang}.qm")
+        self.application.installTranslator(self.translator)
+        locale.setlocale(locale.LC_ALL, lang)
 
         logging.basicConfig(
-            level=self.settings.value("log_level", logging.INFO),
+            level=self.user_settings.value("log_level"),
             format="%(asctime)s - %(message)s",
             datefmt="%x %X",
         )
-        lang = self.settings.value("language", "en_us")
-        locale.setlocale(locale.LC_ALL, lang)
-        self.installTranslator(Translator().get_instance())
-        # LogHandler().set_signal(self.bot_thread.log)
-        self.main_controller = MainController(self.settings)
-        self.logs_controller = LogsController(self.settings)
-        self.message_controller = MessageController()
-        self.group_controller = GroupController()
+
+        self.database = DatabaseController(self.user_settings.value("database"))
+
+        self.config_controller = ConfigController(self.translator, self.user_settings)
+        self.logs_controller = LogsController()
         self.credits_controller = CreditsController()
+        self.main_controller = MainController(
+            self.database,
+            self.user_settings,
+            self.config_controller.view,
+            self.logs_controller.view,
+            self.credits_controller.view,
+        )
+
+        self.group_controller = GroupController()
+
+        self.setup_connections()
+        sys.exit(self.application.exec())
+
+    def setup_connections(self):
+        for view in (
+            self.config_controller.view,
+            self.main_controller.view,
+            self.logs_controller.view,
+        ):
+            self.config_controller.language_changed.connect(view.translate_ui)
 
     @staticmethod
-    def create_settings() -> QSettings:
+    def create_user_settings() -> QSettings:
         settings = QSettings("discord_bot_creator", "main")
-        if not settings.contains("auto_start_bot"):
-            settings.setValue("auto_start_bot", False)
-        if not settings.contains("language"):
-            settings.setValue("language", "en_us")
-        if not settings.contains("log_level"):
-            settings.setValue("log_level", logging.INFO)
+        default_values = {
+            "auto_start_bot": False,
+            "language": Language.ENGLISH,
+            "log_level": logging.INFO,
+            "database": ":memory:",
+            "style": "windows11",
+        }
+        for key, value in default_values.items():
+            if not settings.contains(key):
+                settings.setValue(key, value)
         return settings

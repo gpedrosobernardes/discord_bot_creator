@@ -1,24 +1,32 @@
-from PySide6.QtCore import QCoreApplication
+from PySide6.QtCore import QCoreApplication, QTranslator, QObject
 from PySide6.QtGui import QIcon, QPixmap, Qt
 from PySide6.QtWidgets import QDialog, QLabel, QVBoxLayout
 
 
-class CreditsView:
+class CreditsView(QObject):
     def __init__(self):
+        super().__init__()
         self.window = QDialog()
-        self.window.setWindowTitle(QCoreApplication.translate("MainWindow", "Credits"))
         self.window.setFixedSize(400, 200)
         self.window.setWindowIcon(QIcon("source/icons/window-icon.svg"))
 
-        self.layout = QVBoxLayout()
-
         pixmap = QPixmap("source/icons/icon.svg")
-        self.logo = QLabel()
-        self.logo.setPixmap(pixmap)
+        self.logo_label = QLabel()
+        self.logo_label.setPixmap(pixmap)
 
-        self.label = QLabel(QCoreApplication.translate("MainWindow", "Credits text"))
+        self.credits_label = QLabel()
 
-        self.layout.addWidget(self.logo, alignment=Qt.AlignmentFlag.AlignCenter)
-        self.layout.addWidget(self.label, alignment=Qt.AlignmentFlag.AlignCenter)
+        self.setup_layout()
+        self.translate_ui()
 
-        self.window.setLayout(self.layout)
+    def translate_ui(self):
+        self.window.setWindowTitle(self.tr("Credits"))
+        name = "Gustavo Pedroso Bernardes"
+        self.credits_label.setText(self.tr("Developed by: {name}").format(name=name))
+
+    def setup_layout(self):
+        layout = QVBoxLayout()
+        layout.addWidget(self.logo_label, alignment=Qt.AlignmentFlag.AlignCenter)
+        layout.addWidget(self.credits_label, alignment=Qt.AlignmentFlag.AlignCenter)
+
+        self.window.setLayout(layout)

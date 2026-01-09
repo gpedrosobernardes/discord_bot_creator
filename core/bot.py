@@ -6,7 +6,7 @@ import typing
 import discord
 from discord import MessageType
 
-from core.database import Database
+from core.database import DatabaseController
 from core.translator import Translator
 from interpreter.conditions import MessageConditionValidator
 from interpreter.variable import Variable
@@ -22,7 +22,7 @@ translate = Translator.translate
 class Bot(discord.Client):
     def __init__(self):
         super().__init__(intents=discord.Intents.all())
-        self.database = Database()
+        self.database = DatabaseController()
 
     async def on_ready(self):
         logger.info(translate("Bot", "Bot started!"))
@@ -68,8 +68,8 @@ class Bot(discord.Client):
                     message.conditions, discord_message
                 )
                 if validator.is_valid_all():
-                    if message.delay:
-                        await self.apply_delay(message.delay)
+                    if message.delay_spin_box:
+                        await self.apply_delay(message.delay_spin_box)
                     if message.replies:
                         await self.send_replies(
                             message,

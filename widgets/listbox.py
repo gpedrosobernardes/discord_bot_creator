@@ -1,105 +1,111 @@
-import typing
-
-from PySide6.QtCore import Qt, QCoreApplication, QSize, QPoint
-from PySide6.QtGui import QAction
+from PySide6.QtCore import Qt, QSize, QPoint
+from PySide6.QtGui import QAction, QValidator
+from PySide6.QtSql import QSqlTableModel
 from PySide6.QtWidgets import (
     QVBoxLayout,
     QHBoxLayout,
     QWidget,
-    QScrollArea,
     QToolButton,
-    QListWidget,
     QMenu,
+    QListView,
 )
-from qextrawidgets import QExtraTextEdit, QEmojiPicker
+from qextrawidgets import (
+    QExtraTextEdit,
+    QEmojiPicker,
+    QStandardTwemojiDelegate,
+    QTwemojiTextDocument,
+)
 from qextrawidgets.icons import QThemeResponsiveIcon
 
-translate = QCoreApplication.translate
 
-
-class QListBox(QScrollArea):
-    def __init__(self):
+class QListBox(QWidget):
+    def __init__(self, model: QSqlTableModel, emoji_picker: QEmojiPicker):
         super().__init__()
-        self.list = QListWidget()
-        self.list.setMinimumHeight(85)
-        self.add_button = QToolButton()
-        self.add_button.setIcon(QThemeResponsiveIcon.fromAwesome("fa6s.arrow-right"))
-        self.add_button.setIconSize(QSize(20, 20))
-        self.emote_button = QToolButton()
-        self.emote_button.setIcon(QThemeResponsiveIcon.fromAwesome("fa6s.face-smile"))
-        self.emote_button.setIconSize(QSize(20, 20))
-        self.text_edit = QExtraTextEdit()
 
-        self.emoji_picker_popup = QEmojiPicker()
-        self.emoji_picker_popup.setContentsMargins(10, 10, 10, 10)
-        self.emoji_picker_popup.setWindowFlags(
-            Qt.WindowType.Popup | Qt.WindowType.FramelessWindowHint
-        )
-        self.emoji_picker_popup.setFixedSize(500, 500)
+        self._list_view = QListView()
+        self._list_view.setItemDelegate(QStandardTwemojiDelegate())
+        self._list_view.setMinimumHeight(85)
+        self._list_view.setModel(model)
+        self._list_view.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
 
-        self.__context_menu = QMenu()
-        delete_action = QAction(translate("QListBox", "Remove"), self)
-        delete_action.triggered.connect(self.delete_selected_items)
-        self.__context_menu.addAction(delete_action)
+        self._add_button = QToolButton()
+        self._add_button.setIcon(QThemeResponsiveIcon.fromAwesome("fa6s.arrow-right"))
+        self._add_button.setIconSize(QSize(20, 20))
 
-        self.setWidgetResizable(True)
+        self._emote_button = QToolButton()
+        self._emote_button.setIcon(QThemeResponsiveIcon.fromAwesome("fa6s.face-smile"))
+        self._emote_button.setIconSize(QSize(20, 20))
 
-        self.setup_layout()
-        self.setup_connections()
+        self._text_edit = QExtraTextEdit()
+        self._document: QTwemojiTextDocument = self._text_edit.document()
+        self._document.setDevicePixelRatio(self.devicePixelRatio())
 
-    def setup_connections(self):
-        self.emote_button.pressed.connect(self.raise_emoji_picker)
-        self.emoji_picker_popup.picked.connect(
-            lambda emoji: self.text_edit.insertPlainText(emoji[1])
-        )
-        self.add_button.clicked.connect(self.on_add_button)
+        self._emoji_picker = emoji_picker
 
-    def setup_layout(self):
+        self._delete_action = QAction()
+        self._delete_action.setShortcut("Delete")
+
+        self.addButtonPressed = self._add_button.pressed
+
+        self._setup_layout()
+        self._setup_connections()
+        self.translate_ui()
+
+    def _setup_connections(self):
+        self._emote_button.pressed.connect(self._show_emoji_picker)
+        self._list_view.customContextMenuRequested.connect(self._on_context_menu)
+        self._delete_action.triggered.connect(self._delete_selected_indexes)
+
+    def _setup_layout(self):
         horizontal_layout = QHBoxLayout()
-        horizontal_layout.addWidget(self.text_edit)
-        horizontal_layout.addWidget(
-            self.add_button, alignment=Qt.AlignmentFlag.AlignTop
-        )
-        horizontal_layout.addWidget(
-            self.emote_button, alignment=Qt.AlignmentFlag.AlignTop
-        )
+        horizontal_layout.addWidget(self._text_edit)
+        horizontal_layout.addWidget(self._add_button, 0, Qt.AlignmentFlag.AlignTop)
+        horizontal_layout.addWidget(self._emote_button, 0, Qt.AlignmentFlag.AlignTop)
         horizontal_layout.setStretch(0, True)
-        content_widget = QWidget()
-        layout = QVBoxLayout(content_widget)
-        layout.addWidget(self.list)
+
+        layout = QVBoxLayout()
+        layout.addWidget(self._list_view)
         layout.addLayout(horizontal_layout)
-        self.setWidget(content_widget)
 
-    def keyPressEvent(self, event):
-        if event.key() == Qt.Key.Key_Delete:
-            for item in self.list.selectedItems():
-                self.list.takeItem(self.list.row(item))
-        else:
-            super().keyPressEvent(event)
+        self.setLayout(layout)
 
-    def on_add_button(self):
-        self.list.addItem(self.text_edit.toPlainText())
-        self.text_edit.clear()
+    def translate_ui(self):
+        self._delete_action.setText(self.tr("Remove"))
 
-    def raise_emoji_picker(self):
-        absolute_pos = self.emote_button.mapToGlobal(QPoint(-500, -500))
-        self.emoji_picker_popup.move(absolute_pos)
-        self.emoji_picker_popup.show()
+    def _show_emoji_picker(self):
+        absolute_pos = self._emote_button.mapToGlobal(QPoint(-500, -500))
+        self._emoji_picker.move(absolute_pos)
+        self._emoji_picker.picked.disconnect()
+        self._emoji_picker.picked.connect(
+            lambda emoji: self._text_edit.insertPlainText(emoji[1])
+        )
+        self._emoji_picker.show()
 
-    def is_selecting(self) -> bool:
-        return bool(self.list.selectedItems())
+    def _delete_selected_indexes(self):
+        indexes = self._list_view.selectedIndexes()
+        rows = sorted(set(index.row() for index in indexes), reverse=True)
+        model = self._list_view.model()
+        for row in rows:
+            model.removeRow(row)
 
-    def get_items_text(self) -> typing.List[str]:
-        return [self.list.item(i).text() for i in range(self.list.count())]
+    def _on_context_menu(self, position: QPoint):
+        global_position = self._list_view.mapToGlobal(position)
+        if self._list_view.selectedIndexes():
+            context_menu = QMenu()
+            context_menu.addAction(self._delete_action)
+            context_menu.exec(global_position)
 
-    def add_item(self, *args):
-        # noinspection PyArgumentList
-        self.list.addItem(*args)
+    def get_text(self) -> str:
+        return self._document.toPlainText()
 
-    def contextMenuEvent(self, event):
-        if self.is_selecting():
-            self.__context_menu.exec(event.globalPos())
+    def clear_text(self):
+        self._document.clear()
 
-    def delete_selected_items(self):
-        for item in self.list.selectedItems():
-            self.list.takeItem(self.list.row(item))
+    def set_model_column(self, index: int):
+        self._list_view.setModelColumn(index)
+
+    def set_text_validator(self, validator: QValidator):
+        self._text_edit.setValidator(validator)
+
+    def set_line_limit(self, line_limit: int):
+        self._document.setLineLimit(line_limit)

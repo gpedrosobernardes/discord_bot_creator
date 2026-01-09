@@ -20,7 +20,6 @@ class QLogTextEdit(QPlainTextEdit):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setReadOnly(True)
-        self.setPlaceholderText(self.tr("No logs at moment"))
         self.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.installEventFilter(self)
         style_hints = QApplication.styleHints()
