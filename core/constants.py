@@ -48,9 +48,7 @@ class IntField(Enum):
 
 class StrComparator(Enum):
     EQUAL_TO = QT_TRANSLATE_NOOP("StrComparator", "Equal to")
-    NOT_EQUAL_TO = QT_TRANSLATE_NOOP("StrComparator", "Not equal to")
     CONTAINS = QT_TRANSLATE_NOOP("StrComparator", "Contains")
-    NOT_CONTAINS = QT_TRANSLATE_NOOP("StrComparator", "Not contains")
     STARTS_WITH = QT_TRANSLATE_NOOP("StrComparator", "Starts with")
     ENDS_WITH = QT_TRANSLATE_NOOP("StrComparator", "Ends with")
     REGEX = QT_TRANSLATE_NOOP("StrComparator", "Regex")
@@ -58,7 +56,6 @@ class StrComparator(Enum):
 
 class IntComparator(Enum):
     EQUAL_TO = QT_TRANSLATE_NOOP("IntComparator", "Equal to")
-    NOT_EQUAL_TO = QT_TRANSLATE_NOOP("IntComparator", "Not equal to")
     GREATER_THAN = QT_TRANSLATE_NOOP("IntComparator", "Greater than")
     LESS_THAN = QT_TRANSLATE_NOOP("IntComparator", "Less than")
     GREATER_OR_EQUAL_TO = QT_TRANSLATE_NOOP("IntComparator", "Greater or equal to")

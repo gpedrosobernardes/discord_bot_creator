@@ -39,7 +39,9 @@ class MessageConditionValidator:
         self.conditions_validated = 0
 
         # 1. Data Extraction Strategies
-        self._field_extractors: Dict[str, Callable[[discord.Message], Union[str, int]]] = {
+        self._field_extractors: Dict[
+            str, Callable[[discord.Message], Union[str, int]]
+        ] = {
             StrField.MESSAGE.value: lambda m: str(m.clean_content),
             StrField.AUTHOR_NAME.value: lambda m: m.author.name,
             StrField.CHANNEL_NAME.value: lambda m: m.channel.name,
@@ -55,7 +57,6 @@ class MessageConditionValidator:
         # 2. Integer Operators
         self._int_operators: Dict[str, Callable[[int, int], bool]] = {
             IntComparator.EQUAL_TO.value: operator.eq,
-            IntComparator.NOT_EQUAL_TO.value: operator.ne,
             IntComparator.GREATER_THAN.value: operator.gt,
             IntComparator.LESS_THAN.value: operator.lt,
             IntComparator.GREATER_OR_EQUAL_TO.value: operator.ge,
@@ -66,9 +67,7 @@ class MessageConditionValidator:
         # operator.contains(a, b) is equivalent to "b in a"
         self._str_operators: Dict[str, Callable[[str, str], bool]] = {
             StrComparator.EQUAL_TO.value: operator.eq,
-            StrComparator.NOT_EQUAL_TO.value: operator.ne,
             StrComparator.CONTAINS.value: operator.contains,
-            StrComparator.NOT_CONTAINS.value: lambda m, t: t not in m,
             StrComparator.STARTS_WITH.value: str.startswith,
             StrComparator.ENDS_WITH.value: str.endswith,
         }
@@ -105,8 +104,14 @@ class MessageConditionValidator:
         message_value = extractor(self.message)
 
         if isinstance(message_value, int):
-            return self._validate_int(condition, message_value)
-        return self._validate_str(condition, str(message_value))
+            result = self._validate_int(condition, message_value)
+        else:
+            result = self._validate_str(condition, str(message_value))
+
+        if condition.value("reverse_comparator"):
+            result = not result
+
+        return result
 
     def _validate_int(self, condition: QSqlRecord, msg_value: int) -> bool:
         """
