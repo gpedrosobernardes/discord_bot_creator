@@ -1,6 +1,6 @@
 import qtawesome
-from PySide6.QtCore import QCoreApplication, QSize, QTranslator, QObject
-from PySide6.QtGui import QIcon, Qt, QAction
+from PySide6.QtCore import QSize, Qt
+from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import (
     QWidget,
     QVBoxLayout,
@@ -16,126 +16,83 @@ from PySide6.QtWidgets import (
     QHBoxLayout,
 )
 from qextrawidgets import QColorButton, QPasswordLineEdit, QSearchLineEdit
-from qextrawidgets.icons import QThemeResponsiveIcon
 
 from widgets.groups_list import QGroupsList
 from widgets.log_textedit import QLogTextEdit
 
 
-class MainView(QObject):
+class MainView(QMainWindow):
+    """
+    Main Window View for the Discord Bot Creator application.
+
+    This class handles the main UI layout, including the menu bar,
+    tabs for messages and groups, and the configuration panel.
+    """
+
     def __init__(self):
+        """Initializes the MainView."""
         super().__init__()
-        # window
-        self.window = QMainWindow()
-        self.window.setMinimumSize(800, 600)
-        self.window.resize(1000, 800)
-        self.window.setWindowIcon(QIcon("source/icons/window-icon.svg"))
-        self.window.setWindowTitle("Discord Bot Creator")
 
-        # actions
+        self._init_ui()
+        self._init_layout()
+        self.translate_ui()
 
-        # file actions
-        self.new_file_action = QAction()
+    def _init_ui(self):
+        """Initialize widgets and configure their properties."""
+        self.setMinimumSize(800, 600)
+        self.resize(1000, 800)
+        self.setWindowIcon(QIcon("source/icons/window-icon.svg"))
+        self.setWindowTitle("Discord Bot Creator")
 
-        self.load_file_action = QAction()
+        self._init_menus()
+        self._init_controls()
 
-        self.save_file_action = QAction()
-
-        self.save_as_file_action = QAction()
-
-        self.config_action = QAction()
-
-        self.exit_action = QAction()
-
-        # message actions
-        self.new_message_action = QAction(
-            icon=QThemeResponsiveIcon.fromAwesome("fa6s.plus"),
-            shortcut="Ctrl+N",
-        )
-
-        self.edit_message_action = QAction(
-            icon=QThemeResponsiveIcon.fromAwesome("fa6s.pencil"),
-            shortcut="Ctrl+E",
-        )
-
-        self.remove_message_action = QAction(
-            icon=QThemeResponsiveIcon.fromAwesome("fa6s.minus"),
-            shortcut="Delete",
-        )
-
-        self.remove_all_message_action = QAction(
-            icon=QThemeResponsiveIcon.fromAwesome("fa6s.trash"),
-            shortcut="Ctrl+Delete",
-        )
-
-        # group actions
-        self.config_group_action = QAction(
-            icon=QThemeResponsiveIcon.fromAwesome("fa6s.gear"),
-        )
-
-        self.quit_group_action = QAction(
-            icon=QThemeResponsiveIcon.fromAwesome("fa6s.arrow-right-from-bracket"),
-        )
-
-        # help actions
-        self.credits_action = QAction()
-        self.logs_action = QAction()
-        self.project_action = QAction()
-        self.report_bug_action = QAction()
-        self.discord_applications_action = QAction()
-
-        # menu
+    def _init_menus(self):
+        """Initialize the menu bar and menus."""
         self.menu_bar = QMenuBar()
+        self.setMenuBar(self.menu_bar)
 
-        self.file_menu = QMenu(self.menu_bar)
-
+        self.project_menu = QMenu(self.menu_bar)
         self.edit_menu = QMenu(self.menu_bar)
-
         self.help_menu = QMenu(self.menu_bar)
 
-        # left widgets
+        self.menu_bar.addMenu(self.project_menu)
+        self.menu_bar.addMenu(self.edit_menu)
+        self.menu_bar.addMenu(self.help_menu)
 
-        # group tab
+    def _init_controls(self):
+        """Initialize all UI controls."""
+        # --- Left Side: Groups Tab ---
         self.search_groups = QSearchLineEdit()
-
         self.groups_list_widget = QGroupsList()
-
         self.config_group_button = QToolButton()
-        self.config_group_button.setDefaultAction(self.config_group_action)
-
         self.quit_group_button = QToolButton()
-        self.quit_group_button.setDefaultAction(self.quit_group_action)
 
-        # message tab
+        # --- Left Side: Messages Tab ---
         self.search_messages_line_edit = QSearchLineEdit()
-
         self.messages_list_view = QListView()
 
         self.new_message_tool_button = QToolButton()
-        self.new_message_tool_button.setDefaultAction(self.new_message_action)
-
         self.edit_message_tool_button = QToolButton()
-        self.edit_message_tool_button.setDefaultAction(self.edit_message_action)
-
         self.remove_message_tool_button = QToolButton()
-        self.remove_message_tool_button.setDefaultAction(self.remove_message_action)
-
         self.remove_all_message_tool_button = QToolButton()
-        self.remove_all_message_tool_button.setDefaultAction(
-            self.remove_all_message_action
-        )
 
-        # right widgets
+        self.left_tab_widget = QTabWidget()
+        self.left_tab_widget.setMinimumWidth(280)
+
+        # --- Right Side ---
         self.logs_text_edit = QLogTextEdit()
         self.cmd_line_edit = QLineEdit()
 
         self.token_label = QLabel()
-
         self.token_line_edit = QPasswordLineEdit()
         self.token_line_edit.setMaxLength(100)
 
-        switch_icon = QIcon()
+        self._init_switch_button()
 
+    def _init_switch_button(self):
+        """Initialize the switch bot button with icons."""
+        switch_icon = QIcon()
         pixmap_play = qtawesome.icon("fa6s.play").pixmap(QSize(48, 48))
         switch_icon.addPixmap(pixmap_play, QIcon.Mode.Normal, QIcon.State.Off)
 
@@ -146,144 +103,102 @@ class MainView(QObject):
         self.switch_bot_button.setCheckable(True)
         self.switch_bot_button.setIcon(switch_icon)
 
-        self.left_tab_widget = QTabWidget()
+    def _init_layout(self):
+        """Initialize Layouts and add widgets to them."""
+        # 1. Create Left Panel (Tabs)
+        messages_tab = self._create_messages_tab()
+        groups_tab = self._create_groups_tab()
 
-        self.setup_menus()
-        self.setup_layout()
-        self.translate_ui()
-        self.window.show()
+        self.left_tab_widget.addTab(messages_tab, "")
+        self.left_tab_widget.addTab(groups_tab, "")
 
-    def setup_menus(self):
-        self.window.setMenuBar(self.menu_bar)
+        # 2. Create Right Panel
+        right_panel = self._create_right_panel()
 
-        self.menu_bar.addMenu(self.file_menu)
-        self.menu_bar.addMenu(self.edit_menu)
-        self.menu_bar.addMenu(self.help_menu)
+        # 3. Main Splitter
+        splitter = QSplitter(Qt.Orientation.Horizontal)
+        splitter.addWidget(self.left_tab_widget)
+        splitter.addWidget(right_panel)
+        splitter.setStretchFactor(1, 1)
 
-        self.file_menu.addActions(
-            (
-                self.new_file_action,
-                self.load_file_action,
-                self.save_file_action,
-                self.save_as_file_action,
-                self.config_action,
-                self.exit_action,
-            )
-        )
+        self.setCentralWidget(splitter)
 
-        self.edit_menu.addActions(
-            (
-                self.new_message_action,
-                self.remove_all_message_action,
-            )
-        )
-
-        self.help_menu.addActions(
-            (
-                self.discord_applications_action,
-                self.logs_action,
-                self.credits_action,
-                self.project_action,
-                self.report_bug_action,
-            )
-        )
-
-    def setup_layout(self):
-        # left frame
-        group_tool_buttons_horizontal_layout = QHBoxLayout()
-        group_tool_buttons_horizontal_layout.addStretch()
-        for widget in (
-            self.config_group_button,
-            self.quit_group_button,
-        ):
-            group_tool_buttons_horizontal_layout.addWidget(widget)
-
-        group_vertical_layout = QVBoxLayout()
-        for widget in (
-            self.search_groups,
-            self.groups_list_widget,
-        ):
-            group_vertical_layout.addWidget(widget)
-        group_vertical_layout.addLayout(group_tool_buttons_horizontal_layout)
-
-        groups_widget = QWidget()
-        groups_widget.setContentsMargins(5, 5, 5, 5)
-        groups_widget.setLayout(group_vertical_layout)
-
-        # message tab
-        message_tool_buttons_horizontal_layout = QHBoxLayout()
-        message_tool_buttons_horizontal_layout.addStretch()
-
-        for widget in (
+    def _create_messages_tab(self) -> QWidget:
+        """Create the messages tab widget."""
+        # Toolbar
+        toolbar_layout = QHBoxLayout()
+        toolbar_layout.addStretch()
+        for btn in (
             self.new_message_tool_button,
             self.edit_message_tool_button,
             self.remove_message_tool_button,
             self.remove_all_message_tool_button,
         ):
-            message_tool_buttons_horizontal_layout.addWidget(widget)
+            toolbar_layout.addWidget(btn)
 
-        message_vertical_layout = QVBoxLayout()
-        for widget in (
-            self.search_messages_line_edit,
-            self.messages_list_view,
-        ):
-            message_vertical_layout.addWidget(widget)
-        message_vertical_layout.addLayout(message_tool_buttons_horizontal_layout)
+        # Main Layout
+        layout = QVBoxLayout()
+        layout.addWidget(self.search_messages_line_edit)
+        layout.addWidget(self.messages_list_view)
+        layout.addLayout(toolbar_layout)
 
-        messages_widget = QWidget()
-        messages_widget.setContentsMargins(5, 5, 5, 5)
-        messages_widget.setLayout(message_vertical_layout)
+        container = QWidget()
+        container.setContentsMargins(5, 5, 5, 5)
+        container.setLayout(layout)
+        return container
 
-        self.left_tab_widget.setMinimumWidth(280)
-        self.left_tab_widget.addTab(messages_widget, "")
-        self.left_tab_widget.addTab(groups_widget, "")
+    def _create_groups_tab(self) -> QWidget:
+        """Create the groups tab widget."""
+        # Toolbar
+        toolbar_layout = QHBoxLayout()
+        toolbar_layout.addStretch()
+        toolbar_layout.addWidget(self.config_group_button)
+        toolbar_layout.addWidget(self.quit_group_button)
 
-        # right frame
-        right_vertical_box_layout = QVBoxLayout()
-        right_vertical_box_layout.setContentsMargins(10, 10, 10, 10)
-        for widget in (
+        # Main Layout
+        layout = QVBoxLayout()
+        layout.addWidget(self.search_groups)
+        layout.addWidget(self.groups_list_widget)
+        layout.addLayout(toolbar_layout)
+
+        container = QWidget()
+        container.setContentsMargins(5, 5, 5, 5)
+        container.setLayout(layout)
+        return container
+
+    def _create_right_panel(self) -> QWidget:
+        """Create the right panel widget."""
+        layout = QVBoxLayout()
+        layout.setContentsMargins(10, 10, 10, 10)
+
+        widgets = (
             self.logs_text_edit,
             self.cmd_line_edit,
             self.token_label,
             self.token_line_edit,
             self.switch_bot_button,
-        ):
-            right_vertical_box_layout.addWidget(widget)
+        )
 
-        right_widget = QWidget()
-        right_widget.setMinimumWidth(520)
-        right_widget.setLayout(right_vertical_box_layout)
+        for widget in widgets:
+            layout.addWidget(widget)
 
-        # splitter
-        splitter = QSplitter(Qt.Orientation.Horizontal)
-        splitter.addWidget(self.left_tab_widget)
-        splitter.addWidget(right_widget)
-        splitter.setStretchFactor(1, 1)
-        self.window.setCentralWidget(splitter)
+        container = QWidget()
+        container.setMinimumWidth(520)
+        container.setLayout(layout)
+        return container
 
     def translate_ui(self):
-        self.new_file_action.setText(self.tr("New file"))
-        self.load_file_action.setText(self.tr("Load"))
-        self.save_file_action.setText(self.tr("Save"))
-        self.save_as_file_action.setText(self.tr("Save as"))
-        self.config_action.setText(self.tr("Configuration"))
-        self.exit_action.setText(self.tr("Exit"))
-        self.new_message_action.setText(self.tr("New message"))
-        self.edit_message_action.setText(self.tr("Edit message"))
-        self.remove_message_action.setText(self.tr("Remove message"))
-        self.remove_all_message_action.setText(self.tr("Remove all messages"))
-        self.config_group_action.setText(self.tr("Config group"))
-        self.quit_group_action.setText(self.tr("Quit group"))
-        self.credits_action.setText(self.tr("Credits"))
-        self.logs_action.setText(self.tr("Logs"))
-        self.project_action.setText(self.tr("Project"))
-        self.report_bug_action.setText(self.tr("Report bug"))
-        self.discord_applications_action.setText(self.tr("Discord applications"))
-        self.file_menu.setTitle(self.tr("File"))
+        """Translate UI texts."""
+        # Menus
+        self.project_menu.setTitle(self.tr("Project"))
         self.edit_menu.setTitle(self.tr("Edit"))
         self.help_menu.setTitle(self.tr("Help"))
+
+        # Tabs
         self.left_tab_widget.setTabText(0, self.tr("Messages"))
         self.left_tab_widget.setTabText(1, self.tr("Groups"))
+
+        # Right Panel
         self.cmd_line_edit.setPlaceholderText(self.tr("Type a command"))
         self.token_label.setText(self.tr("Token"))
         self.switch_bot_button.setText(self.tr("Turn on/off bot"))

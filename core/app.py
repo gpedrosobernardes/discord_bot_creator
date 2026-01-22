@@ -4,6 +4,7 @@ import sys
 
 from PySide6.QtCore import QSettings, QTranslator
 from PySide6.QtWidgets import QApplication
+from qextrawidgets.utils import QEmojiFonts
 
 from controllers.config import ConfigController
 from controllers.credits import CreditsController
@@ -13,6 +14,7 @@ from controllers.main import MainController
 from core.constants import Language
 from core.database import DatabaseController
 from core.log_handler import LogHandler
+
 
 logger = logging.getLogger(__name__)
 logger.addHandler(LogHandler())
@@ -36,7 +38,7 @@ class Application:
             datefmt="%x %X",
         )
 
-        self.database = DatabaseController(self.user_settings.value("database"))
+        self.database = DatabaseController(self.user_settings.value("database"), "main")
 
         self.config_controller = ConfigController(self.translator, self.user_settings)
         self.logs_controller = LogsController()
@@ -67,10 +69,12 @@ class Application:
         settings = QSettings("discord_bot_creator", "main")
         default_values = {
             "auto_start_bot": False,
+            "confirm_actions": True,
             "language": Language.ENGLISH,
             "log_level": logging.INFO,
             "database": ":memory:",
             "style": "windows11",
+            "emoji_font": QEmojiFonts.loadTwemojiFont(),
         }
         for key, value in default_values.items():
             if not settings.contains(key):

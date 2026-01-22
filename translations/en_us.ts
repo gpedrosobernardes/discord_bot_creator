@@ -282,6 +282,57 @@
     </message>
 </context>
 <context>
+    <name>IntComparator</name>
+    <message>
+        <location filename="../core/constants.py" line="58"/>
+        <source>Equal to</source>
+        <translation>Equal to</translation>
+    </message>
+    <message>
+        <location filename="../core/constants.py" line="59"/>
+        <source>Greater than</source>
+        <translation>Greater than</translation>
+    </message>
+    <message>
+        <location filename="../core/constants.py" line="60"/>
+        <source>Less than</source>
+        <translation>Less than</translation>
+    </message>
+    <message>
+        <location filename="../core/constants.py" line="61"/>
+        <source>Greater or equal to</source>
+        <translation>Greater or equal to</translation>
+    </message>
+    <message>
+        <location filename="../core/constants.py" line="62"/>
+        <source>Less or equal to</source>
+        <translation>Less or equal to</translation>
+    </message>
+</context>
+<context>
+    <name>IntField</name>
+    <message>
+        <location filename="../core/constants.py" line="43"/>
+        <source>Mentions to bot</source>
+        <translation>Mentions to bot</translation>
+    </message>
+    <message>
+        <location filename="../core/constants.py" line="44"/>
+        <source>Mentions</source>
+        <translation>Mentions</translation>
+    </message>
+    <message>
+        <location filename="../core/constants.py" line="45"/>
+        <source>Bot author</source>
+        <translation>Bot author</translation>
+    </message>
+    <message>
+        <location filename="../core/constants.py" line="46"/>
+        <source>Emojis</source>
+        <translation>Emojis</translation>
+    </message>
+</context>
+<context>
     <name>LogsView</name>
     <message>
         <location filename="../views/logs.py" line="43"/>
@@ -483,110 +534,110 @@
 <context>
     <name>MessageView</name>
     <message>
-        <location filename="../views/messages.py" line="122"/>
+        <location filename="../views/messages.py" line="119"/>
         <source>Message</source>
         <translation>Message</translation>
     </message>
     <message>
-        <location filename="../views/messages.py" line="123"/>
+        <location filename="../views/messages.py" line="120"/>
         <source>Name</source>
         <translation>Name</translation>
     </message>
     <message>
-        <location filename="../views/messages.py" line="125"/>
+        <location filename="../views/messages.py" line="122"/>
         <source>The name can include letters (with accents), numbers, and spaces.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../views/messages.py" line="129"/>
+        <location filename="../views/messages.py" line="126"/>
         <source>Conditions</source>
-        <translation type="unfinished"></translation>
+        <translation>Conditions</translation>
     </message>
     <message>
-        <location filename="../views/messages.py" line="129"/>
+        <location filename="../views/messages.py" line="126"/>
         <source>Reactions</source>
-        <translation type="unfinished"></translation>
+        <translation>Reactions</translation>
     </message>
     <message>
-        <location filename="../views/messages.py" line="129"/>
+        <location filename="../views/messages.py" line="126"/>
         <source>Replies</source>
-        <translation type="unfinished"></translation>
+        <translation>Replies</translation>
     </message>
     <message>
-        <location filename="../views/messages.py" line="133"/>
+        <location filename="../views/messages.py" line="130"/>
         <source>Action</source>
         <translation>Action</translation>
     </message>
     <message>
-        <location filename="../views/messages.py" line="135"/>
+        <location filename="../views/messages.py" line="132"/>
         <source>Pin</source>
         <translation>Pin</translation>
     </message>
     <message>
-        <location filename="../views/messages.py" line="135"/>
+        <location filename="../views/messages.py" line="132"/>
         <source>Delete</source>
         <translation>Delete</translation>
     </message>
     <message>
-        <location filename="../views/messages.py" line="135"/>
-        <location filename="../views/messages.py" line="140"/>
-        <location filename="../views/messages.py" line="146"/>
-        <location filename="../views/messages.py" line="152"/>
+        <location filename="../views/messages.py" line="132"/>
+        <location filename="../views/messages.py" line="137"/>
+        <location filename="../views/messages.py" line="143"/>
+        <location filename="../views/messages.py" line="149"/>
         <source>None</source>
         <translation>None</translation>
     </message>
     <message>
-        <location filename="../views/messages.py" line="138"/>
+        <location filename="../views/messages.py" line="135"/>
         <source>Punishment</source>
         <translation>Punishment</translation>
     </message>
     <message>
-        <location filename="../views/messages.py" line="140"/>
+        <location filename="../views/messages.py" line="137"/>
         <source>Kick</source>
         <translation>Kick</translation>
     </message>
     <message>
-        <location filename="../views/messages.py" line="140"/>
+        <location filename="../views/messages.py" line="137"/>
         <source>Ban</source>
         <translation>Ban</translation>
     </message>
     <message>
-        <location filename="../views/messages.py" line="143"/>
+        <location filename="../views/messages.py" line="140"/>
         <source>Where reply</source>
         <translation>Where reply</translation>
     </message>
     <message>
-        <location filename="../views/messages.py" line="146"/>
+        <location filename="../views/messages.py" line="143"/>
         <source>Group</source>
         <translation>Group</translation>
     </message>
     <message>
-        <location filename="../views/messages.py" line="146"/>
+        <location filename="../views/messages.py" line="143"/>
         <source>Private</source>
         <translation>Private</translation>
     </message>
     <message>
-        <location filename="../views/messages.py" line="150"/>
+        <location filename="../views/messages.py" line="147"/>
         <source>Where react</source>
         <translation>Where react</translation>
     </message>
     <message>
-        <location filename="../views/messages.py" line="152"/>
+        <location filename="../views/messages.py" line="149"/>
         <source>Author</source>
         <translation>Author</translation>
     </message>
     <message>
-        <location filename="../views/messages.py" line="152"/>
+        <location filename="../views/messages.py" line="149"/>
         <source>Bot</source>
         <translation>Bot</translation>
     </message>
     <message>
-        <location filename="../views/messages.py" line="155"/>
+        <location filename="../views/messages.py" line="152"/>
         <source>Delay</source>
         <translation>Delay</translation>
     </message>
     <message>
-        <location filename="../views/messages.py" line="156"/>
+        <location filename="../views/messages.py" line="153"/>
         <source>Confirm</source>
         <translation>Confirm</translation>
     </message>
@@ -602,15 +653,37 @@
 <context>
     <name>QConditionListbox</name>
     <message>
-        <location filename="../widgets/condition_listbox.py" line="77"/>
+        <location filename="../widgets/condition_listbox.py" line="87"/>
+        <location filename="../widgets/condition_listbox.py" line="136"/>
+        <source>Reverse comparator</source>
+        <translation>Reverse comparator</translation>
+    </message>
+    <message>
+        <location filename="../widgets/condition_listbox.py" line="88"/>
+        <location filename="../widgets/condition_listbox.py" line="131"/>
         <source>Case insensitive</source>
         <translation>Case insensitive</translation>
+    </message>
+    <message>
+        <location filename="../widgets/condition_listbox.py" line="118"/>
+        <source>Field</source>
+        <translation>Field</translation>
+    </message>
+    <message>
+        <location filename="../widgets/condition_listbox.py" line="123"/>
+        <source>Comparator</source>
+        <translation>Comparator</translation>
+    </message>
+    <message>
+        <location filename="../widgets/condition_listbox.py" line="126"/>
+        <source>Value</source>
+        <translation>Value</translation>
     </message>
 </context>
 <context>
     <name>QListBox</name>
     <message>
-        <location filename="../widgets/listbox.py" line="73"/>
+        <location filename="../widgets/listbox.py" line="72"/>
         <source>Remove</source>
         <translation>Remove</translation>
     </message>
@@ -620,33 +693,56 @@
     <message>
         <location filename="../core/constants.py" line="50"/>
         <source>Equal to</source>
-        <translation type="unfinished"></translation>
+        <translation>Equal to</translation>
     </message>
     <message>
         <location filename="../core/constants.py" line="51"/>
         <source>Contains</source>
-        <translation type="unfinished"></translation>
+        <translation>Contains</translation>
     </message>
     <message>
         <location filename="../core/constants.py" line="52"/>
         <source>Starts with</source>
-        <translation type="unfinished"></translation>
+        <translation>Starts with</translation>
     </message>
     <message>
         <location filename="../core/constants.py" line="53"/>
         <source>Ends with</source>
-        <translation type="unfinished"></translation>
+        <translation>Ends with</translation>
     </message>
     <message>
         <location filename="../core/constants.py" line="54"/>
         <source>Regex</source>
-        <translation type="unfinished"></translation>
+        <translation>Regex</translation>
+    </message>
+</context>
+<context>
+    <name>StrField</name>
+    <message>
+        <location filename="../core/constants.py" line="36"/>
+        <source>Message</source>
+        <translation>Message</translation>
+    </message>
+    <message>
+        <location filename="../core/constants.py" line="37"/>
+        <source>Author name</source>
+        <translation>Author name</translation>
+    </message>
+    <message>
+        <location filename="../core/constants.py" line="38"/>
+        <source>Channel name</source>
+        <translation>Channel name</translation>
+    </message>
+    <message>
+        <location filename="../core/constants.py" line="39"/>
+        <source>Guild name</source>
+        <translation>Guild name</translation>
     </message>
 </context>
 <context>
     <name>self.view</name>
     <message>
-        <location filename="../controllers/message.py" line="59"/>
+        <location filename="../controllers/message.py" line="57"/>
         <source>New message</source>
         <translation type="unfinished">New message</translation>
     </message>
@@ -654,18 +750,18 @@
 <context>
     <name>window</name>
     <message>
-        <location filename="../controllers/message.py" line="141"/>
-        <location filename="../controllers/message.py" line="145"/>
+        <location filename="../controllers/message.py" line="175"/>
+        <location filename="../controllers/message.py" line="179"/>
         <source>Error</source>
         <translation type="unfinished">Error</translation>
     </message>
     <message>
-        <location filename="../controllers/message.py" line="141"/>
+        <location filename="../controllers/message.py" line="175"/>
         <source>Empty name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../controllers/message.py" line="145"/>
+        <location filename="../controllers/message.py" line="179"/>
         <source>Invalid name</source>
         <translation type="unfinished"></translation>
     </message>

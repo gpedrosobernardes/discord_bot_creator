@@ -4,27 +4,27 @@ from PySide6.QtCore import QT_TRANSLATE_NOOP
 
 
 class Actions(IntEnum):
-    PIN = 1
-    DELETE = 2
-    NONE = 3
+    PIN = 0
+    DELETE = 1
+    NONE = 2
 
 
 class Punishment(IntEnum):
-    KICK = 1
-    BAN = 2
-    NONE = 3
+    KICK = 0
+    BAN = 1
+    NONE = 2
 
 
 class WhereReply(IntEnum):
-    GROUP = 1
-    PRIVATE = 2
-    NONE = 3
+    GROUP = 0
+    PRIVATE = 1
+    NONE = 2
 
 
 class WhereReact(IntEnum):
-    AUTHOR = 1
-    BOT = 2
-    NONE = 3
+    AUTHOR = 0
+    BOT = 1
+    NONE = 2
 
 
 class Language(StrEnum):
@@ -32,34 +32,34 @@ class Language(StrEnum):
     PORTUGUESE = "pt_br"
 
 
-class StrField(StrEnum):
-    MESSAGE = "message"
-    AUTHOR_NAME = "author_name"
-    CHANNEL_NAME = "channel_name"
-    GUILD_NAME = "guild_name"
+class StrField(Enum):
+    MESSAGE = QT_TRANSLATE_NOOP("StrField", "Message")
+    AUTHOR_NAME = QT_TRANSLATE_NOOP("StrField", "Author name")
+    CHANNEL_NAME = QT_TRANSLATE_NOOP("StrField", "Channel name")
+    GUILD_NAME = QT_TRANSLATE_NOOP("StrField", "Guild name")
 
 
-class IntField(StrEnum):
-    MENTIONS_TO_BOT = "mentions_to_bot"
-    MENTIONS = "mentions"
-    BOT_AUTHOR = "bot_author"
-    EMOJIS = "emojis"
+class IntField(Enum):
+    MENTIONS_TO_BOT = QT_TRANSLATE_NOOP("IntField", "Mentions to bot")
+    MENTIONS = QT_TRANSLATE_NOOP("IntField", "Mentions")
+    BOT_AUTHOR = QT_TRANSLATE_NOOP("IntField", "Bot author")
+    EMOJIS = QT_TRANSLATE_NOOP("IntField", "Emojis")
 
 
 class StrComparator(Enum):
     EQUAL_TO = QT_TRANSLATE_NOOP("StrComparator", "Equal to")
+    NOT_EQUAL_TO = QT_TRANSLATE_NOOP("StrComparator", "Not equal to")
     CONTAINS = QT_TRANSLATE_NOOP("StrComparator", "Contains")
+    NOT_CONTAINS = QT_TRANSLATE_NOOP("StrComparator", "Not contains")
     STARTS_WITH = QT_TRANSLATE_NOOP("StrComparator", "Starts with")
     ENDS_WITH = QT_TRANSLATE_NOOP("StrComparator", "Ends with")
     REGEX = QT_TRANSLATE_NOOP("StrComparator", "Regex")
 
 
-class IntComparator(StrEnum):
-    EQUAL_TO = "equal_to"
-    GREATER_THAN = "greater_than"
-    LESS_THAN = "less_than"
-    GREATER_OR_EQUAL_TO = "greater_or_equal_to"
-    LESS_OR_EQUAL_TO = "less_or_equal_to"
-
-
-print(StrComparator)
+class IntComparator(Enum):
+    EQUAL_TO = QT_TRANSLATE_NOOP("IntComparator", "Equal to")
+    NOT_EQUAL_TO = QT_TRANSLATE_NOOP("IntComparator", "Not equal to")
+    GREATER_THAN = QT_TRANSLATE_NOOP("IntComparator", "Greater than")
+    LESS_THAN = QT_TRANSLATE_NOOP("IntComparator", "Less than")
+    GREATER_OR_EQUAL_TO = QT_TRANSLATE_NOOP("IntComparator", "Greater or equal to")
+    LESS_OR_EQUAL_TO = QT_TRANSLATE_NOOP("IntComparator", "Less or equal to")

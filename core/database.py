@@ -1,22 +1,25 @@
 import logging
 import os
+import shutil
 
-from PySide6.QtCore import QStandardPaths
+from PySide6.QtCore import QStandardPaths, Qt
 from PySide6.QtSql import (
     QSqlDatabase,
     QSqlQuery,
     QSqlTableModel,
-    QSqlRelationalTableModel,
-    QSqlRelation,
 )
 
 
 class DatabaseController:
-    def __init__(self, name: str):
-        path = self.get_database_path(name)
+    def __init__(self, name: str, connection_name: str):
+        self.name = name
 
-        self.database = QSqlDatabase.addDatabase("QSQLITE")
-        self.database.setDatabaseName(path)
+        if QSqlDatabase.contains(connection_name):
+            self.database = QSqlDatabase.database(connection_name)
+        else:
+            self.database = QSqlDatabase.addDatabase("QSQLITE", connection_name)
+            path = self.get_database_path(name)
+            self.database.setDatabaseName(path)
 
         if self.database.open():
             self.create_tables()
@@ -83,9 +86,10 @@ class DatabaseController:
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 message_id INTEGER NOT NULL,
                 field TEXT NOT NULL,
-                operator TEXT NOT NULL,
+                comparator TEXT NOT NULL,
                 value TEXT NOT NULL,
                 case_insensitive BOOLEAN DEFAULT 0,
+                reverse_comparator BOOLEAN DEFAULT 0,
                 FOREIGN KEY (message_id) REFERENCES messages(id) ON DELETE CASCADE
             )
             """
@@ -103,9 +107,69 @@ class DatabaseController:
             """
         )
 
+    def switch_database(self, new_name: str):
+        if self.database.isOpen():
+            self.database.close()
+
+        self.name = new_name
+        path = self.get_database_path(new_name)
+        self.database.setDatabaseName(path)
+
+        if self.database.open():
+            self.create_tables()
+        else:
+            print(f"Failed to switch database: {self.database.lastError().text()}")
+
+    def copy_database(self, new_name: str) -> bool:
+        current_path = self.get_database_path(self.name)
+        new_path = self.get_database_path(new_name)
+
+        if os.path.exists(new_path):
+            return False
+
+        # Flush changes before copying
+        self.database.commit()
+
+        try:
+            shutil.copy2(current_path, new_path)
+            return True
+        except IOError as e:
+            print(f"Failed to copy database: {e}")
+            return False
+
+    def rename_database(self, new_name: str) -> bool:
+        current_path = self.get_database_path(self.name)
+        new_path = self.get_database_path(new_name)
+
+        if os.path.exists(new_path):
+            return False
+
+        # Close database before renaming
+        if self.database.isOpen():
+            self.database.close()
+
+        try:
+            os.rename(current_path, new_path)
+            self.name = new_name
+            # Reopen database with new name
+            self.database.setDatabaseName(new_path)
+            if not self.database.open():
+                print(
+                    f"Failed to reopen database after rename: {self.database.lastError().text()}"
+                )
+                return False
+            return True
+        except OSError as e:
+            print(f"Failed to rename database: {e}")
+            # Try to reopen old database
+            self.database.setDatabaseName(current_path)
+            self.database.open()
+            return False
+
     def get_groups_model(self):
         model = QSqlTableModel(db=self.database)
         model.setTable("groups")
+        model.setEditStrategy(QSqlTableModel.EditStrategy.OnManualSubmit)
         return model
 
     def get_messages_model(self) -> QSqlTableModel:
@@ -118,21 +182,20 @@ class DatabaseController:
     def get_message_replies_model(self) -> QSqlTableModel:
         model = QSqlTableModel(db=self.database)
         model.setTable("message_replies")
+        model.setEditStrategy(QSqlTableModel.EditStrategy.OnManualSubmit)
         # model.select()
         return model
 
     def get_message_reactions_model(self) -> QSqlTableModel:
-        # ALTERAÇÃO: Use QSqlTableModel em vez de QSqlRelationalTableModel
         model = QSqlTableModel(db=self.database)
         model.setTable("message_reactions")
-        # REMOVIDO: model.setRelation(...) -> Não é necessário aqui e causa o erro
-        # model.select()
+        model.setEditStrategy(QSqlTableModel.EditStrategy.OnManualSubmit)
         return model
 
     def get_message_conditions_model(self) -> QSqlTableModel:
         model = QSqlTableModel(db=self.database)
         model.setTable("message_conditions")
-
+        model.setEditStrategy(QSqlTableModel.EditStrategy.OnManualSubmit)
         return model
 
     def get_logs_model(self):
@@ -145,6 +208,75 @@ class DatabaseController:
         if not query.exec(sql):
             print(query.lastError().text())
 
+    def new_log(self, record: logging.LogRecord):
+        query = QSqlQuery(self.database)
+        query.prepare(
+            "INSERT INTO logs (datetime, message, level_number) VALUES (?, ?, ?)"
+        )
+        query.addBindValue(record.created)
+        query.addBindValue(record.getMessage())
+        query.addBindValue(record.levelno)
+        if not query.exec():
+            print(query.lastError().text())
+
+    def delete_reactions_by_message_id(self, message_id: int):
+        query = QSqlQuery(self.database)
+        query.prepare("DELETE FROM message_reactions WHERE message_id = ?")
+        query.addBindValue(message_id)
+        if not query.exec():
+            print(query.lastError().text())
+
+    def delete_all_reactions(self):
+        query = QSqlQuery(self.database)
+        query.prepare("DELETE FROM message_reactions")
+        if not query.exec():
+            print(query.lastError().text())
+
+    def delete_replies_by_message_id(self, message_id: int):
+        query = QSqlQuery(self.database)
+        query.prepare("DELETE FROM message_replies WHERE message_id = ?")
+        query.addBindValue(message_id)
+        if not query.exec():
+            print(query.lastError().text())
+
+    def delete_all_replies(self):
+        query = QSqlQuery(self.database)
+        query.prepare("DELETE FROM message_replies")
+        if not query.exec():
+            print(query.lastError().text())
+
+    def delete_conditions_by_message_id(self, message_id: int):
+        query = QSqlQuery(self.database)
+        query.prepare("DELETE FROM message_conditions WHERE message_id = ?")
+        query.addBindValue(message_id)
+        if not query.exec():
+            print(query.lastError().text())
+
+    def delete_all_conditions(self):
+        query = QSqlQuery(self.database)
+        query.prepare("DELETE FROM message_conditions")
+        if not query.exec():
+            print(query.lastError().text())
+
+    def delete_message_by_id(self, message_id: int):
+        query = QSqlQuery(self.database)
+        query.prepare("DELETE FROM messages WHERE id = ?")
+        query.addBindValue(message_id)
+        if not query.exec():
+            print(query.lastError().text())
+        self.delete_conditions_by_message_id(message_id)
+        self.delete_reactions_by_message_id(message_id)
+        self.delete_replies_by_message_id(message_id)
+
+    def delete_all_messages(self):
+        query = QSqlQuery(self.database)
+        query.prepare("DELETE FROM messages")
+        if not query.exec():
+            print(query.lastError().text())
+        self.delete_all_conditions()
+        self.delete_all_reactions()
+        self.delete_all_replies()
+
     @staticmethod
     def get_database_path(file_name: str):
         if file_name == ":memory:":
@@ -153,9 +285,21 @@ class DatabaseController:
         data_dir = QStandardPaths.writableLocation(
             QStandardPaths.StandardLocation.AppDataLocation
         )
+        data_dir = os.path.join(data_dir, "projects")
+        print(data_dir)
 
         if not os.path.exists(data_dir):
             os.makedirs(data_dir)
 
-        full_path = os.path.join(data_dir, file_name)
+        full_path = os.path.join(data_dir, f"{file_name}.db")
         return os.path.normpath(full_path)
+
+    @staticmethod
+    def list_projects():
+        data_dir = QStandardPaths.writableLocation(
+            QStandardPaths.StandardLocation.AppDataLocation
+        )
+        data_dir = os.path.join(data_dir, "projects")
+        if not os.path.exists(data_dir):
+            return []
+        return [f.replace(".db", "") for f in os.listdir(data_dir) if f.endswith(".db")]

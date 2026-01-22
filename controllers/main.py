@@ -1,29 +1,39 @@
 from __future__ import annotations
 
+import logging
+import sys
 import webbrowser
+from typing import Optional
 
 from PySide6.QtCore import (
-    QCoreApplication,
     QSortFilterProxyModel,
     QSettings,
-    QTranslator,
+    Qt,
+    Slot,
 )
-from PySide6.QtGui import Qt
-from PySide6.QtWidgets import QCompleter
+from PySide6.QtGui import QAction, QKeySequence
+from PySide6.QtWidgets import QCompleter, QInputDialog, QMessageBox
+from qextrawidgets.icons import QThemeResponsiveIcon
 
-from controllers.config import ConfigController
 from controllers.message import MessageController
+from core.bot_thread import QBotThread
 from core.database import DatabaseController
+from core.log_handler import LogHandler
 from utils.token_validator import TokenValidator
 from views.config import ConfigView
 from views.credits import CreditsView
 from views.logs import LogsView
 from views.main import MainView
 
-translate = QCoreApplication.translate
-
 
 class MainController:
+    """
+    Controller for the Main Window.
+
+    Orchestrates the interaction between the MainView, DatabaseController,
+    and other sub-controllers/views.
+    """
+
     def __init__(
         self,
         database: DatabaseController,
@@ -32,110 +42,428 @@ class MainController:
         logs_view: LogsView,
         credits_view: CreditsView,
     ):
+        """
+        Initializes the MainController.
+
+        Args:
+            database: The database controller instance.
+            user_settings: The user settings instance.
+            config_view: The configuration view instance.
+            logs_view: The logs view instance.
+            credits_view: The credits view instance.
+        """
+        super().__init__()
+        # 1. Dependency Injection
         self.database = database
         self.user_settings = user_settings
-        self.view = MainView()
+        self.config_view = config_view
+        self.logs_view = logs_view
+        self.credits_view = credits_view
 
+        # 2. State & Context
+        self.message_windows = []
         self.messages_model = self.database.get_messages_model()
         self.messages_proxy_model = QSortFilterProxyModel()
+        self.bot_thread = QBotThread()
+
+        self.log_handler = LogHandler(self.database)
+        logging.getLogger().addHandler(self.log_handler)
+        logging.getLogger().setLevel(logging.INFO)
+
+        # 3. View Initialization
+        self.view = MainView()
+
+        # 4. Init Sequence
+        self._init_models()
+        self._init_actions()
+        self._init_validators()
+        self._init_completers()
+        self._init_connections()
+
+        # 5. Initial State
+        self.translate_ui()
+        self._load_initial_state()
+        self.view.show()
+
+    # --- Initialization ---
+
+    def _init_models(self):
+        """Initialize and configure data models."""
+        self.messages_proxy_model.setSourceModel(self.messages_model)
         self.messages_proxy_model.setFilterCaseSensitivity(
             Qt.CaseSensitivity.CaseInsensitive
         )
         self.messages_proxy_model.setFilterKeyColumn(
             self.messages_model.fieldIndex("name")
         )
-        self.message_windows = []
-        self.messages_proxy_model.setSourceModel(self.messages_model)
+
         self.view.messages_list_view.setModel(self.messages_proxy_model)
         self.view.messages_list_view.setModelColumn(
             self.messages_model.fieldIndex("name")
         )
 
-        self.setup_validators()
-        self.setup_completers()
-        self.setup_connections(self.view, logs_view, config_view, credits_view)
-        self.load_settings()
+    def _init_actions(self):
+        """Initialize all QActions and assign them to menus/buttons."""
+        self._setup_project_actions()
+        self._setup_edit_actions()
+        self._setup_group_actions()
+        self._setup_help_actions()
 
-    def load_settings(self):
-        self.view.token_line_edit.setText(self.user_settings.value("token"))
-
-    def setup_connections(
-        self,
-        view: MainView,
-        logs_view: LogsView,
-        config_view: ConfigView,
-        credits_view: CreditsView,
-    ):
-
-        # line edits
-        view.search_messages_line_edit.textChanged.connect(
-            self.messages_proxy_model.setFilterFixedString
-        )
-
-        view.token_line_edit.editingFinished.connect(self.on_token_changed)
-
-        # actions
-
-        # file actions
-        view.config_action.triggered.connect(config_view.window.show)
-
-        # message actions
-        view.new_message_action.triggered.connect(self.on_new_message_action)
-        view.edit_message_action.triggered.connect(self.on_edit_message_action)
-        view.remove_message_action.triggered.connect(self.on_remove_message_action)
-        view.remove_all_message_action.triggered.connect(
-            self.on_remove_all_message_action
-        )
-
-        # help actions
-        view.discord_applications_action.triggered.connect(
-            lambda: webbrowser.open("https://discord.com/developers/applications/")
-        )
-        view.report_bug_action.triggered.connect(
-            lambda: webbrowser.open(
-                "https://github.com/gustavopedrosob/discord_bot_creator/issues/new"
-            )
-        )
-        view.project_action.triggered.connect(
-            lambda: webbrowser.open(
-                "https://github.com/gustavopedrosob/discord_bot_creator"
-            )
-        )
-        view.logs_action.triggered.connect(logs_view.window.show)
-        view.credits_action.triggered.connect(credits_view.window.show)
-
-    def setup_validators(self):
+    def _init_validators(self):
+        """Initialize input validators."""
         self.view.token_line_edit.setValidator(
             TokenValidator(self.view.token_line_edit)
         )
 
-    def setup_completers(self):
+    def _init_completers(self):
+        """Initialize input completers."""
         cmd_completer = QCompleter(["clear"])
         cmd_completer.setCaseSensitivity(Qt.CaseSensitivity.CaseInsensitive)
         cmd_completer.setFilterMode(Qt.MatchFlag.MatchContains)
         self.view.cmd_line_edit.setCompleter(cmd_completer)
 
-    def on_token_changed(self):
-        if self.view.token_line_edit.hasAcceptableInput():
-            self.user_settings.setValue("token", self.view.token_line_edit.text())
+    def _init_connections(self):
+        """Connect signals to slots."""
+        self.view.search_messages_line_edit.textChanged.connect(
+            self.messages_proxy_model.setFilterFixedString
+        )
+        self.view.token_line_edit.editingFinished.connect(self.on_token_changed)
+        self.view.switch_bot_button.clicked.connect(self.on_switch_bot_clicked)
 
-    def on_new_message_action(self):
-        self.new_message_controller()
+        # Bot Thread Connections
+        self.bot_thread.signals.login_failure.connect(self.on_bot_login_failure)
+        self.bot_thread.finished.connect(self.on_bot_finished)
 
-    def on_edit_message_action(self):
-        index = self.view.messages_list_view.currentIndex().row()
-        self.new_message_controller(index)
+        # Log Handler Connections
+        self.log_handler.signaler.log.connect(self.view.logs_text_edit.add_log)
 
-    def on_remove_message_action(self):
-        index = self.view.messages_list_view.currentIndex().row()
-        self.messages_model.removeRow(index)
+    def _load_initial_state(self):
+        """Load initial state from settings."""
+        self.view.token_line_edit.setText(self.user_settings.value("token"))
 
-    def on_remove_all_message_action(self):
-        self.messages_model.removeRows(0, self.messages_model.rowCount())
+        current_project = self.user_settings.value("current_project")
+        projects = DatabaseController.list_projects()
 
-    def new_message_controller(self, index: int = None):
+        if current_project and current_project in projects:
+            self._switch_project(current_project)
+            return
+
+        while True:
+            projects = DatabaseController.list_projects()
+
+            if not projects:
+                name = self._prompt_new_project_name(strict=True)
+                if name:
+                    self._switch_project(name)
+                    return
+            else:
+                new_project_str = self.view.tr("<Create New Project>")
+                items = [new_project_str] + projects
+
+                item, ok = QInputDialog.getItem(
+                    self.view,
+                    self.view.tr("Load Project"),
+                    self.view.tr("Select a project or create a new one:"),
+                    items,
+                    0,
+                    False,
+                )
+
+                if not ok:
+                    sys.exit(0)
+
+                if item == new_project_str:
+                    name = self._prompt_new_project_name(strict=False)
+                    if name:
+                        self._switch_project(name)
+                        return
+                else:
+                    self._switch_project(item)
+                    return
+
+    # --- Action Setup Helpers ---
+
+    def _create_action(
+        self,
+        icon_name: Optional[str] = None,
+        shortcut: Optional[str] = None,
+        triggered=None,
+    ) -> QAction:
+        """Helper to create a QAction."""
+        action = QAction(self.view)
+        if icon_name:
+            action.setIcon(QThemeResponsiveIcon.fromAwesome(icon_name))
+        if shortcut:
+            action.setShortcut(QKeySequence(shortcut))
+        if triggered:
+            action.triggered.connect(triggered)
+        return action
+
+    def _setup_project_actions(self):
+        self.new_project_action = self._create_action(
+            triggered=self.on_new_project_action
+        )
+        self.load_project_action = self._create_action(
+            triggered=self.on_load_project_action
+        )
+        self.save_as_project_action = self._create_action(
+            triggered=self.on_save_as_project_action
+        )
+        self.rename_project_action = self._create_action(
+            triggered=self.on_rename_project_action
+        )
+        self.config_action = self._create_action(triggered=self.config_view.show)
+        self.exit_action = self._create_action(triggered=self.view.close)
+
+        self.view.project_menu.addActions(
+            [
+                self.new_project_action,
+                self.load_project_action,
+                self.save_as_project_action,
+                self.rename_project_action,
+                self.config_action,
+                self.exit_action,
+            ]
+        )
+
+    def _setup_edit_actions(self):
+        self.new_message_action = self._create_action(
+            "fa6s.plus", "Ctrl+N", self.on_new_message_action
+        )
+        self.edit_message_action = self._create_action(
+            "fa6s.pencil", "Ctrl+E", self.on_edit_message_action
+        )
+        self.remove_message_action = self._create_action(
+            "fa6s.minus", "Delete", self.on_remove_message_action
+        )
+        self.remove_all_message_action = self._create_action(
+            "fa6s.trash", "Ctrl+Delete", self.on_remove_all_message_action
+        )
+
+        self.view.edit_menu.addActions(
+            [self.new_message_action, self.remove_all_message_action]
+        )
+
+        # Bind to buttons
+        self.view.new_message_tool_button.setDefaultAction(self.new_message_action)
+        self.view.edit_message_tool_button.setDefaultAction(self.edit_message_action)
+        self.view.remove_message_tool_button.setDefaultAction(
+            self.remove_message_action
+        )
+        self.view.remove_all_message_tool_button.setDefaultAction(
+            self.remove_all_message_action
+        )
+
+    def _setup_group_actions(self):
+        self.config_group_action = self._create_action("fa6s.gear")
+        self.quit_group_action = self._create_action("fa6s.arrow-right-from-bracket")
+
+        self.view.config_group_button.setDefaultAction(self.config_group_action)
+        self.view.quit_group_button.setDefaultAction(self.quit_group_action)
+
+    def _setup_help_actions(self):
+        self.discord_applications_action = self._create_action(
+            triggered=lambda: webbrowser.open(
+                "https://discord.com/developers/applications/"
+            )
+        )
+        self.report_bug_action = self._create_action(
+            triggered=lambda: webbrowser.open(
+                "https://github.com/gustavopedrosob/discord_bot_creator/issues/new"
+            )
+        )
+        self.project_action = self._create_action(
+            triggered=lambda: webbrowser.open(
+                "https://github.com/gustavopedrosob/discord_bot_creator"
+            )
+        )
+        self.logs_action = self._create_action(triggered=self.logs_view.window.show)
+        self.credits_action = self._create_action(
+            triggered=self.credits_view.window.show
+        )
+
+        self.view.help_menu.addActions(
+            [
+                self.discord_applications_action,
+                self.logs_action,
+                self.credits_action,
+                self.project_action,
+                self.report_bug_action,
+            ]
+        )
+
+    def translate_ui(self):
+        """Translate UI texts for actions."""
+        self.view.translate_ui()
+
+        # Project
+        self.new_project_action.setText(self.view.tr("New project"))
+        self.load_project_action.setText(self.view.tr("Load"))
+        self.save_as_project_action.setText(self.view.tr("Save as"))
+        self.rename_project_action.setText(self.view.tr("Rename project"))
+        self.config_action.setText(self.view.tr("Configuration"))
+        self.exit_action.setText(self.view.tr("Exit"))
+
+        # Edit / Messages
+        self.new_message_action.setText(self.view.tr("New message"))
+        self.edit_message_action.setText(self.view.tr("Edit message"))
+        self.remove_message_action.setText(self.view.tr("Remove message"))
+        self.remove_all_message_action.setText(self.view.tr("Remove all messages"))
+
+        # Groups
+        self.config_group_action.setText(self.view.tr("Config group"))
+        self.quit_group_action.setText(self.view.tr("Quit group"))
+
+        # Help
+        self.credits_action.setText(self.view.tr("Credits"))
+        self.logs_action.setText(self.view.tr("Logs"))
+        self.project_action.setText(self.view.tr("Project"))
+        self.report_bug_action.setText(self.view.tr("Report bug"))
+        self.discord_applications_action.setText(self.view.tr("Discord applications"))
+
+    # --- Project Management Logic ---
+
+    def _switch_project(self, project_name: str):
+        if not project_name:
+            return
+
+        self.database.switch_database(project_name)
+        self.user_settings.setValue("current_project", project_name)
+        self._refresh_models()
+        self.view.setWindowTitle(f"Discord Bot Creator - {project_name}")
+        self.bot_thread.set_database_name(project_name)
+
+    def _refresh_models(self):
+        self.messages_model = self.database.get_messages_model()
+        self.messages_proxy_model.setSourceModel(self.messages_model)
+        self.messages_proxy_model.setFilterKeyColumn(
+            self.messages_model.fieldIndex("name")
+        )
+        self.view.messages_list_view.setModel(self.messages_proxy_model)
+        self.view.messages_list_view.setModelColumn(
+            self.messages_model.fieldIndex("name")
+        )
+
+    def _prompt_new_project_name(self, strict: bool = False) -> Optional[str]:
+        default_name = self.view.tr("New Project")
+        while True:
+            dialog = QInputDialog(self.view)
+            dialog.setWindowTitle(self.view.tr("New Project"))
+            dialog.setLabelText(self.view.tr("Project Name:"))
+            dialog.setTextValue(default_name)
+
+            if strict:
+                dialog.setWindowFlags(
+                    Qt.WindowType.Dialog
+                    | Qt.WindowType.WindowTitleHint
+                    | Qt.WindowType.CustomizeWindowHint
+                )
+
+            ret = dialog.exec()
+
+            if ret == QInputDialog.DialogCode.Accepted:
+                name = dialog.textValue().strip()
+                if not name:
+                    QMessageBox.warning(
+                        self.view,
+                        self.view.tr("Error"),
+                        self.view.tr("Project name cannot be empty."),
+                    )
+                    continue
+                if name in DatabaseController.list_projects():
+                    QMessageBox.warning(
+                        self.view,
+                        self.view.tr("Error"),
+                        self.view.tr("A project with this name already exists."),
+                    )
+                    continue
+                return name
+            else:
+                if strict:
+                    continue
+                return None
+
+    @Slot()
+    def on_new_project_action(self):
+        name = self._prompt_new_project_name()
+        if name:
+            self._switch_project(name)
+
+    @Slot()
+    def on_load_project_action(self):
+        projects = DatabaseController.list_projects()
+        if not projects:
+            QMessageBox.information(
+                self.view,
+                self.view.tr("Load Project"),
+                self.view.tr("No projects found."),
+            )
+            return
+
+        current = self.database.name
+        current_index = projects.index(current) if current in projects else 0
+
+        name, ok = QInputDialog.getItem(
+            self.view,
+            self.view.tr("Load Project"),
+            self.view.tr("Select Project:"),
+            projects,
+            current_index,
+            False,
+        )
+        if ok and name:
+            self._switch_project(name)
+
+    @Slot()
+    def on_save_as_project_action(self):
+        name, ok = QInputDialog.getText(
+            self.view,
+            self.view.tr("Save Project As"),
+            self.view.tr("New Project Name:"),
+        )
+        if ok and name:
+            if self.database.copy_database(name):
+                self._switch_project(name)
+                QMessageBox.information(
+                    self.view,
+                    self.view.tr("Project Saved"),
+                    self.view.tr(f"Project '{name}' saved successfully."),
+                )
+            else:
+                QMessageBox.critical(
+                    self.view,
+                    self.view.tr("Error"),
+                    self.view.tr(
+                        "Failed to save project. The name might already exist or be invalid."
+                    ),
+                )
+
+    @Slot()
+    def on_rename_project_action(self):
+        name = self._prompt_new_project_name()
+        if name:
+            if self.database.rename_database(name):
+                self.user_settings.setValue("current_project", name)
+                self.view.setWindowTitle(f"Discord Bot Creator - {name}")
+                QMessageBox.information(
+                    self.view,
+                    self.view.tr("Project Renamed"),
+                    self.view.tr(f"Project renamed to '{name}' successfully."),
+                )
+            else:
+                QMessageBox.critical(
+                    self.view,
+                    self.view.tr("Error"),
+                    self.view.tr(
+                        "Failed to rename project. The name might already exist or be invalid."
+                    ),
+                )
+
+    # --- Message Management Logic ---
+
+    def _new_message_controller(self, index: Optional[int] = None):
         message_controller = MessageController(
-            self.messages_model, self.database, index
+            self.messages_model, self.database, self.user_settings, index
         )
         window = message_controller.view.window
         self.message_windows.append(message_controller)
@@ -143,12 +471,80 @@ class MainController:
             lambda: self.message_windows.remove(message_controller)
         )
 
-    # def on_new_message(self, record: QSqlRecord):
-    #     model = self.database.get_messages_model()
-    #     model.insertRecord(-1, record)
-    #     model.submit()
-    #     self.messages_model.insertRow(self.messages_model.rowCount())
-    #     index = self.messages_model.index(self.messages_model.rowCount())
-    #     self.messages_model.setData(
-    #         index, record.value("name"), role=Qt.ItemDataRole.DisplayRole
-    #     )
+    @Slot()
+    def on_new_message_action(self):
+        self._new_message_controller()
+
+    @Slot()
+    def on_edit_message_action(self):
+        index = self.view.messages_list_view.currentIndex().row()
+        self._new_message_controller(index)
+
+    @Slot()
+    def on_remove_message_action(self):
+        index = self.view.messages_list_view.currentIndex().row()
+        self.database.delete_message_by_id(index)
+
+    @Slot()
+    def on_remove_all_message_action(self):
+        if self.user_settings.value("confirm_actions", type=bool):
+            ret = QMessageBox.question(
+                self.view,
+                self.view.tr("Confirm Deletion"),
+                self.view.tr("Are you sure you want to delete all messages?"),
+                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+                QMessageBox.StandardButton.No,
+            )
+
+            if ret == QMessageBox.StandardButton.No:
+                return
+
+        self.database.delete_all_messages()
+
+    # --- App Logic ---
+
+    @Slot()
+    def on_token_changed(self):
+        if self.view.token_line_edit.hasAcceptableInput():
+            self.user_settings.setValue("token", self.view.token_line_edit.text())
+
+    # --- Bot Logic ---
+
+    @Slot()
+    def on_switch_bot_clicked(self):
+        """Handle bot start/stop."""
+        if self.view.switch_bot_button.isChecked():
+            token = self.view.token_line_edit.text()
+            if not token:
+                QMessageBox.warning(
+                    self.view,
+                    self.view.tr("Error"),
+                    self.view.tr("Please enter a valid token."),
+                )
+                self.view.switch_bot_button.setChecked(False)
+                return
+
+            self.bot_thread.set_token(token)
+            self.bot_thread.start()
+            self.view.token_line_edit.setReadOnly(True)
+        else:
+            self.bot_thread.close()
+            self.view.token_line_edit.setReadOnly(False)
+
+    @Slot()
+    def on_bot_login_failure(self):
+        """Called when login fails."""
+        QMessageBox.critical(
+            self.view,
+            self.view.tr("Login Failed"),
+            self.view.tr("Invalid token. Please check your token and try again."),
+        )
+        self.view.switch_bot_button.setChecked(False)
+        self.view.token_line_edit.setReadOnly(False)
+
+    @Slot()
+    def on_bot_finished(self):
+        """Called when the bot thread finishes."""
+        if self.view.switch_bot_button.isChecked():
+            self.view.switch_bot_button.setChecked(False)
+        self.view.token_line_edit.setReadOnly(False)

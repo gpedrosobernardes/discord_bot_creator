@@ -1,82 +1,98 @@
 import logging
-import typing
 
-from PySide6.QtCore import Qt
-from PySide6.QtGui import QTextCursor, QColor, QTextCharFormat, QTextDocument
-from PySide6.QtWidgets import QApplication, QPlainTextEdit
+from PySide6.QtCore import Qt, Slot
+from PySide6.QtGui import QSyntaxHighlighter, QTextCharFormat, QColor, QFont
+from PySide6.QtWidgets import QApplication
+from PySide6.QtWidgets import QPlainTextEdit
 
-from utils import colors
+
+class LogHighlighter(QSyntaxHighlighter):
+    """
+    Camada responsável por colorir o texto dinamicamente.
+    Ele não olha para o texto, mas sim para o 'Estado do Bloco' (UserState).
+    """
+
+    def __init__(self, document):
+        super().__init__(document)
+
+        self._formats = {
+            Qt.ColorScheme.Dark: {
+                logging.INFO: self._create_text_char_format("#ffffff"),
+                logging.DEBUG: self._create_text_char_format("#929EA8"),
+                logging.ERROR: self._create_text_char_format("#FC6E77"),
+                logging.WARNING: self._create_text_char_format("#FFC107"),
+            },
+            Qt.ColorScheme.Light: {
+                logging.INFO: self._create_text_char_format("#000000"),
+                logging.DEBUG: self._create_text_char_format("#5A6269"),
+                logging.ERROR: self._create_text_char_format("#B62A37"),
+                logging.WARNING: self._create_text_char_format("#8B6702"),
+            },
+        }
+
+    @staticmethod
+    def _create_text_char_format(color: str, bold: bool = False) -> QTextCharFormat:
+        fmt = QTextCharFormat()
+        fmt.setForeground(QColor(color))
+        if bold:
+            fmt.setFontWeight(QFont.Weight.Bold)
+        return fmt
+
+    def highlightBlock(self, text: str):
+        """
+        Chamado automaticamente pelo Qt para cada linha visível.
+        Aplica a formatação baseada no 'currentBlockState'.
+        """
+        # O UserState contém o logging.LEVEL que definimos ao inserir o texto
+        level = self.currentBlockState()
+
+        # Pega o esquema atual do sistema (ou o forçado pela demo)
+        scheme = QApplication.styleHints().colorScheme()
+
+        # Fallback se o esquema for desconhecido
+        if scheme not in self._formats:
+            scheme = Qt.ColorScheme.Light
+
+        current_theme_formats = self._formats[scheme]
+
+        # Se houver uma cor definida para este nível neste tema, aplica
+        if level in current_theme_formats:
+            self.setFormat(
+                0,  # Início (caractere 0)
+                len(text),  # Tamanho (linha toda)
+                current_theme_formats[level],
+            )
 
 
 class QLogTextEdit(QPlainTextEdit):
-    _CLASS_PROPERTY_KEY = 1001
-    _CLASS_MAP = {
-        logging.INFO: colors.TEXT,
-        logging.WARNING: colors.WARNING,
-        logging.DEBUG: colors.SECONDARY,
-        logging.ERROR: colors.DANGER,
-    }
-
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, max_line_count: int = 2000):
         super().__init__(parent)
         self.setReadOnly(True)
-        self.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        self.installEventFilter(self)
-        style_hints = QApplication.styleHints()
-        _color_scheme = style_hints.colorScheme()
-        style_hints.colorSchemeChanged.connect(self._on_theme_changed)
-        self._recolor_by_class(
-            colors.DARK_THEME if self._is_dark_mode() else colors.LIGHT_THEME
-        )
+        self.document().setMaximumBlockCount(max_line_count)
 
-    @staticmethod
-    def _is_dark_mode():
-        style_hints = QApplication.styleHints()
-        color_scheme = style_hints.colorScheme()
-        return color_scheme.value == 2
+        # 1. Instala o Highlighter no documento deste widget
+        self.highlighter = LogHighlighter(self.document())
 
-    def add_log(self, message: str, level: typing.Optional[int] = logging.INFO):
-        cursor = self.textCursor()
-        cursor.movePosition(
-            QTextCursor.MoveOperation.End, QTextCursor.MoveMode.MoveAnchor
-        )
-        class_ = self._CLASS_MAP.get(level, colors.PRIMARY)
-        color_map = colors.DARK_THEME if self._is_dark_mode() else colors.LIGHT_THEME
-        color = color_map[class_]
-        fmt = QTextCharFormat()
-        fmt.setForeground(color)
-        fmt.setProperty(self._CLASS_PROPERTY_KEY, class_)
-        cursor.insertText(message, fmt)
+        # 2. Conecta mudança de tema
+        QApplication.styleHints().colorSchemeChanged.connect(self._on_theme_changed)
 
+    @Slot(str, int)
+    def add_log(self, message: str, level: int = logging.INFO):
+        """
+        Adiciona texto puro e marca o estado do bloco.
+        """
+        self.appendPlainText(message)
+
+        # Pega o bloco que acabamos de criar
+        block = self.document().lastBlock()
+
+        # 1. Define o estado (Isso não dispara o repaint visual sozinho)
+        block.setUserState(level)
+
+        # 2. FORÇA o highlighter a repintar APENAS este bloco agora que ele tem estado
+        self.highlighter.rehighlightBlock(block)
+
+    @Slot()
     def _on_theme_changed(self):
-        color_map = colors.DARK_THEME if self._is_dark_mode() else colors.LIGHT_THEME
-        self._recolor_by_class(color_map)
-
-    @staticmethod
-    def _get_text_fragments(doc: QTextDocument):
-        block = doc.firstBlock()
-        while block.isValid():
-            it = block.begin()
-            while not it.atEnd():
-                yield it.fragment()
-                it += 1
-            block = block.next()
-
-    def _recolor_by_class(self, color_map: dict[str, QColor]):
-        doc = self.document()
-        cursor = QTextCursor(doc)
-
-        for fragment in self._get_text_fragments(doc):
-            if fragment.isValid():
-                fmt = fragment.charFormat()
-                if fmt.hasProperty(self._CLASS_PROPERTY_KEY):
-                    color_class = fmt.property(self._CLASS_PROPERTY_KEY)
-                    if color_class in color_map:
-                        new_fmt = QTextCharFormat(fmt)
-                        new_fmt.setForeground(color_map[color_class])
-                        cursor.setPosition(fragment.position())
-                        cursor.setPosition(
-                            fragment.position() + fragment.length(),
-                            QTextCursor.MoveMode.KeepAnchor,
-                        )
-                        cursor.setCharFormat(new_fmt)
+        # Apenas avisa o highlighter para atualizar as cores internas e redesenhar
+        self.highlighter.rehighlight()

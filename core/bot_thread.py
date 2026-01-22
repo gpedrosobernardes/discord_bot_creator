@@ -1,38 +1,102 @@
-import discord
-from PySide6.QtCore import Signal, QThread
-from discord import (
-    LoginFailure,
-)
+import asyncio
+import logging
+from typing import Dict, Optional
 
-from core.integrated_bot import IntegratedBot
+import discord
+from PySide6.QtCore import QThread
+from discord import LoginFailure
+
+from core.integrated_bot import IntegratedBot, BotSignals
+
+# Logger setup para capturar erros internos da thread
+logger = logging.getLogger(__name__)
 
 
 class QBotThread(QThread):
-    bot_ready = Signal()
-    log = Signal(str, int)
-    login_failure = Signal()
-    guild_join = Signal(str)
-    guild_remove = Signal(str)
-    guild_update = Signal(str)
+    """
+    Thread dedicada para executar o loop de eventos asyncio do Discord Bot.
+    Gerencia a comunicação thread-safe entre a GUI (Qt) e o Bot (Asyncio).
+    """
 
-    def __init__(self):
+    def __init__(self) -> None:
+        """Initializes the QBotThread."""
         super().__init__()
-        self.__bot = IntegratedBot(self)
+        self._token: str = ""
+        self.signals = BotSignals()
+        self._bot: Optional[IntegratedBot] = None
+        self._database_name: str = None
 
-    def run(self):
-        if self.__bot.is_closed():
-            self.__bot = IntegratedBot(self)
+    def set_token(self, token: str) -> None:
+        """Sets the bot token before starting."""
+        self._token = token
+
+    def set_database_name(self, database_name: str):
+        self._database_name = database_name
+        if self._bot:
+            self._bot.database.switch_database(database_name)
+
+    def run(self) -> None:
+        """
+        Main entry point for the thread.
+        Initializes the IntegratedBot and starts the asyncio loop.
+        """
+        # Sempre recria o bot ao iniciar a thread para garantir um loop limpo
+        self._bot = IntegratedBot(self.signals, self._database_name)
+
         try:
-            self.__bot.run("")
+            if not self._token:
+                logging.error("Token not provided.")
+                return
+
+            # run() do discord.py é bloqueante, o que é perfeito para QThread.run()
+            self._bot.run(self._token)
+
         except LoginFailure:
-            self.login_failure.emit()
+            self.signals.login_failure.emit()
+            logging.error("Login failed: Invalid Token.")
+        except Exception as e:
+            logging.critical(f"Critical Bot Error: {e}")
+        finally:
+            # Limpeza ao encerrar
+            self._bot = None
 
-    def groups(self) -> dict[int, discord.Guild]:
-        return {guild.id: guild for guild in self.__bot.guilds}
+    def groups(self) -> Dict[int, discord.Guild]:
+        """
+        Retrieves the current guilds safely.
 
-    def leave_group(self, group_id: int):
-        group = self.__bot.get_guild(group_id)
-        self.__bot.loop.create_task(self.__bot.leave_guild(group))
+        Returns:
+            Dict[int, discord.Guild]: Dictionary of guilds or empty dict if bot not ready.
+        """
+        if self._bot and self._bot.is_ready():
+            # Nota: Acessar .guilds de outra thread é tecnicamente arriscado,
+            # mas para leitura simples geralmente funciona em Python (GIL).
+            # O ideal seria emitir isso via sinal, mas para getters síncronos, mantemos assim.
+            return {guild.id: guild for guild in self._bot.guilds}
+        return {}
 
-    def close(self):
-        self.__bot.loop.create_task(self.__bot.close())
+    def leave_group(self, group_id: int) -> None:
+        """
+        Schedules a task to leave a guild in the bot's async loop safely.
+
+        Args:
+            group_id (int): The ID of the guild to leave.
+        """
+        if not self._bot or not self._bot.loop.is_running():
+            return
+
+        guild = self._bot.get_guild(group_id)
+        if guild:
+            # THREAD SAFETY: Usa run_coroutine_threadsafe para injetar no loop
+            asyncio.run_coroutine_threadsafe(
+                self._bot.leave_guild(guild), self._bot.loop
+            )
+
+    def close(self) -> None:
+        """
+        Schedules the bot closure safely from the main thread.
+        """
+        if self._bot and not self._bot.is_closed() and self._bot.loop.is_running():
+            # THREAD SAFETY: Injeta o comando de fechar no loop do bot
+            future = asyncio.run_coroutine_threadsafe(self._bot.close(), self._bot.loop)
+            # Opcional: aguardar o futuro se quiser travar a GUI até fechar,
+            # mas geralmente deixamos fechar em background.

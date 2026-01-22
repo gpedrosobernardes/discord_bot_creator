@@ -2,12 +2,12 @@ from PySide6.QtCore import (
     Qt,
     QRegularExpression,
     QObject,
+    QSize,
 )
 from PySide6.QtGui import (
     QIcon,
     QRegularExpressionValidator,
 )
-from PySide6.QtSql import QSqlTableModel
 from PySide6.QtWidgets import (
     QVBoxLayout,
     QHBoxLayout,
@@ -17,19 +17,20 @@ from PySide6.QtWidgets import (
     QLineEdit,
     QSpinBox,
     QComboBox,
+    QToolButton,
+    QWidget,
 )
-from qextrawidgets import QAccordion, QEmojiPicker
+from qextrawidgets import QAccordion
+from qextrawidgets.icons import QThemeResponsiveIcon
+from qextrawidgets.widgets.emoji_picker import QEmojiGrid
 
-from widgets.condition_listbox import QConditionListbox
-from widgets.listbox import QListBox
+from widgets.condition_form import QConditionForm
+from widgets.reply_form import QReplyForm
 
 
 class MessageView(QObject):
     def __init__(
         self,
-        reaction_model: QSqlTableModel,
-        reply_model: QSqlTableModel,
-        emoji_picker: QEmojiPicker,
     ):
         super().__init__()
 
@@ -52,15 +53,26 @@ class MessageView(QObject):
         )
         self.name_line_edit.setMaxLength(40)
         self.name_line_edit.setValidator(name_entry_validator)
-        self.listbox_conditions = QConditionListbox()
-        self.listbox_reactions = QListBox(reaction_model, emoji_picker)
-        self.listbox_replies = QListBox(reply_model, emoji_picker)
+
+        self.listbox_conditions = QConditionForm()
+
+        # Reactions
+
+        self.reactions_widget = QWidget()
+
+        self.reactions_grid = QEmojiGrid(self.reactions_widget, 40, 0.2)
+
+        self.add_reaction_button = QToolButton()
+        self.add_reaction_button.setIcon(
+            QThemeResponsiveIcon.fromAwesome("fa6s.face-smile")
+        )
+        self.add_reaction_button.setIconSize(QSize(20, 20))
+
+        self.listbox_replies = QReplyForm()
+
         self.collapse_group = QAccordion()
         self.collapse_group.addSection("", self.listbox_conditions)
-        self.collapse_group.addSection(
-            "",
-            self.listbox_reactions,
-        )
+        self.collapse_group.addSection("", self.reactions_widget)
         self.collapse_group.addSection("", self.listbox_replies)
         self.collapse_group.expandAll(False)
 
@@ -80,12 +92,14 @@ class MessageView(QObject):
         self.delay_spin_box = QSpinBox()
         self.confirm_button = QPushButton()
         self.setup_layout()
-        self.translate_ui()
 
     def setup_layout(self):
+        reactions_layout = QHBoxLayout()
+        reactions_layout.addWidget(self.reactions_grid)
+        reactions_layout.addWidget(self.add_reaction_button)
+        self.reactions_widget.setLayout(reactions_layout)
+
         left_layout = QVBoxLayout()
-        mid_layout = QVBoxLayout()
-        right_layout = QVBoxLayout()
         left_layout.addWidget(self.collapse_group)
         left_layout.setSpacing(0)
         left_layout.setContentsMargins(0, 0, 0, 0)
@@ -103,18 +117,21 @@ class MessageView(QObject):
             self.delay_spin_box,
         )
 
+        right_layout = QVBoxLayout()
         for widget in widgets:
             right_layout.addWidget(widget)
         right_layout.addStretch()
         right_layout.addWidget(self.confirm_button)
+
         horizontal_layout = QHBoxLayout()
         horizontal_layout.addLayout(left_layout)
-        horizontal_layout.addLayout(mid_layout)
         horizontal_layout.addLayout(right_layout)
+
         vertical_layout = QVBoxLayout()
         vertical_layout.addWidget(self.name_text)
         vertical_layout.addWidget(self.name_line_edit)
         vertical_layout.addLayout(horizontal_layout)
+
         self.window.setLayout(vertical_layout)
         self.window.show()
 
@@ -155,16 +172,4 @@ class MessageView(QObject):
         self.delay_label.setText(self.tr("Delay"))
         self.confirm_button.setText(self.tr("Confirm"))
 
-        # models
-        # str_fields = (
-        #     self.tr("Message"),
-        #     self.tr("Author name"),
-        #     self.tr("Channel name"),
-        #     self.tr("Guild name"),
-        # )
-        # for row, field in enumerate(str_fields):
-        #     index = self.str_fields.index(row, 0)
-        #     self.str_fields.setData(index, field)
-
-        # int_fields = (self.tr("Mentions to bot"), self.tr("Mentions"), self.tr("Bot author"), self.tr("Emojis"))
-        #
+        self.listbox_conditions.translate_ui()
