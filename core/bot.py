@@ -249,7 +249,7 @@ class Bot(discord.Client):
             where_reply = message_record.value("where_reply")
 
             if (
-                where_reply == WhereReply.GROUP
+                where_reply in (WhereReply.GROUP, WhereReply.BOTH)
                 and discord_message.channel.guild is not None
             ):
                 await self.send_reply(
@@ -258,10 +258,14 @@ class Bot(discord.Client):
                     discord_message.channel,
                     message_record,
                 )
-            elif where_reply == WhereReply.PRIVATE:
+            if where_reply in (WhereReply.PRIVATE, WhereReply.BOTH):
                 dm_channel = await discord_message.author.create_dm()
                 await self.send_reply(
                     reply_text, discord_message, dm_channel, message_record
+                )
+            elif where_reply == WhereReply.SAME_CHANNEL:
+                await self.send_reply(
+                    reply_text, discord_message, discord_message.channel, message_record
                 )
 
     async def send_reply(
@@ -276,14 +280,29 @@ class Bot(discord.Client):
             log_msg = QCoreApplication.translate(
                 "Bot", 'Replying on group "{}" to the message "{}" by the author {}.'
             )
-        else:
+        elif where_reply == WhereReply.PRIVATE:
             log_msg = QCoreApplication.translate(
                 "Bot", 'Replying on private "{}" to the message "{}" by the author {}.'
             )
+        elif where_reply == WhereReply.SAME_CHANNEL:
+            log_msg = QCoreApplication.translate(
+                "Bot",
+                'Replying on same channel "{}" to the message "{}" by the author {}.',
+            )
+        elif where_reply == WhereReply.BOTH:
+            log_msg = QCoreApplication.translate(
+                "Bot",
+                'Replying on both group and private "{}" to the message "{}" by the author {}.',
+            )
+        else:
+            log_msg = None
 
-        logger.info(
-            log_msg.format(reply, discord_message.clean_content, discord_message.author)
-        )
+        if log_msg:
+            logger.info(
+                log_msg.format(
+                    reply, discord_message.clean_content, discord_message.author
+                )
+            )
 
         reply_message = await self.send_message(channel, reply)
 

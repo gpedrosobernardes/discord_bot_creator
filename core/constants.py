@@ -18,7 +18,9 @@ class Punishment(IntEnum):
 class WhereReply(IntEnum):
     GROUP = 0
     PRIVATE = 1
-    NONE = 2
+    SAME_CHANNEL = 2
+    BOTH = 3
+    NONE = 4
 
 
 class WhereReact(IntEnum):

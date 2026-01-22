@@ -160,7 +160,13 @@ class MessageView(QObject):
         self.where_reply_label.setText(self.tr("Where reply"))
 
         for i, text in enumerate(
-            [self.tr("Group"), self.tr("Private"), self.tr("None")]
+            [
+                self.tr("Group"),
+                self.tr("Private"),
+                self.tr("Same Channel"),
+                self.tr("Both"),
+                self.tr("None"),
+            ]
         ):
             self.where_reply_combobox.insertItem(i, text)
 
