@@ -16,6 +16,7 @@ from PySide6.QtGui import QAction, QKeySequence
 from PySide6.QtWidgets import QCompleter, QInputDialog, QMessageBox
 from qextrawidgets.icons import QThemeResponsiveIcon
 
+from controllers.config import ConfigController
 from controllers.message import MessageController
 from core.bot_thread import QBotThread
 from core.database import DatabaseController
@@ -41,7 +42,7 @@ class MainController(QObject):
         self,
         database: DatabaseController,
         user_settings: QSettings,
-        config_view: ConfigView,
+        config_controller: ConfigController,
         logs_view: LogsView,
         credits_view: CreditsView,
         log_handler: LogHandler,
@@ -52,7 +53,7 @@ class MainController(QObject):
         Args:
             database: The database controller instance.
             user_settings: The user settings instance.
-            config_view: The configuration view instance.
+            config_controller: The configuration controller instance.
             logs_view: The logs view instance.
             credits_view: The credits view instance.
         """
@@ -60,7 +61,8 @@ class MainController(QObject):
         # 1. Dependency Injection
         self.database = database
         self.user_settings = user_settings
-        self.config_view = config_view
+        self.config_view = config_controller.view
+        self.config_controller = config_controller
         self.logs_view = logs_view
         self.credits_view = credits_view
         self.log_handler = log_handler
@@ -471,6 +473,7 @@ class MainController(QObject):
         window.destroyed.connect(
             lambda: self.message_windows.remove(message_controller)
         )
+        self.config_controller.language_changed.connect(message_controller.translate_ui)
 
     @Slot()
     def on_new_message_action(self):

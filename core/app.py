@@ -39,7 +39,7 @@ class Application:
         self.main_controller = MainController(
             self.database,
             self.user_settings,
-            self.config_controller.view,
+            self.config_controller,
             self.logs_controller.view,
             self.credits_controller.view,
             self.log_handler,
