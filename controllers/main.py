@@ -588,6 +588,14 @@ class MainController(QObject):
     @Slot(QPoint)
     def on_groups_list_context_menu(self, position: QPoint):
         """Handles the context menu request for the groups list."""
+        index = self.view.groups_list_widget.indexAt(position)
+
+        if not index.isValid():
+            return
+
+        if not self.view.groups_list_widget.selectionModel().isSelected(index):
+            return
+
         menu = QMenu(self.view)
         menu.addAction(self.config_group_action)
         menu.addAction(self.quit_group_action)
