@@ -11,9 +11,10 @@ from PySide6.QtCore import (
     Slot,
     QObject,
     Signal,
+    QPoint,
 )
 from PySide6.QtGui import QAction, QKeySequence
-from PySide6.QtWidgets import QCompleter, QInputDialog, QMessageBox
+from PySide6.QtWidgets import QCompleter, QInputDialog, QMessageBox, QMenu
 from qextrawidgets.icons import QThemeResponsiveIcon
 
 from controllers.config import ConfigController
@@ -131,6 +132,11 @@ class MainController(QObject):
         )
         self.view.token_line_edit.editingFinished.connect(self.on_token_changed)
         self.view.switch_bot_button.clicked.connect(self.on_switch_bot_clicked)
+
+        # Groups List Context Menu
+        self.view.groups_list_widget.customContextMenuRequested.connect(
+            self.on_groups_list_context_menu
+        )
 
         # Bot Thread Connections
         self.bot_thread.signals.login_failure.connect(self.on_bot_login_failure)
@@ -558,3 +564,12 @@ class MainController(QObject):
         if self.view.switch_bot_button.isChecked():
             self.view.switch_bot_button.setChecked(False)
         self.view.token_line_edit.setReadOnly(False)
+
+    @Slot(QPoint)
+    def on_groups_list_context_menu(self, position: QPoint):
+        """Handles the context menu request for the groups list."""
+        menu = QMenu(self.view)
+        menu.addAction(self.config_group_action)
+        menu.addAction(self.quit_group_action)
+        global_position = self.view.groups_list_widget.mapToGlobal(position)
+        menu.exec(global_position)
