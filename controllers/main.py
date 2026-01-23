@@ -617,16 +617,15 @@ class MainController(QObject):
         """Handles the context menu request for the groups list."""
         index = self.view.groups_list_widget.indexAt(position)
 
-        if not index.isValid():
-            return
-
-        if not self.view.groups_list_widget.selectionModel().isSelected(index):
-            return
-
         menu = QMenu(self.view)
-        menu.addAction(self.config_group_action)
-        menu.addAction(self.quit_group_action)
-        menu.addSeparator()
+
+        if index.isValid() and self.view.groups_list_widget.selectionModel().isSelected(
+            index
+        ):
+            menu.addAction(self.config_group_action)
+            menu.addAction(self.quit_group_action)
+            menu.addSeparator()
+
         menu.addAction(self.generate_invite_action)
         global_position = self.view.groups_list_widget.mapToGlobal(position)
         menu.exec(global_position)
@@ -638,7 +637,9 @@ class MainController(QObject):
 
         menu = QMenu(self.view)
 
-        if index.isValid():
+        if index.isValid() and self.view.messages_list_view.selectionModel().isSelected(
+            index
+        ):
             menu.addAction(self.edit_message_action)
             menu.addAction(self.remove_message_action)
             menu.addSeparator()
