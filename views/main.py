@@ -200,6 +200,10 @@ class MainView(QMainWindow):
         self.left_tab_widget.setTabText(0, self.tr("Messages"))
         self.left_tab_widget.setTabText(1, self.tr("Groups"))
 
+        # Search Placeholders
+        self.search_messages_line_edit.setPlaceholderText(self.tr("Search messages..."))
+        self.search_groups.setPlaceholderText(self.tr("Search groups..."))
+
         # Right Panel
         self.cmd_line_edit.setPlaceholderText(self.tr("Type a command"))
         self.token_label.setText(self.tr("Token"))

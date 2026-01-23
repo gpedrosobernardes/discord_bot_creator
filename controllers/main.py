@@ -294,7 +294,9 @@ class MainController(QObject):
         self.config_group_action = self._create_action(
             "fa6s.gear", "Ctrl+G", triggered=self.on_config_group_action
         )
-        self.quit_group_action = self._create_action("fa6s.arrow-right-from-bracket")
+        self.quit_group_action = self._create_action(
+            "fa6s.arrow-right-from-bracket", triggered=self.on_quit_group_action
+        )
         self.generate_invite_action = self._create_action(
             "fa6s.link", triggered=self.on_generate_invite_action
         )
@@ -525,6 +527,14 @@ class MainController(QObject):
     @Slot()
     def on_edit_message_action(self):
         index = self.view.messages_list_view.currentIndex()
+        if not index.isValid():
+            QMessageBox.warning(
+                self.view,
+                self.tr("Error"),
+                self.tr("No message selected"),
+            )
+            return
+
         id_index = index.siblingAtColumn(self.messages_model.fieldIndex("id"))
         data = self.messages_model.data(id_index)
         self._new_message_controller(data)
@@ -532,6 +542,14 @@ class MainController(QObject):
     @Slot()
     def on_remove_message_action(self):
         index = self.view.messages_list_view.currentIndex()
+        if not index.isValid():
+            QMessageBox.warning(
+                self.view,
+                self.tr("Error"),
+                self.tr("No message selected"),
+            )
+            return
+
         id_index = index.siblingAtColumn(self.messages_model.fieldIndex("id"))
         data = self.messages_model.data(id_index)
         self.database.delete_message_by_id(data)
@@ -539,6 +557,14 @@ class MainController(QObject):
 
     @Slot()
     def on_remove_all_message_action(self):
+        if self.messages_model.rowCount() == 0:
+            QMessageBox.warning(
+                self.view,
+                self.tr("Error"),
+                self.tr("No messages to delete"),
+            )
+            return
+
         if self.user_settings.value("confirm_actions", type=bool):
             ret = QMessageBox.question(
                 self.view,
@@ -697,6 +723,11 @@ class MainController(QObject):
     def on_config_group_action(self):
         index = self.view.groups_list_widget.currentIndex()
         if not index.isValid():
+            QMessageBox.warning(
+                self.view,
+                self.tr("Error"),
+                self.tr("No group selected"),
+            )
             return
 
         item = self.groups_model.itemFromIndex(index)
@@ -719,6 +750,34 @@ class MainController(QObject):
         self.group_windows.append(controller)
         controller.view.finished.connect(lambda: self.group_windows.remove(controller))
         controller.view.show()
+
+    @Slot()
+    def on_quit_group_action(self):
+        index = self.view.groups_list_widget.currentIndex()
+        if not index.isValid():
+            QMessageBox.warning(
+                self.view,
+                self.tr("Error"),
+                self.tr("No group selected"),
+            )
+            return
+
+        item = self.groups_model.itemFromIndex(index)
+        group_id = item.data(Qt.ItemDataRole.UserRole)
+
+        if self.user_settings.value("confirm_actions", type=bool):
+            ret = QMessageBox.question(
+                self.view,
+                self.tr("Confirm Action"),
+                self.tr("Are you sure you want to leave this group?"),
+                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+                QMessageBox.StandardButton.No,
+            )
+
+            if ret == QMessageBox.StandardButton.No:
+                return
+
+        self.bot_thread.leave_group(group_id)
 
     @Slot()
     def on_generate_invite_action(self):
