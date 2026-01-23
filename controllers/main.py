@@ -142,6 +142,14 @@ class MainController(QObject):
             self.on_groups_list_context_menu
         )
 
+        # Messages List Context Menu
+        self.view.messages_list_view.setContextMenuPolicy(
+            Qt.ContextMenuPolicy.CustomContextMenu
+        )
+        self.view.messages_list_view.customContextMenuRequested.connect(
+            self.on_messages_list_context_menu
+        )
+
         # Bot Thread Connections
         self.bot_thread.signals.login_failure.connect(self.on_bot_login_failure)
         self.bot_thread.finished.connect(self.on_bot_finished)
@@ -600,6 +608,23 @@ class MainController(QObject):
         menu.addAction(self.config_group_action)
         menu.addAction(self.quit_group_action)
         global_position = self.view.groups_list_widget.mapToGlobal(position)
+        menu.exec(global_position)
+
+    @Slot(QPoint)
+    def on_messages_list_context_menu(self, position: QPoint):
+        """Handles the context menu request for the messages list."""
+        index = self.view.messages_list_view.indexAt(position)
+
+        menu = QMenu(self.view)
+        
+        if index.isValid():
+            menu.addAction(self.edit_message_action)
+            menu.addAction(self.remove_message_action)
+            menu.addSeparator()
+        
+        menu.addAction(self.remove_all_message_action)
+        
+        global_position = self.view.messages_list_view.mapToGlobal(position)
         menu.exec(global_position)
 
     @Slot(str)
