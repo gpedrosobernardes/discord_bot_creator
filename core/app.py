@@ -16,10 +16,6 @@ from core.database import DatabaseController
 from core.log_handler import LogHandler
 
 
-logger = logging.getLogger(__name__)
-logger.addHandler(LogHandler())
-
-
 class Application:
     def __init__(self):
         self.application = QApplication(sys.argv)
@@ -32,13 +28,10 @@ class Application:
         self.application.installTranslator(self.translator)
         locale.setlocale(locale.LC_ALL, lang)
 
-        logging.basicConfig(
-            level=self.user_settings.value("log_level"),
-            format="%(asctime)s - %(message)s",
-            datefmt="%x %X",
-        )
-
         self.database = DatabaseController(self.user_settings.value("database"), "main")
+
+        self.log_handler = LogHandler(self.database)
+        logging.getLogger("core").addHandler(self.log_handler)
 
         self.config_controller = ConfigController(self.translator, self.user_settings)
         self.logs_controller = LogsController()
@@ -49,6 +42,7 @@ class Application:
             self.config_controller.view,
             self.logs_controller.view,
             self.credits_controller.view,
+            self.log_handler,
         )
 
         self.group_controller = GroupController()

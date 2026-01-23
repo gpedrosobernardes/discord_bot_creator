@@ -1,6 +1,5 @@
 import asyncio
 import logging
-import random
 import typing
 
 import discord
@@ -10,12 +9,10 @@ from discord import MessageType
 
 from core.constants import Actions, Punishment, WhereReply, WhereReact
 from core.database import DatabaseController
-from core.log_handler import LogHandler
-from interpreter.conditions import MessageConditionValidator
-from interpreter.variable import Variable
+from core.conditions import MessageConditionValidator
+from core.variable import Variable
 
 logger = logging.getLogger(__name__)
-logger.addHandler(LogHandler())
 
 
 class Bot(discord.Client):

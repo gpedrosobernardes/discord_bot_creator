@@ -41,6 +41,7 @@ class MainController:
         config_view: ConfigView,
         logs_view: LogsView,
         credits_view: CreditsView,
+        log_handler: LogHandler,
     ):
         """
         Initializes the MainController.
@@ -59,16 +60,13 @@ class MainController:
         self.config_view = config_view
         self.logs_view = logs_view
         self.credits_view = credits_view
+        self.log_handler = log_handler
 
         # 2. State & Context
         self.message_windows = []
         self.messages_model = self.database.get_messages_model()
         self.messages_proxy_model = QSortFilterProxyModel()
         self.bot_thread = QBotThread()
-
-        self.log_handler = LogHandler(self.database)
-        logging.getLogger().addHandler(self.log_handler)
-        logging.getLogger().setLevel(logging.INFO)
 
         # 3. View Initialization
         self.view = MainView()
