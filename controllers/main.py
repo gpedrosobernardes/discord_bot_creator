@@ -158,13 +158,13 @@ class MainController(QObject):
                     self._switch_project(name)
                     return
             else:
-                new_project_str = self.view.tr("<Create New Project>")
+                new_project_str = self.tr("<Create New Project>")
                 items = [new_project_str] + projects
 
                 item, ok = QInputDialog.getItem(
                     self.view,
-                    self.view.tr("Load Project"),
-                    self.view.tr("Select a project or create a new one:"),
+                    self.tr("Load Project"),
+                    self.tr("Select a project or create a new one:"),
                     items,
                     0,
                     False,
@@ -298,29 +298,29 @@ class MainController(QObject):
         self.view.translate_ui()
 
         # Project
-        self.new_project_action.setText(self.view.tr("New project"))
-        self.load_project_action.setText(self.view.tr("Load"))
-        self.save_as_project_action.setText(self.view.tr("Save as"))
-        self.rename_project_action.setText(self.view.tr("Rename project"))
-        self.config_action.setText(self.view.tr("Configuration"))
-        self.exit_action.setText(self.view.tr("Exit"))
+        self.new_project_action.setText(self.tr("New"))
+        self.load_project_action.setText(self.tr("Load"))
+        self.save_as_project_action.setText(self.tr("Save as"))
+        self.rename_project_action.setText(self.tr("Rename"))
+        self.config_action.setText(self.tr("Configuration"))
+        self.exit_action.setText(self.tr("Exit"))
 
         # Edit / Messages
-        self.new_message_action.setText(self.view.tr("New message"))
-        self.edit_message_action.setText(self.view.tr("Edit message"))
-        self.remove_message_action.setText(self.view.tr("Remove message"))
-        self.remove_all_message_action.setText(self.view.tr("Remove all messages"))
+        self.new_message_action.setText(self.tr("New message"))
+        self.edit_message_action.setText(self.tr("Edit message"))
+        self.remove_message_action.setText(self.tr("Remove message"))
+        self.remove_all_message_action.setText(self.tr("Remove all messages"))
 
         # Groups
-        self.config_group_action.setText(self.view.tr("Config group"))
-        self.quit_group_action.setText(self.view.tr("Quit group"))
+        self.config_group_action.setText(self.tr("Config group"))
+        self.quit_group_action.setText(self.tr("Quit group"))
 
         # Help
-        self.credits_action.setText(self.view.tr("Credits"))
-        self.logs_action.setText(self.view.tr("Logs"))
-        self.project_action.setText(self.view.tr("Project"))
-        self.report_bug_action.setText(self.view.tr("Report bug"))
-        self.discord_applications_action.setText(self.view.tr("Discord applications"))
+        self.credits_action.setText(self.tr("Credits"))
+        self.logs_action.setText(self.tr("Logs"))
+        self.project_action.setText(self.tr("Project"))
+        self.report_bug_action.setText(self.tr("Report bug"))
+        self.discord_applications_action.setText(self.tr("Discord applications"))
 
     # --- Project Management Logic ---
 
@@ -347,11 +347,11 @@ class MainController(QObject):
         )
 
     def _prompt_new_project_name(self, strict: bool = False) -> Optional[str]:
-        default_name = self.view.tr("New Project")
+        default_name = self.tr("New Project")
         while True:
             dialog = QInputDialog(self.view)
-            dialog.setWindowTitle(self.view.tr("New Project"))
-            dialog.setLabelText(self.view.tr("Project Name:"))
+            dialog.setWindowTitle(self.tr("New Project"))
+            dialog.setLabelText(self.tr("Project Name:"))
             dialog.setTextValue(default_name)
 
             if strict:
@@ -368,15 +368,15 @@ class MainController(QObject):
                 if not name:
                     QMessageBox.warning(
                         self.view,
-                        self.view.tr("Error"),
-                        self.view.tr("Project name cannot be empty."),
+                        self.tr("Error"),
+                        self.tr("Project name cannot be empty."),
                     )
                     continue
                 if name in DatabaseController.list_projects():
                     QMessageBox.warning(
                         self.view,
-                        self.view.tr("Error"),
-                        self.view.tr("A project with this name already exists."),
+                        self.tr("Error"),
+                        self.tr("A project with this name already exists."),
                     )
                     continue
                 return name
@@ -397,8 +397,8 @@ class MainController(QObject):
         if not projects:
             QMessageBox.information(
                 self.view,
-                self.view.tr("Load Project"),
-                self.view.tr("No projects found."),
+                self.tr("Load Project"),
+                self.tr("No projects found."),
             )
             return
 
@@ -407,8 +407,8 @@ class MainController(QObject):
 
         name, ok = QInputDialog.getItem(
             self.view,
-            self.view.tr("Load Project"),
-            self.view.tr("Select Project:"),
+            self.tr("Load Project"),
+            self.tr("Select Project:"),
             projects,
             current_index,
             False,
@@ -420,22 +420,22 @@ class MainController(QObject):
     def on_save_as_project_action(self):
         name, ok = QInputDialog.getText(
             self.view,
-            self.view.tr("Save Project As"),
-            self.view.tr("New Project Name:"),
+            self.tr("Save Project As"),
+            self.tr("New Project Name:"),
         )
         if ok and name:
             if self.database.copy_database(name):
                 self._switch_project(name)
                 QMessageBox.information(
                     self.view,
-                    self.view.tr("Project Saved"),
-                    self.view.tr(f"Project '{name}' saved successfully."),
+                    self.tr("Project Saved"),
+                    self.tr(f"Project '{name}' saved successfully."),
                 )
             else:
                 QMessageBox.critical(
                     self.view,
-                    self.view.tr("Error"),
-                    self.view.tr(
+                    self.tr("Error"),
+                    self.tr(
                         "Failed to save project. The name might already exist or be invalid."
                     ),
                 )
@@ -449,14 +449,14 @@ class MainController(QObject):
                 self.view.setWindowTitle(f"Discord Bot Creator - {name}")
                 QMessageBox.information(
                     self.view,
-                    self.view.tr("Project Renamed"),
-                    self.view.tr(f"Project renamed to '{name}' successfully."),
+                    self.tr("Project Renamed"),
+                    self.tr(f"Project renamed to '{name}' successfully."),
                 )
             else:
                 QMessageBox.critical(
                     self.view,
-                    self.view.tr("Error"),
-                    self.view.tr(
+                    self.tr("Error"),
+                    self.tr(
                         "Failed to rename project. The name might already exist or be invalid."
                     ),
                 )
@@ -492,8 +492,8 @@ class MainController(QObject):
         if self.user_settings.value("confirm_actions", type=bool):
             ret = QMessageBox.question(
                 self.view,
-                self.view.tr("Confirm Deletion"),
-                self.view.tr("Are you sure you want to delete all messages?"),
+                self.tr("Confirm Deletion"),
+                self.tr("Are you sure you want to delete all messages?"),
                 QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
                 QMessageBox.StandardButton.No,
             )
@@ -520,8 +520,8 @@ class MainController(QObject):
             if not token:
                 QMessageBox.warning(
                     self.view,
-                    self.view.tr("Error"),
-                    self.view.tr("Please enter a valid token."),
+                    self.tr("Error"),
+                    self.tr("Please enter a valid token."),
                 )
                 self.view.switch_bot_button.setChecked(False)
                 return
@@ -538,8 +538,8 @@ class MainController(QObject):
         """Called when login fails."""
         QMessageBox.critical(
             self.view,
-            self.view.tr("Login Failed"),
-            self.view.tr("Invalid token. Please check your token and try again."),
+            self.tr("Login Failed"),
+            self.tr("Invalid token. Please check your token and try again."),
         )
         self.view.switch_bot_button.setChecked(False)
         self.view.token_line_edit.setReadOnly(False)

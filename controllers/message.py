@@ -67,7 +67,7 @@ class MessageController(QObject):
         self._setup_data_mapper()
 
         if self.context == MessageWindowContext.NEW:
-            self.view.name_line_edit.setText(self.view.tr("New message"))
+            self.view.name_line_edit.setText(self.tr("New message"))
             # Do not submit immediately for new messages
             # self.data_mapper.submit()
 
@@ -460,7 +460,7 @@ class MessageController(QObject):
             self.view.window.accept()
 
     def _show_error(self, message: str):
-        QMessageBox.warning(self.view.window, self.view.window.tr("Error"), message)
+        QMessageBox.warning(self.view.window, self.tr("Error"), message)
 
     def on_accepted(self):
         # Submit all changes manually
