@@ -478,13 +478,18 @@ class MainController(QObject):
 
     @Slot()
     def on_edit_message_action(self):
-        index = self.view.messages_list_view.currentIndex().row()
-        self._new_message_controller(index)
+        index = self.view.messages_list_view.currentIndex()
+        id_index = index.siblingAtColumn(self.messages_model.fieldIndex("id"))
+        data = self.messages_model.data(id_index)
+        self._new_message_controller(data)
 
     @Slot()
     def on_remove_message_action(self):
-        index = self.view.messages_list_view.currentIndex().row()
-        self.database.delete_message_by_id(index)
+        index = self.view.messages_list_view.currentIndex()
+        id_index = index.siblingAtColumn(self.messages_model.fieldIndex("id"))
+        data = self.messages_model.data(id_index)
+        self.database.delete_message_by_id(data)
+        self.messages_model.select()
 
     @Slot()
     def on_remove_all_message_action(self):
@@ -501,6 +506,7 @@ class MainController(QObject):
                 return
 
         self.database.delete_all_messages()
+        self.messages_model.select()
 
     # --- App Logic ---
 
