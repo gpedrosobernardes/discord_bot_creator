@@ -24,6 +24,7 @@ from qextrawidgets import QAccordion
 from qextrawidgets.icons import QThemeResponsiveIcon
 from qextrawidgets.widgets.emoji_picker import QEmojiGrid
 
+from core.constants import Actions, Punishment, WhereReply, WhereReact
 from widgets.condition_form import QConditionForm
 from widgets.reply_form import QReplyForm
 
@@ -78,15 +79,19 @@ class MessageView(QObject):
 
         self.action_label = QLabel()
         self.action_combobox = QComboBox()
+        self.action_combobox.insertItems(0, map(str, Actions))
 
         self.punishment_label = QLabel()
         self.punishment_combobox = QComboBox()
+        self.punishment_combobox.insertItems(0, map(str, Punishment))
 
         self.where_reply_label = QLabel()
         self.where_reply_combobox = QComboBox()
+        self.where_reply_combobox.insertItems(0, map(str, WhereReply))
 
         self.where_react_label = QLabel()
         self.where_react_combobox = QComboBox()
+        self.where_react_combobox.insertItems(0, map(str, WhereReact))
 
         self.delay_label = QLabel()
         self.delay_spin_box = QSpinBox()
@@ -150,12 +155,12 @@ class MessageView(QObject):
         self.action_label.setText(self.tr("Action"))
 
         for i, text in enumerate([self.tr("Pin"), self.tr("Delete"), self.tr("None")]):
-            self.action_combobox.insertItem(i, text)
+            self.action_combobox.setItemText(i, text)
 
         self.punishment_label.setText(self.tr("Punishment"))
 
         for i, text in enumerate([self.tr("Kick"), self.tr("Ban"), self.tr("None")]):
-            self.punishment_combobox.insertItem(i, text)
+            self.punishment_combobox.setItemText(i, text)
 
         self.where_reply_label.setText(self.tr("Where reply"))
 
@@ -168,12 +173,12 @@ class MessageView(QObject):
                 self.tr("None"),
             ]
         ):
-            self.where_reply_combobox.insertItem(i, text)
+            self.where_reply_combobox.setItemText(i, text)
 
         self.where_react_label.setText(self.tr("Where react"))
 
         for i, text in enumerate([self.tr("Author"), self.tr("Bot"), self.tr("None")]):
-            self.where_react_combobox.insertItem(i, text)
+            self.where_react_combobox.setItemText(i, text)
 
         self.delay_label.setText(self.tr("Delay"))
         self.confirm_button.setText(self.tr("Confirm"))

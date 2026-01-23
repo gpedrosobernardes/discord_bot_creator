@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import logging
 import sys
 import webbrowser
 from typing import Optional

@@ -58,13 +58,12 @@ class MessageController(QObject):
 
         # Initial State
         self._setup_actions()
-
-        self.translate_ui()
-        self.on_condition_field_changed()
-
         self._setup_models()
         self._setup_connections()
         self._setup_data_mapper()
+
+        self.translate_ui()
+        self.on_condition_field_changed()
 
         if self.context == MessageWindowContext.NEW:
             self.view.name_line_edit.setText(self.tr("New message"))
