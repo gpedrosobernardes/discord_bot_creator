@@ -13,7 +13,7 @@ from PySide6.QtCore import (
     Signal,
     QPoint,
 )
-from PySide6.QtGui import QAction, QKeySequence
+from PySide6.QtGui import QAction, QKeySequence, QStandardItemModel, QStandardItem
 from PySide6.QtWidgets import QCompleter, QInputDialog, QMessageBox, QMenu
 from qextrawidgets.icons import QThemeResponsiveIcon
 
@@ -23,7 +23,6 @@ from core.bot_thread import QBotThread
 from core.database import DatabaseController
 from core.log_handler import LogHandler
 from utils.token_validator import TokenValidator
-from views.config import ConfigView
 from views.credits import CreditsView
 from views.logs import LogsView
 from views.main import MainView
@@ -72,6 +71,7 @@ class MainController(QObject):
         self.message_windows = []
         self.messages_model = self.database.get_messages_model()
         self.messages_proxy_model = QSortFilterProxyModel()
+        self.groups_model = QStandardItemModel()
         self.bot_thread = QBotThread()
 
         # 3. View Initialization
@@ -104,6 +104,8 @@ class MainController(QObject):
         self.view.messages_list_view.setModelColumn(
             self.messages_model.fieldIndex("name")
         )
+
+        self.view.groups_list_widget.setModel(self.groups_model)
 
     def _init_actions(self):
         """Initialize all QActions and assign them to menus/buttons."""
@@ -141,6 +143,10 @@ class MainController(QObject):
         # Bot Thread Connections
         self.bot_thread.signals.login_failure.connect(self.on_bot_login_failure)
         self.bot_thread.finished.connect(self.on_bot_finished)
+        self.bot_thread.signals.bot_ready.connect(self.on_bot_ready)
+        self.bot_thread.signals.guild_join.connect(self.on_guild_join)
+        self.bot_thread.signals.guild_remove.connect(self.on_guild_remove)
+        self.bot_thread.signals.guild_update.connect(self.on_guild_update)
 
         # Log Handler Connections
         self.log_handler.signaler.log.connect(self.view.logs_text_edit.add_log)
@@ -564,6 +570,16 @@ class MainController(QObject):
         if self.view.switch_bot_button.isChecked():
             self.view.switch_bot_button.setChecked(False)
         self.view.token_line_edit.setReadOnly(False)
+        self.groups_model.clear()
+
+    @Slot()
+    def on_bot_ready(self):
+        """Called when the bot is ready."""
+        self.groups_model.clear()
+        for guild_id, guild in self.bot_thread.groups().items():
+            item = QStandardItem(guild.name)
+            item.setData(guild_id, Qt.ItemDataRole.UserRole)
+            self.groups_model.appendRow(item)
 
     @Slot(QPoint)
     def on_groups_list_context_menu(self, position: QPoint):
@@ -573,3 +589,47 @@ class MainController(QObject):
         menu.addAction(self.quit_group_action)
         global_position = self.view.groups_list_widget.mapToGlobal(position)
         menu.exec(global_position)
+
+    @Slot(str)
+    def on_guild_join(self, guild_id_str: str):
+        guild_id = int(guild_id_str)
+        guilds = self.bot_thread.groups()
+        guild = guilds.get(guild_id)
+
+        if guild:
+            item = QStandardItem(guild.name)
+            item.setData(guild_id, Qt.ItemDataRole.UserRole)
+            self.groups_model.appendRow(item)
+
+    @Slot(str)
+    def on_guild_remove(self, guild_id_str: str):
+        guild_id = int(guild_id_str)
+        matches = self.groups_model.match(
+            self.groups_model.index(0, 0),
+            Qt.ItemDataRole.UserRole,
+            guild_id,
+            1,
+            Qt.MatchFlag.MatchExactly,
+        )
+        if matches:
+            self.groups_model.removeRow(matches[0].row())
+
+    @Slot(str)
+    def on_guild_update(self, guild_id_str: str):
+        guild_id = int(guild_id_str)
+        guilds = self.bot_thread.groups()
+        guild = guilds.get(guild_id)
+
+        if not guild:
+            return
+
+        matches = self.groups_model.match(
+            self.groups_model.index(0, 0),
+            Qt.ItemDataRole.UserRole,
+            guild_id,
+            1,
+            Qt.MatchFlag.MatchExactly,
+        )
+        if matches:
+            item = self.groups_model.itemFromIndex(matches[0])
+            item.setText(guild.name)
