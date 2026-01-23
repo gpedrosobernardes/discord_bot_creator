@@ -4,6 +4,7 @@ import operator
 from typing import List, Dict, Callable, Union
 
 import discord
+import emoji_data_python
 import emojis
 from PySide6.QtCore import QCoreApplication
 from PySide6.QtSql import QSqlRecord
@@ -20,6 +21,8 @@ class MessageConditionValidator:
     This class extracts specific fields from a Discord message and compares them
     against target values using specified operators (e.g., equals, contains, regex).
     """
+
+    emoji_regex = emoji_data_python.get_emoji_regex()
 
     def __init__(
         self,
@@ -51,7 +54,7 @@ class MessageConditionValidator:
             ),
             IntField.MENTIONS.value: lambda m: len(m.mentions),
             IntField.BOT_AUTHOR.value: lambda m: int(m.author.bot),
-            IntField.EMOJIS.value: lambda m: emojis.count(m.clean_content),
+            IntField.EMOJIS.value: lambda m: len(self.emoji_regex.findall(m.content)),
         }
 
         # 2. Integer Operators
