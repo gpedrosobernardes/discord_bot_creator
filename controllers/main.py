@@ -225,19 +225,23 @@ class MainController(QObject):
 
     def _setup_project_actions(self):
         self.new_project_action = self._create_action(
-            triggered=self.on_new_project_action
+            shortcut="Ctrl+Shift+N", triggered=self.on_new_project_action
         )
         self.load_project_action = self._create_action(
-            triggered=self.on_load_project_action
+            shortcut="Ctrl+O", triggered=self.on_load_project_action
         )
         self.save_as_project_action = self._create_action(
-            triggered=self.on_save_as_project_action
+            shortcut="Ctrl+Shift+S", triggered=self.on_save_as_project_action
         )
         self.rename_project_action = self._create_action(
-            triggered=self.on_rename_project_action
+            shortcut="F2", triggered=self.on_rename_project_action
         )
-        self.config_action = self._create_action(triggered=self.config_view.show)
-        self.exit_action = self._create_action(triggered=self.view.close)
+        self.config_action = self._create_action(
+            shortcut="Ctrl+,", triggered=self.config_view.show
+        )
+        self.exit_action = self._create_action(
+            shortcut="Ctrl+Q", triggered=self.view.close
+        )
 
         self.view.project_menu.addActions(
             [
@@ -261,7 +265,7 @@ class MainController(QObject):
             "fa6s.minus", "Delete", self.on_remove_message_action
         )
         self.remove_all_message_action = self._create_action(
-            "fa6s.trash", "Ctrl+Delete", self.on_remove_all_message_action
+            "fa6s.trash", "Ctrl+Shift+Delete", self.on_remove_all_message_action
         )
 
         self.view.edit_menu.addActions(
@@ -280,7 +284,7 @@ class MainController(QObject):
 
     def _setup_group_actions(self):
         self.config_group_action = self._create_action(
-            "fa6s.gear", triggered=self.on_config_group_action
+            "fa6s.gear", "Ctrl+G", triggered=self.on_config_group_action
         )
         self.quit_group_action = self._create_action("fa6s.arrow-right-from-bracket")
 
@@ -303,9 +307,11 @@ class MainController(QObject):
                 "https://github.com/gustavopedrosob/discord_bot_creator"
             )
         )
-        self.logs_action = self._create_action(triggered=self.logs_view.window.show)
+        self.logs_action = self._create_action(
+            shortcut="Ctrl+L", triggered=self.logs_view.window.show
+        )
         self.credits_action = self._create_action(
-            triggered=self.credits_view.window.show
+            shortcut="F1", triggered=self.credits_view.window.show
         )
 
         self.view.help_menu.addActions(
