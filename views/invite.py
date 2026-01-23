@@ -8,8 +8,10 @@ from PySide6.QtWidgets import (
     QGridLayout,
     QScrollArea,
     QWidget,
+    QHBoxLayout,
+    QPushButton,
 )
-from PySide6.QtCore import Qt
+
 import discord
 
 
@@ -19,24 +21,24 @@ class InviteDialog(QDialog):
         self.setWindowTitle(self.tr("Generate Invite Link"))
         self.resize(500, 600)
 
-        layout = QVBoxLayout(self)
-
         self.client_id_edit = QLineEdit()
         self.client_id_edit.setPlaceholderText(self.tr("Client ID (Application ID)"))
-        layout.addWidget(QLabel(self.tr("Client ID:")))
-        layout.addWidget(self.client_id_edit)
 
-        layout.addWidget(QLabel(self.tr("Permissions:")))
-
-        # Scroll Area for permissions
-        scroll = QScrollArea()
-        scroll.setWidgetResizable(True)
-        scroll_content = QWidget()
-        self.permissions_layout = QGridLayout(scroll_content)
-        scroll.setWidget(scroll_content)
+        self.select_all_btn = QPushButton(self.tr("Select All"))
+        self.deselect_all_btn = QPushButton(self.tr("Deselect All"))
 
         self.permissions_checks = {}
+        self.permissions_layout = QGridLayout()
 
+        self.button_box = QDialogButtonBox(
+            QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel
+        )
+
+        self._init_permissions()
+        self._init_layout()
+        self._init_connections()
+
+    def _init_permissions(self):
         # List of permissions
         perms = [
             ("administrator", self.tr("Administrator")),
@@ -77,20 +79,54 @@ class InviteDialog(QDialog):
             ("moderate_members", self.tr("Moderate Members")),
         ]
 
-        for i, (perm_attr, perm_name) in enumerate(perms):
+        for perm_attr, perm_name in perms:
             cb = QCheckBox(perm_name)
             cb.setProperty("perm_attr", perm_attr)
+            cb.setChecked(True)  # Selected by default
             self.permissions_checks[perm_attr] = cb
+
+    def _init_layout(self):
+        layout = QVBoxLayout(self)
+
+        layout.addWidget(QLabel(self.tr("Client ID:")))
+        layout.addWidget(self.client_id_edit)
+
+        layout.addWidget(QLabel(self.tr("Permissions:")))
+
+        # Selection buttons
+        selection_layout = QHBoxLayout()
+        selection_layout.addWidget(self.select_all_btn)
+        selection_layout.addWidget(self.deselect_all_btn)
+        selection_layout.addStretch()
+        layout.addLayout(selection_layout)
+
+        # Add checkboxes to layout
+        for i, cb in enumerate(self.permissions_checks.values()):
             self.permissions_layout.addWidget(cb, i // 2, i % 2)
 
-        layout.addWidget(scroll)
+        # Scroll Area for permissions
+        scroll = QScrollArea()
+        scroll.setWidgetResizable(True)
+        scroll_content = QWidget()
+        scroll_content.setLayout(self.permissions_layout)
+        scroll.setWidget(scroll_content)
 
-        self.button_box = QDialogButtonBox(
-            QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel
-        )
+        layout.addWidget(scroll)
+        layout.addWidget(self.button_box)
+
+    def _init_connections(self):
+        self.select_all_btn.clicked.connect(self.select_all)
+        self.deselect_all_btn.clicked.connect(self.deselect_all)
         self.button_box.accepted.connect(self.accept)
         self.button_box.rejected.connect(self.reject)
-        layout.addWidget(self.button_box)
+
+    def select_all(self):
+        for cb in self.permissions_checks.values():
+            cb.setChecked(True)
+
+    def deselect_all(self):
+        for cb in self.permissions_checks.values():
+            cb.setChecked(False)
 
     def get_permissions(self) -> discord.Permissions:
         p = discord.Permissions.none()

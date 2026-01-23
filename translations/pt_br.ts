@@ -135,7 +135,7 @@
 <context>
     <name>ConditionValidator</name>
     <message>
-        <location filename="../core/conditions.py" line="224"/>
+        <location filename="../core/conditions.py" line="227"/>
         <source>[NoCase] </source>
         <translation>[Sem maiúsculas/minúsculas] </translation>
     </message>
@@ -300,29 +300,51 @@
     </message>
 </context>
 <context>
-    <name>GroupWindow</name>
+    <name>GroupController</name>
     <message>
-        <location filename="../views/group.py" line="62"/>
+        <location filename="../controllers/group.py" line="71"/>
+        <location filename="../controllers/group.py" line="75"/>
+        <source>Select a channel</source>
+        <translation>Selecione um canal</translation>
+    </message>
+</context>
+<context>
+    <name>GroupView</name>
+    <message>
+        <location filename="../views/group.py" line="95"/>
+        <source>Group Configuration</source>
+        <translation>Configuração de grupo</translation>
+    </message>
+    <message>
+        <location filename="../views/group.py" line="96"/>
         <source>Welcome message:</source>
         <translation>Messagem de boas-vindas:</translation>
     </message>
     <message>
-        <location filename="../views/group.py" line="70"/>
-        <location filename="../views/group.py" line="82"/>
+        <location filename="../views/group.py" line="97"/>
+        <location filename="../views/group.py" line="101"/>
         <source>Channel:</source>
         <translation>Canal:</translation>
     </message>
     <message>
-        <location filename="../views/group.py" line="73"/>
-        <location filename="../views/group.py" line="85"/>
+        <location filename="../views/group.py" line="98"/>
+        <location filename="../views/group.py" line="102"/>
         <source>Message:</source>
         <translation>Mensagem:</translation>
     </message>
     <message>
-        <location filename="../views/group.py" line="75"/>
+        <location filename="../views/group.py" line="100"/>
         <source>Goodbye message:</source>
         <translation>Mensagem de despedida:</translation>
     </message>
+    <message>
+        <location filename="../views/group.py" line="104"/>
+        <source>Confirm and save</source>
+        <translation>Confirmar e salvar</translation>
+    </message>
+</context>
+<context>
+    <name>GroupWindow</name>
     <message>
         <location filename="../widgets/channel_dialog.py" line="85"/>
         <source>Channels</source>
@@ -391,6 +413,219 @@
     </message>
 </context>
 <context>
+    <name>InviteDialog</name>
+    <message>
+        <location filename="../views/invite.py" line="21"/>
+        <source>Generate Invite Link</source>
+        <translation>Gerar link de convite</translation>
+    </message>
+    <message>
+        <location filename="../views/invite.py" line="25"/>
+        <source>Client ID (Application ID)</source>
+        <translation>ID do cliente (ID do aplicativo)</translation>
+    </message>
+    <message>
+        <location filename="../views/invite.py" line="91"/>
+        <source>Client ID:</source>
+        <translation>ID do cliente:</translation>
+    </message>
+    <message>
+        <location filename="../views/invite.py" line="94"/>
+        <source>Permissions:</source>
+        <translation>Permissões:</translation>
+    </message>
+    <message>
+        <location filename="../views/invite.py" line="44"/>
+        <source>Administrator</source>
+        <translation>Administrador</translation>
+    </message>
+    <message>
+        <location filename="../views/invite.py" line="27"/>
+        <source>Select All</source>
+        <translation>Selecionar tudo</translation>
+    </message>
+    <message>
+        <location filename="../views/invite.py" line="28"/>
+        <source>Deselect All</source>
+        <translation>Desmarcar tudo</translation>
+    </message>
+    <message>
+        <location filename="../views/invite.py" line="45"/>
+        <source>Manage Server</source>
+        <translation>Gerenciar servidor</translation>
+    </message>
+    <message>
+        <location filename="../views/invite.py" line="46"/>
+        <source>Manage Roles</source>
+        <translation>Gerenciar funções</translation>
+    </message>
+    <message>
+        <location filename="../views/invite.py" line="47"/>
+        <source>Manage Channels</source>
+        <translation>Gerenciar canais</translation>
+    </message>
+    <message>
+        <location filename="../views/invite.py" line="48"/>
+        <source>Kick Members</source>
+        <translation>Expulsar membros</translation>
+    </message>
+    <message>
+        <location filename="../views/invite.py" line="49"/>
+        <source>Ban Members</source>
+        <translation>Banir membros</translation>
+    </message>
+    <message>
+        <location filename="../views/invite.py" line="50"/>
+        <source>Create Invite</source>
+        <translation>Criar convite</translation>
+    </message>
+    <message>
+        <location filename="../views/invite.py" line="51"/>
+        <source>Change Nickname</source>
+        <translation>Alterar apelido</translation>
+    </message>
+    <message>
+        <location filename="../views/invite.py" line="52"/>
+        <source>Manage Nicknames</source>
+        <translation>Gerenciar apelidos</translation>
+    </message>
+    <message>
+        <location filename="../views/invite.py" line="53"/>
+        <source>Manage Emojis</source>
+        <translation>Gerenciar emojis</translation>
+    </message>
+    <message>
+        <location filename="../views/invite.py" line="54"/>
+        <source>Manage Webhooks</source>
+        <translation>Gerenciar webhooks</translation>
+    </message>
+    <message>
+        <location filename="../views/invite.py" line="55"/>
+        <source>View Audit Log</source>
+        <translation>Ver registro de auditoria</translation>
+    </message>
+    <message>
+        <location filename="../views/invite.py" line="56"/>
+        <source>View Channels (Read Messages)</source>
+        <translation>Ver canais (ler mensagens)</translation>
+    </message>
+    <message>
+        <location filename="../views/invite.py" line="57"/>
+        <source>Send Messages</source>
+        <translation>Enviar mensagens</translation>
+    </message>
+    <message>
+        <location filename="../views/invite.py" line="58"/>
+        <source>Send TTS Messages</source>
+        <translation>Enviar mensagens TTS</translation>
+    </message>
+    <message>
+        <location filename="../views/invite.py" line="59"/>
+        <source>Manage Messages</source>
+        <translation>Gerenciar mensagens</translation>
+    </message>
+    <message>
+        <location filename="../views/invite.py" line="60"/>
+        <source>Embed Links</source>
+        <translation>Incorporar links</translation>
+    </message>
+    <message>
+        <location filename="../views/invite.py" line="61"/>
+        <source>Attach Files</source>
+        <translation>Anexar arquivos</translation>
+    </message>
+    <message>
+        <location filename="../views/invite.py" line="62"/>
+        <source>Read Message History</source>
+        <translation>Ler histórico de mensagens</translation>
+    </message>
+    <message>
+        <location filename="../views/invite.py" line="63"/>
+        <source>Mention Everyone</source>
+        <translation>Mencione todos</translation>
+    </message>
+    <message>
+        <location filename="../views/invite.py" line="64"/>
+        <source>Use External Emojis</source>
+        <translation>Use Emojis Externos</translation>
+    </message>
+    <message>
+        <location filename="../views/invite.py" line="65"/>
+        <source>Add Reactions</source>
+        <translation>Adicionar reações</translation>
+    </message>
+    <message>
+        <location filename="../views/invite.py" line="66"/>
+        <source>Connect</source>
+        <translation>Conectar</translation>
+    </message>
+    <message>
+        <location filename="../views/invite.py" line="67"/>
+        <source>Speak</source>
+        <translation>Falar</translation>
+    </message>
+    <message>
+        <location filename="../views/invite.py" line="68"/>
+        <source>Mute Members</source>
+        <translation>Silenciar membros</translation>
+    </message>
+    <message>
+        <location filename="../views/invite.py" line="69"/>
+        <source>Deafen Members</source>
+        <translation>Membros surdos</translation>
+    </message>
+    <message>
+        <location filename="../views/invite.py" line="70"/>
+        <source>Move Members</source>
+        <translation>Mover membros</translation>
+    </message>
+    <message>
+        <location filename="../views/invite.py" line="71"/>
+        <source>Use Voice Activity</source>
+        <translation>Usar atividade de voz</translation>
+    </message>
+    <message>
+        <location filename="../views/invite.py" line="72"/>
+        <source>Priority Speaker</source>
+        <translation>Orador Prioritário</translation>
+    </message>
+    <message>
+        <location filename="../views/invite.py" line="73"/>
+        <source>Video</source>
+        <translation>Vídeo</translation>
+    </message>
+    <message>
+        <location filename="../views/invite.py" line="74"/>
+        <source>Request to Speak</source>
+        <translation>Solicitação para falar</translation>
+    </message>
+    <message>
+        <location filename="../views/invite.py" line="75"/>
+        <source>Manage Threads</source>
+        <translation>Gerenciar tópicos</translation>
+    </message>
+    <message>
+        <location filename="../views/invite.py" line="76"/>
+        <source>Create Public Threads</source>
+        <translation>Crie tópicos públicos</translation>
+    </message>
+    <message>
+        <location filename="../views/invite.py" line="77"/>
+        <source>Create Private Threads</source>
+        <translation>Crie tópicos privados</translation>
+    </message>
+    <message>
+        <location filename="../views/invite.py" line="78"/>
+        <source>Send Messages in Threads</source>
+        <translation>Enviar mensagens em tópicos</translation>
+    </message>
+    <message>
+        <location filename="../views/invite.py" line="79"/>
+        <source>Moderate Members</source>
+        <translation>Membros Moderados</translation>
+    </message>
+</context>
+<context>
     <name>LogsTableModel</name>
     <message>
         <location filename="../core/database.py" line="21"/>
@@ -424,273 +659,333 @@
 <context>
     <name>MainController</name>
     <message>
-        <location filename="../controllers/main.py" line="160"/>
+        <location filename="../controllers/main.py" line="192"/>
         <source>&lt;Create New Project&gt;</source>
         <translation>&lt;Criar novo projeto&gt;</translation>
     </message>
     <message>
-        <location filename="../controllers/main.py" line="165"/>
-        <location filename="../controllers/main.py" line="399"/>
-        <location filename="../controllers/main.py" line="409"/>
+        <location filename="../controllers/main.py" line="197"/>
+        <location filename="../controllers/main.py" line="446"/>
+        <location filename="../controllers/main.py" line="456"/>
         <source>Load Project</source>
         <translation>Carregar projeto</translation>
     </message>
     <message>
-        <location filename="../controllers/main.py" line="166"/>
+        <location filename="../controllers/main.py" line="198"/>
         <source>Select a project or create a new one:</source>
         <translation>Selecione um projeto ou crie um novo:</translation>
     </message>
     <message>
-        <location filename="../controllers/main.py" line="301"/>
+        <location filename="../controllers/main.py" line="347"/>
         <source>Load</source>
         <translation>Carregar</translation>
     </message>
     <message>
-        <location filename="../controllers/main.py" line="302"/>
+        <location filename="../controllers/main.py" line="348"/>
         <source>Save as</source>
         <translation>Salvar como</translation>
     </message>
     <message>
-        <location filename="../controllers/main.py" line="300"/>
+        <location filename="../controllers/main.py" line="346"/>
         <source>New</source>
         <translation>Novo</translation>
     </message>
     <message>
-        <location filename="../controllers/main.py" line="303"/>
+        <location filename="../controllers/main.py" line="349"/>
         <source>Rename</source>
         <translation>Renomear</translation>
     </message>
     <message>
-        <location filename="../controllers/main.py" line="304"/>
+        <location filename="../controllers/main.py" line="350"/>
         <source>Configuration</source>
         <translation>Configuração</translation>
     </message>
     <message>
-        <location filename="../controllers/main.py" line="305"/>
+        <location filename="../controllers/main.py" line="351"/>
         <source>Exit</source>
         <translation>Sair</translation>
     </message>
     <message>
-        <location filename="../controllers/main.py" line="308"/>
+        <location filename="../controllers/main.py" line="354"/>
         <source>New message</source>
         <translation>Nova mensagem</translation>
     </message>
     <message>
-        <location filename="../controllers/main.py" line="309"/>
+        <location filename="../controllers/main.py" line="355"/>
         <source>Edit message</source>
         <translation>Editar mensagem</translation>
     </message>
     <message>
-        <location filename="../controllers/main.py" line="310"/>
+        <location filename="../controllers/main.py" line="356"/>
         <source>Remove message</source>
         <translation>Remover mensagem</translation>
     </message>
     <message>
-        <location filename="../controllers/main.py" line="311"/>
+        <location filename="../controllers/main.py" line="357"/>
         <source>Remove all messages</source>
         <translation>Remover todas mensagens</translation>
     </message>
     <message>
-        <location filename="../controllers/main.py" line="314"/>
+        <location filename="../controllers/main.py" line="360"/>
         <source>Config group</source>
         <translation>Configurar grupo</translation>
     </message>
     <message>
-        <location filename="../controllers/main.py" line="315"/>
+        <location filename="../controllers/main.py" line="361"/>
         <source>Quit group</source>
         <translation>Sair do grupo</translation>
     </message>
     <message>
-        <location filename="../controllers/main.py" line="318"/>
+        <location filename="../controllers/main.py" line="362"/>
+        <source>Generate invite</source>
+        <translation>Gerar convite</translation>
+    </message>
+    <message>
+        <location filename="../controllers/main.py" line="365"/>
         <source>Credits</source>
         <translation>Creditos</translation>
     </message>
     <message>
-        <location filename="../controllers/main.py" line="319"/>
+        <location filename="../controllers/main.py" line="366"/>
         <source>Logs</source>
         <translation>Registros</translation>
     </message>
     <message>
-        <location filename="../controllers/main.py" line="320"/>
+        <location filename="../controllers/main.py" line="367"/>
         <source>Project</source>
         <translation>Projeto</translation>
     </message>
     <message>
-        <location filename="../controllers/main.py" line="321"/>
+        <location filename="../controllers/main.py" line="368"/>
         <source>Report bug</source>
         <translation>Reportar bug</translation>
     </message>
     <message>
-        <location filename="../controllers/main.py" line="322"/>
+        <location filename="../controllers/main.py" line="369"/>
         <source>Discord applications</source>
         <translation>Aplicações do Discord</translation>
     </message>
     <message>
-        <location filename="../controllers/main.py" line="349"/>
-        <location filename="../controllers/main.py" line="352"/>
+        <location filename="../controllers/main.py" line="396"/>
+        <location filename="../controllers/main.py" line="399"/>
         <source>New Project</source>
         <translation>Novo Projeto</translation>
     </message>
     <message>
-        <location filename="../controllers/main.py" line="353"/>
+        <location filename="../controllers/main.py" line="400"/>
         <source>Project Name:</source>
         <translation>Nome do Projeto:</translation>
     </message>
     <message>
-        <location filename="../controllers/main.py" line="370"/>
-        <location filename="../controllers/main.py" line="377"/>
-        <location filename="../controllers/main.py" line="436"/>
-        <location filename="../controllers/main.py" line="457"/>
-        <location filename="../controllers/main.py" line="522"/>
+        <location filename="../controllers/main.py" line="417"/>
+        <location filename="../controllers/main.py" line="424"/>
+        <location filename="../controllers/main.py" line="483"/>
+        <location filename="../controllers/main.py" line="504"/>
+        <location filename="../controllers/main.py" line="533"/>
+        <location filename="../controllers/main.py" line="548"/>
+        <location filename="../controllers/main.py" line="563"/>
+        <location filename="../controllers/main.py" line="600"/>
+        <location filename="../controllers/main.py" line="728"/>
+        <location filename="../controllers/main.py" line="743"/>
+        <location filename="../controllers/main.py" line="760"/>
+        <location filename="../controllers/main.py" line="793"/>
+        <location filename="../controllers/main.py" line="816"/>
         <source>Error</source>
         <translation>Erro</translation>
     </message>
     <message>
-        <location filename="../controllers/main.py" line="371"/>
+        <location filename="../controllers/main.py" line="418"/>
         <source>Project name cannot be empty.</source>
         <translation>O nome do projeto não pode estar vazio.</translation>
     </message>
     <message>
-        <location filename="../controllers/main.py" line="378"/>
+        <location filename="../controllers/main.py" line="425"/>
         <source>A project with this name already exists.</source>
         <translation>Já existe um projeto com esse nome.</translation>
     </message>
     <message>
-        <location filename="../controllers/main.py" line="400"/>
+        <location filename="../controllers/main.py" line="447"/>
         <source>No projects found.</source>
         <translation>Nenhum projeto encontrado.</translation>
     </message>
     <message>
-        <location filename="../controllers/main.py" line="410"/>
+        <location filename="../controllers/main.py" line="457"/>
         <source>Select Project:</source>
         <translation>Selecione Projeto:</translation>
     </message>
     <message>
-        <location filename="../controllers/main.py" line="422"/>
+        <location filename="../controllers/main.py" line="469"/>
         <source>Save Project As</source>
         <translation>Salvar projeto como</translation>
     </message>
     <message>
-        <location filename="../controllers/main.py" line="423"/>
+        <location filename="../controllers/main.py" line="470"/>
         <source>New Project Name:</source>
         <translation>Novo nome do projeto:</translation>
     </message>
     <message>
-        <location filename="../controllers/main.py" line="430"/>
+        <location filename="../controllers/main.py" line="477"/>
         <source>Project Saved</source>
         <translation>Projeto salvo</translation>
     </message>
     <message>
-        <location filename="../controllers/main.py" line="431"/>
+        <location filename="../controllers/main.py" line="478"/>
         <source>Project &apos;{name}&apos; saved successfully.</source>
         <translation>O projeto &apos;{name}&apos; foi salvo com sucesso.</translation>
     </message>
     <message>
-        <location filename="../controllers/main.py" line="438"/>
+        <location filename="../controllers/main.py" line="485"/>
         <source>Failed to save project. The name might already exist or be invalid.</source>
         <translation>Falha ao salvar o projeto. O nome pode já existir ou ser inválido.</translation>
     </message>
     <message>
-        <location filename="../controllers/main.py" line="451"/>
+        <location filename="../controllers/main.py" line="498"/>
         <source>Project Renamed</source>
         <translation>Projeto renomeado</translation>
     </message>
     <message>
-        <location filename="../controllers/main.py" line="452"/>
+        <location filename="../controllers/main.py" line="499"/>
         <source>Project renamed to &apos;{name}&apos; successfully.</source>
         <translation>Projeto renomeado para &apos;{name}&apos; com sucesso.</translation>
     </message>
     <message>
-        <location filename="../controllers/main.py" line="459"/>
+        <location filename="../controllers/main.py" line="506"/>
         <source>Failed to rename project. The name might already exist or be invalid.</source>
         <translation>Falha ao renomear o projeto. O nome pode já existir ou ser inválido.</translation>
     </message>
     <message>
-        <location filename="../controllers/main.py" line="494"/>
+        <location filename="../controllers/main.py" line="534"/>
+        <location filename="../controllers/main.py" line="549"/>
+        <source>No message selected</source>
+        <translation>Nenhuma mensagem selecionada</translation>
+    </message>
+    <message>
+        <location filename="../controllers/main.py" line="564"/>
+        <source>No messages to delete</source>
+        <translation>Nenhuma mensagem para excluir</translation>
+    </message>
+    <message>
+        <location filename="../controllers/main.py" line="571"/>
         <source>Confirm Deletion</source>
         <translation>Confirmar exclusão</translation>
     </message>
     <message>
-        <location filename="../controllers/main.py" line="495"/>
+        <location filename="../controllers/main.py" line="572"/>
         <source>Are you sure you want to delete all messages?</source>
         <translation>Tem certeza de que deseja excluir todas as mensagens?</translation>
     </message>
     <message>
-        <location filename="../controllers/main.py" line="523"/>
+        <location filename="../controllers/main.py" line="601"/>
         <source>Please enter a valid token.</source>
         <translation>Por favor, insira um token válido.</translation>
     </message>
     <message>
-        <location filename="../controllers/main.py" line="540"/>
+        <location filename="../controllers/main.py" line="618"/>
         <source>Login Failed</source>
         <translation>Falha no login</translation>
     </message>
     <message>
-        <location filename="../controllers/main.py" line="541"/>
+        <location filename="../controllers/main.py" line="619"/>
         <source>Invalid token. Please check your token and try again.</source>
         <translation>Token inválido. Verifique seu token e tente novamente.</translation>
+    </message>
+    <message>
+        <location filename="../controllers/main.py" line="729"/>
+        <location filename="../controllers/main.py" line="761"/>
+        <source>No group selected</source>
+        <translation>Nenhum grupo selecionado</translation>
+    </message>
+    <message>
+        <location filename="../controllers/main.py" line="744"/>
+        <source>Could not find the guild information.</source>
+        <translation>Não foi possível encontrar as informações do grupo.</translation>
+    </message>
+    <message>
+        <location filename="../controllers/main.py" line="771"/>
+        <source>Confirm Action</source>
+        <translation>Confirmar ação</translation>
+    </message>
+    <message>
+        <location filename="../controllers/main.py" line="772"/>
+        <source>Are you sure you want to leave this group?</source>
+        <translation>Tem certeza de que deseja sair deste grupo?</translation>
+    </message>
+    <message>
+        <location filename="../controllers/main.py" line="793"/>
+        <source>Invalid Client ID.</source>
+        <translation>ID do cliente inválido.</translation>
+    </message>
+    <message>
+        <location filename="../controllers/main.py" line="812"/>
+        <source>Invite Generated</source>
+        <translation>Convite gerado</translation>
+    </message>
+    <message>
+        <location filename="../controllers/main.py" line="813"/>
+        <source>The invite URL has been copied to your clipboard.</source>
+        <translation>O link do convite foi copiado para a sua área de transferência.</translation>
     </message>
 </context>
 <context>
     <name>MainView</name>
     <message>
-        <location filename="../views/main.py" line="193"/>
+        <location filename="../views/main.py" line="195"/>
         <source>Project</source>
         <translation>Projeto</translation>
     </message>
     <message>
-        <location filename="../views/main.py" line="194"/>
+        <location filename="../views/main.py" line="196"/>
         <source>Edit</source>
         <translation>Editar</translation>
     </message>
     <message>
-        <location filename="../views/main.py" line="195"/>
+        <location filename="../views/main.py" line="197"/>
         <source>Help</source>
         <translation>Ajuda</translation>
     </message>
     <message>
-        <location filename="../views/main.py" line="198"/>
+        <location filename="../views/main.py" line="200"/>
         <source>Messages</source>
         <translation>Mensagens</translation>
     </message>
     <message>
-        <location filename="../views/main.py" line="199"/>
+        <location filename="../views/main.py" line="201"/>
         <source>Groups</source>
         <translation>Grupos</translation>
     </message>
     <message>
-        <location filename="../views/main.py" line="202"/>
+        <location filename="../views/main.py" line="204"/>
+        <source>Search messages...</source>
+        <translation>Pesquisar mensagens...</translation>
+    </message>
+    <message>
+        <location filename="../views/main.py" line="205"/>
+        <source>Search groups...</source>
+        <translation>Pesquisar grupos...</translation>
+    </message>
+    <message>
+        <location filename="../views/main.py" line="208"/>
         <source>Type a command</source>
         <translation>Digite um comando</translation>
     </message>
     <message>
-        <location filename="../views/main.py" line="203"/>
+        <location filename="../views/main.py" line="209"/>
         <source>Token</source>
         <translation>Código do bot</translation>
     </message>
     <message>
-        <location filename="../views/main.py" line="204"/>
+        <location filename="../views/main.py" line="210"/>
         <source>Turn on/off bot</source>
         <translation>Ligar/desligar bot</translation>
     </message>
     <message>
-        <location filename="../views/main.py" line="205"/>
+        <location filename="../views/main.py" line="211"/>
         <source>No logs at moment</source>
         <translation>Sem logs no momento</translation>
     </message>
 </context>
 <context>
     <name>MainWindow</name>
-    <message>
-        <location filename="../widgets/groups_list.py" line="16"/>
-        <source>Config group</source>
-        <translation>Configurar grupo</translation>
-    </message>
-    <message>
-        <location filename="../widgets/groups_list.py" line="17"/>
-        <source>Quit group</source>
-        <translation>Sair do grupo</translation>
-    </message>
     <message>
         <location filename="../widgets/confirm_message_box.py" line="13"/>
         <source>Yes</source>
@@ -705,87 +1000,87 @@
 <context>
     <name>MessageController</name>
     <message>
-        <location filename="../controllers/message.py" line="69"/>
+        <location filename="../controllers/message.py" line="71"/>
         <source>New message</source>
         <translation>Nova mensagem</translation>
     </message>
     <message>
-        <location filename="../controllers/message.py" line="224"/>
+        <location filename="../controllers/message.py" line="226"/>
         <source>Delete selected replie(s)</source>
         <translation>Excluir resposta(s) selecionada(s)</translation>
     </message>
     <message>
-        <location filename="../controllers/message.py" line="225"/>
+        <location filename="../controllers/message.py" line="227"/>
         <source>Clear all replies</source>
         <translation>Limpar todas as respostas</translation>
     </message>
     <message>
-        <location filename="../controllers/message.py" line="226"/>
+        <location filename="../controllers/message.py" line="228"/>
         <source>Delete selected reaction(s)</source>
         <translation>Excluir reação(ões) selecionada(s)</translation>
     </message>
     <message>
-        <location filename="../controllers/message.py" line="227"/>
+        <location filename="../controllers/message.py" line="229"/>
         <source>Clear all reactions</source>
         <translation>Limpar todas as reações</translation>
     </message>
     <message>
-        <location filename="../controllers/message.py" line="228"/>
+        <location filename="../controllers/message.py" line="230"/>
         <source>Delete selected condition(s)</source>
         <translation>Excluir condição(ões) selecionada(s)</translation>
     </message>
     <message>
-        <location filename="../controllers/message.py" line="229"/>
+        <location filename="../controllers/message.py" line="231"/>
         <source>Clear all conditions</source>
         <translation>Limpar todas as condições</translation>
     </message>
     <message>
-        <location filename="../controllers/message.py" line="317"/>
+        <location filename="../controllers/message.py" line="335"/>
         <source>Clear replies</source>
         <translation>Limpar respostas</translation>
     </message>
     <message>
-        <location filename="../controllers/message.py" line="318"/>
+        <location filename="../controllers/message.py" line="336"/>
         <source>Are you sure you want to delete all replies?</source>
         <translation>Tem certeza de que deseja excluir todas as respostas?</translation>
     </message>
     <message>
-        <location filename="../controllers/message.py" line="357"/>
+        <location filename="../controllers/message.py" line="382"/>
         <source>The maximum number of reactions is 20.</source>
         <translation>O número máximo de reações é 20.</translation>
     </message>
     <message>
-        <location filename="../controllers/message.py" line="374"/>
+        <location filename="../controllers/message.py" line="401"/>
         <source>Clear reactions</source>
         <translation>Limpar reações</translation>
     </message>
     <message>
-        <location filename="../controllers/message.py" line="375"/>
+        <location filename="../controllers/message.py" line="402"/>
         <source>Are you sure you want to delete all reactions?</source>
         <translation>Tem certeza de que deseja excluir todas as reações?</translation>
     </message>
     <message>
-        <location filename="../controllers/message.py" line="424"/>
+        <location filename="../controllers/message.py" line="461"/>
         <source>Clear conditions</source>
         <translation>Limpar condições</translation>
     </message>
     <message>
-        <location filename="../controllers/message.py" line="425"/>
+        <location filename="../controllers/message.py" line="462"/>
         <source>Are you sure you want to delete all conditions?</source>
         <translation>Tem certeza de que deseja excluir todas as condições?</translation>
     </message>
     <message>
-        <location filename="../controllers/message.py" line="454"/>
+        <location filename="../controllers/message.py" line="498"/>
         <source>Empty name</source>
         <translation>Nome vazio</translation>
     </message>
     <message>
-        <location filename="../controllers/message.py" line="457"/>
+        <location filename="../controllers/message.py" line="501"/>
         <source>Invalid name</source>
         <translation>Nome inválido</translation>
     </message>
     <message>
-        <location filename="../controllers/message.py" line="463"/>
+        <location filename="../controllers/message.py" line="507"/>
         <source>Error</source>
         <translation>Erro</translation>
     </message>
@@ -793,130 +1088,122 @@
 <context>
     <name>MessageView</name>
     <message>
-        <location filename="../views/messages.py" line="144"/>
+        <location filename="../views/messages.py" line="145"/>
         <source>Message</source>
         <translation>Mensagem</translation>
     </message>
     <message>
-        <location filename="../views/messages.py" line="145"/>
+        <location filename="../views/messages.py" line="146"/>
         <source>Name</source>
         <translation>Nome</translation>
     </message>
     <message>
-        <location filename="../views/messages.py" line="147"/>
+        <location filename="../views/messages.py" line="148"/>
         <source>The name can include letters (with accents), numbers, and spaces.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../views/messages.py" line="151"/>
+        <location filename="../views/messages.py" line="152"/>
         <source>Conditions</source>
         <translation>Condições</translation>
     </message>
     <message>
-        <location filename="../views/messages.py" line="151"/>
+        <location filename="../views/messages.py" line="152"/>
         <source>Reactions</source>
         <translation>Reações</translation>
     </message>
     <message>
-        <location filename="../views/messages.py" line="151"/>
+        <location filename="../views/messages.py" line="152"/>
         <source>Replies</source>
         <translation>Respostas</translation>
     </message>
     <message>
-        <location filename="../views/messages.py" line="155"/>
+        <location filename="../views/messages.py" line="156"/>
         <source>Action</source>
         <translation>Ação</translation>
     </message>
     <message>
-        <location filename="../views/messages.py" line="157"/>
+        <location filename="../views/messages.py" line="158"/>
         <source>Pin</source>
         <translation>Fixar</translation>
     </message>
     <message>
-        <location filename="../views/messages.py" line="157"/>
+        <location filename="../views/messages.py" line="158"/>
         <source>Delete</source>
         <translation>Deletar</translation>
     </message>
     <message>
-        <location filename="../views/messages.py" line="157"/>
-        <location filename="../views/messages.py" line="162"/>
-        <location filename="../views/messages.py" line="173"/>
-        <location filename="../views/messages.py" line="180"/>
+        <location filename="../views/messages.py" line="158"/>
+        <location filename="../views/messages.py" line="163"/>
+        <location filename="../views/messages.py" line="174"/>
+        <location filename="../views/messages.py" line="181"/>
         <source>None</source>
         <translation>Nenhum</translation>
     </message>
     <message>
-        <location filename="../views/messages.py" line="160"/>
+        <location filename="../views/messages.py" line="161"/>
         <source>Punishment</source>
         <translation>Punição</translation>
     </message>
     <message>
-        <location filename="../views/messages.py" line="162"/>
+        <location filename="../views/messages.py" line="163"/>
         <source>Kick</source>
         <translation>Expulsar</translation>
     </message>
     <message>
-        <location filename="../views/messages.py" line="162"/>
+        <location filename="../views/messages.py" line="163"/>
         <source>Ban</source>
         <translation>Banir</translation>
     </message>
     <message>
-        <location filename="../views/messages.py" line="165"/>
+        <location filename="../views/messages.py" line="166"/>
         <source>Where reply</source>
         <translation>Onde responder</translation>
     </message>
     <message>
-        <location filename="../views/messages.py" line="169"/>
+        <location filename="../views/messages.py" line="170"/>
         <source>Group</source>
         <translation>Grupo</translation>
     </message>
     <message>
-        <location filename="../views/messages.py" line="170"/>
+        <location filename="../views/messages.py" line="171"/>
         <source>Private</source>
         <translation>Privado</translation>
     </message>
     <message>
-        <location filename="../views/messages.py" line="171"/>
+        <location filename="../views/messages.py" line="172"/>
         <source>Same Channel</source>
         <translation>Mesmo Canal</translation>
     </message>
     <message>
-        <location filename="../views/messages.py" line="172"/>
+        <location filename="../views/messages.py" line="173"/>
         <source>Both</source>
         <translation>Ambos</translation>
     </message>
     <message>
-        <location filename="../views/messages.py" line="178"/>
+        <location filename="../views/messages.py" line="179"/>
         <source>Where react</source>
         <translation>Onde reagir</translation>
     </message>
     <message>
-        <location filename="../views/messages.py" line="180"/>
+        <location filename="../views/messages.py" line="181"/>
         <source>Author</source>
         <translation>Autor</translation>
     </message>
     <message>
-        <location filename="../views/messages.py" line="180"/>
+        <location filename="../views/messages.py" line="181"/>
         <source>Bot</source>
         <translation>Bot</translation>
     </message>
     <message>
-        <location filename="../views/messages.py" line="183"/>
+        <location filename="../views/messages.py" line="184"/>
         <source>Delay</source>
         <translation>Delay</translation>
     </message>
     <message>
-        <location filename="../views/messages.py" line="184"/>
+        <location filename="../views/messages.py" line="185"/>
         <source>Confirm</source>
         <translation>Confirmar</translation>
-    </message>
-</context>
-<context>
-    <name>MessageWindow</name>
-    <message>
-        <location filename="../views/group.py" line="54"/>
-        <source>Confirm and save</source>
-        <translation>Confirmar e salvar</translation>
     </message>
 </context>
 <context>
