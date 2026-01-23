@@ -329,10 +329,14 @@ class MessageController(QObject):
             self.on_delete_replies()
 
     def _show_replies_menu(self, position: QPoint):
+        list_view = self.view.listbox_replies.list_view()
+        index = list_view.indexAt(position)
+
         menu = QMenu(self.view.window)
-        menu.addAction(self.delete_replies_action)
+        if index.isValid() and list_view.selectionModel().isSelected(index):
+            menu.addAction(self.delete_replies_action)
         menu.addAction(self.clear_replies_action)
-        menu.exec(self.view.listbox_replies.mapToGlobal(position))
+        menu.exec(list_view.mapToGlobal(position))
 
     def _open_reply_emoji_picker(self):
         self._show_emoji_picker(
@@ -388,8 +392,13 @@ class MessageController(QObject):
             self.on_delete_reactions()
 
     def _show_reactions_menu(self, position: QPoint):
+        index = self.view.reactions_grid.indexAt(position)
+
         menu = QMenu(self.view.window)
-        menu.addAction(self.delete_reactions_action)
+        if index.isValid() and self.view.reactions_grid.selectionModel().isSelected(
+            index
+        ):
+            menu.addAction(self.delete_reactions_action)
         menu.addAction(self.clear_reactions_action)
         menu.exec(self.view.reactions_grid.mapToGlobal(position))
 
@@ -453,8 +462,12 @@ class MessageController(QObject):
             self.view.listbox_conditions.set_case_insensitive_disabled(True)
 
     def _show_conditions_menu(self, position: QPoint):
+        table_view = self.view.listbox_conditions.table_view()
+        index = table_view.indexAt(position)
+
         menu = QMenu(self.view.window)
-        menu.addAction(self.delete_conditions_action)
+        if index.isValid() and table_view.selectionModel().isSelected(index):
+            menu.addAction(self.delete_conditions_action)
         menu.addAction(self.clear_conditions_action)
         menu.exec(self.view.listbox_conditions.map_to_global(position))
 
