@@ -21,6 +21,7 @@ class QReplyForm(QWidget):
         self._list_view = QListView()
         self._list_view.setMinimumHeight(85)
         self._list_view.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+        self._list_view.setSelectionMode(QListView.SelectionMode.MultiSelection)
 
         self._add_button = QToolButton()
         self._add_button.setIcon(QThemeResponsiveIcon.fromAwesome("fa6s.arrow-right"))
@@ -82,3 +83,9 @@ class QReplyForm(QWidget):
 
     def list_view_selected_indexes(self):
         return self._list_view.selectedIndexes()
+
+    def list_view(self):
+        return self._list_view
+
+    def select_all(self):
+        self._list_view.selectAll()

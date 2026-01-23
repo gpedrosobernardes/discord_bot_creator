@@ -62,6 +62,7 @@ class MessageView(QObject):
         self.reactions_widget = QWidget()
 
         self.reactions_grid = QEmojiGrid(self.reactions_widget, 40, 0.2)
+        self.reactions_grid.setSelectionMode(QEmojiGrid.SelectionMode.MultiSelection)
 
         self.add_reaction_button = QToolButton()
         self.add_reaction_button.setIcon(

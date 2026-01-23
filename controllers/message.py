@@ -8,6 +8,8 @@ from PySide6.QtWidgets import (
     QMessageBox,
     QDataWidgetMapper,
     QMenu,
+    QListView,
+    QTableView,
 )
 from qextrawidgets import QEmojiPicker
 from qextrawidgets.emoji_utils import EmojiImageProvider
@@ -264,12 +266,17 @@ class MessageController(QObject):
 
     @staticmethod
     def _delete_selected_rows(
-        model: QSqlTableModel, selected_indexes: typing.List[QModelIndex]
+        model: QSqlTableModel,
+        selected_indexes: typing.List[QModelIndex],
+        view_widget: typing.Union[QListView, QTableView],
     ):
         rows = sorted(set(index.row() for index in selected_indexes), reverse=True)
         for row in rows:
-            model.removeRow(row)
-        # model.select() # Removed auto-select to prevent auto-save behavior
+            result = model.removeRow(row)
+            if result:
+                view_widget.setRowHidden(row, True)
+            else:
+                print(f"Erro do modelo: {model.lastError().text()}")
 
     def _show_emoji_picker(
         self, button_position: QPoint, callback: typing.Callable[[str], None]
@@ -305,11 +312,12 @@ class MessageController(QObject):
         record.setValue("message_id", self.message_id)
         if self.reply_model.insertRecord(-1, record):
             self.view.listbox_replies.clear_text()
-            # self.reply_model.select() # Removed auto-select
 
     def on_delete_replies(self):
         self._delete_selected_rows(
-            self.reply_model, self.view.listbox_replies.list_view_selected_indexes()
+            self.reply_model,
+            self.view.listbox_replies.list_view_selected_indexes(),
+            self.view.listbox_replies.list_view(),
         )
 
     def on_clear_replies(self):
@@ -317,8 +325,8 @@ class MessageController(QObject):
             self.tr("Clear replies"),
             self.tr("Are you sure you want to delete all replies?"),
         ):
-            self.database.delete_replies_by_message_id(self.message_id)
-            # self.reply_model.select() # Removed auto-select
+            self.view.listbox_replies.select_all()
+            self.on_delete_replies()
 
     def _show_replies_menu(self, position: QPoint):
         menu = QMenu(self.view.window)
@@ -366,7 +374,9 @@ class MessageController(QObject):
 
     def on_delete_reactions(self):
         self._delete_selected_rows(
-            self.reactions_model, self.view.reactions_grid.selectedIndexes()
+            self.reactions_model,
+            self.view.reactions_grid.selectedIndexes(),
+            self.view.reactions_grid,
         )
 
     def on_clear_reactions(self):
@@ -374,8 +384,8 @@ class MessageController(QObject):
             self.tr("Clear reactions"),
             self.tr("Are you sure you want to delete all reactions?"),
         ):
-            self.database.delete_reactions_by_message_id(self.message_id)
-            # self.reactions_model.select() # Removed auto-select
+            self.view.reactions_grid.selectAll()
+            self.on_delete_reactions()
 
     def _show_reactions_menu(self, position: QPoint):
         menu = QMenu(self.view.window)
@@ -416,7 +426,9 @@ class MessageController(QObject):
 
     def on_delete_conditions(self):
         self._delete_selected_rows(
-            self.conditions_model, self.view.listbox_conditions.selected_indexes()
+            self.conditions_model,
+            self.view.listbox_conditions.selected_indexes(),
+            self.view.listbox_conditions.table_view(),
         )
 
     def on_clear_conditions(self):
@@ -424,8 +436,8 @@ class MessageController(QObject):
             self.tr("Clear conditions"),
             self.tr("Are you sure you want to delete all conditions?"),
         ):
-            self.database.delete_conditions_by_message_id(self.message_id)
-            # self.conditions_model.select() # Removed auto-select
+            self.view.listbox_conditions.select_all()
+            self.on_delete_conditions()
 
     def on_condition_field_changed(self):
         field = self.view.listbox_conditions.get_field_data()

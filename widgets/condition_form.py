@@ -235,3 +235,9 @@ class QConditionForm(QWidget):
 
     def map_to_global(self, pos):
         return self._table_view.mapToGlobal(pos)
+
+    def table_view(self) -> QTableView:
+        return self._table_view
+
+    def select_all(self):
+        self._table_view.selectAll()
