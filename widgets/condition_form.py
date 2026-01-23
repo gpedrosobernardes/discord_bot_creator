@@ -154,30 +154,6 @@ class QConditionForm(QWidget):
         self._reverse_comparator_tool_button.setToolTip(self.tr("Reverse comparator"))
         self._case_insensitive_tool_button.setToolTip(self.tr("Case insensitive"))
 
-        model: QSqlTableModel = self._table_view.model()
-        if model:
-            model.setHeaderData(
-                model.fieldIndex("field"), Qt.Orientation.Horizontal, self.tr("Field")
-            )
-            model.setHeaderData(
-                model.fieldIndex("comparator"),
-                Qt.Orientation.Horizontal,
-                self.tr("Comparator"),
-            )
-            model.setHeaderData(
-                model.fieldIndex("value"), Qt.Orientation.Horizontal, self.tr("Value")
-            )
-            model.setHeaderData(
-                model.fieldIndex("case_insensitive"),
-                Qt.Orientation.Horizontal,
-                self.tr("Case insensitive"),
-            )
-            model.setHeaderData(
-                model.fieldIndex("reverse_comparator"),
-                Qt.Orientation.Horizontal,
-                self.tr("Reverse comparator"),
-            )
-
     def set_field_model(self, model):
         self._field_combobox.setModel(model)
 

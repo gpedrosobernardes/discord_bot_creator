@@ -23,6 +23,9 @@ class ConfigController(QObject):
         self.apply_logging_config(user_settings)
         self.setup_connections(user_settings, translator)
 
+    def translate_ui(self):
+        self.view.translate_ui()
+
     def load_settings(self, user_settings: QSettings):
         # Language
         current_lang = user_settings.value("language")

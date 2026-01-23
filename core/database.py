@@ -10,6 +10,64 @@ from PySide6.QtSql import (
 )
 
 
+class LogsTableModel(QSqlTableModel):
+    def __init__(self, db: QSqlDatabase):
+        super().__init__(db=db)
+        self.setTable("logs")
+        self.translate()
+
+    def translate(self):
+        self.setHeaderData(
+            self.fieldIndex("id"), Qt.Orientation.Horizontal, self.tr("ID")
+        )
+        self.setHeaderData(
+            self.fieldIndex("datetime"),
+            Qt.Orientation.Horizontal,
+            self.tr("Datetime"),
+        )
+        self.setHeaderData(
+            self.fieldIndex("level_number"),
+            Qt.Orientation.Horizontal,
+            self.tr("Level Number"),
+        )
+        self.setHeaderData(
+            self.fieldIndex("message"),
+            Qt.Orientation.Horizontal,
+            self.tr("Message"),
+        )
+
+
+class ConditionsTableModel(QSqlTableModel):
+    def __init__(self, db: QSqlDatabase):
+        super().__init__(db=db)
+        self.setTable("message_conditions")
+        self.setEditStrategy(QSqlTableModel.EditStrategy.OnManualSubmit)
+        self.translate()
+
+    def translate(self):
+        self.setHeaderData(
+            self.fieldIndex("field"), Qt.Orientation.Horizontal, self.tr("Field")
+        )
+        self.setHeaderData(
+            self.fieldIndex("comparator"),
+            Qt.Orientation.Horizontal,
+            self.tr("Comparator"),
+        )
+        self.setHeaderData(
+            self.fieldIndex("value"), Qt.Orientation.Horizontal, self.tr("Value")
+        )
+        self.setHeaderData(
+            self.fieldIndex("case_insensitive"),
+            Qt.Orientation.Horizontal,
+            self.tr("Case insensitive"),
+        )
+        self.setHeaderData(
+            self.fieldIndex("reverse_comparator"),
+            Qt.Orientation.Horizontal,
+            self.tr("Reverse comparator"),
+        )
+
+
 class DatabaseController:
     def __init__(self, name: str, connection_name: str):
         self.name = name
@@ -183,7 +241,6 @@ class DatabaseController:
         model = QSqlTableModel(db=self.database)
         model.setTable("message_replies")
         model.setEditStrategy(QSqlTableModel.EditStrategy.OnManualSubmit)
-        # model.select()
         return model
 
     def get_message_reactions_model(self) -> QSqlTableModel:
@@ -192,16 +249,11 @@ class DatabaseController:
         model.setEditStrategy(QSqlTableModel.EditStrategy.OnManualSubmit)
         return model
 
-    def get_message_conditions_model(self) -> QSqlTableModel:
-        model = QSqlTableModel(db=self.database)
-        model.setTable("message_conditions")
-        model.setEditStrategy(QSqlTableModel.EditStrategy.OnManualSubmit)
-        return model
+    def get_message_conditions_model(self) -> ConditionsTableModel:
+        return ConditionsTableModel(db=self.database)
 
-    def get_logs_model(self):
-        model = QSqlTableModel(db=self.database)
-        model.setTable("logs")
-        return model
+    def get_logs_model(self) -> LogsTableModel:
+        return LogsTableModel(db=self.database)
 
     def exec(self, sql: str):
         query = QSqlQuery(self.database)
@@ -286,7 +338,6 @@ class DatabaseController:
             QStandardPaths.StandardLocation.AppDataLocation
         )
         data_dir = os.path.join(data_dir, "projects")
-        print(data_dir)
 
         if not os.path.exists(data_dir):
             os.makedirs(data_dir)

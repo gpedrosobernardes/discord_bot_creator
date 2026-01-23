@@ -218,6 +218,7 @@ class MessageController(QObject):
 
     def translate_ui(self):
         self.view.translate_ui()
+        self.conditions_model.translate()
 
         # Actions Text
         self.delete_replies_action.setText(self.tr("Delete selected replie(s)"))

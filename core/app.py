@@ -52,12 +52,12 @@ class Application:
         sys.exit(self.application.exec())
 
     def setup_connections(self):
-        for view in (
-            self.config_controller.view,
-            self.main_controller.view,
-            self.logs_controller.view,
+        for controller in (
+            self.config_controller,
+            self.main_controller,
+            self.logs_controller,
         ):
-            self.config_controller.language_changed.connect(view.translate_ui)
+            self.config_controller.language_changed.connect(controller.translate_ui)
 
         self.main_controller.switch_project.connect(
             self.logs_controller.load_logs_model

@@ -1,7 +1,6 @@
 from typing import Any
 
-from PySide6.QtCore import QLocale, QDateTime, QObject, Qt
-from PySide6.QtSql import QSqlTableModel
+from PySide6.QtCore import QLocale, QDateTime, QObject
 from PySide6.QtWidgets import QStyledItemDelegate
 
 from core.database import DatabaseController
@@ -44,37 +43,19 @@ class LogsController(QObject):
         super().__init__()
         self.view = LogsView()
         self.database = database
+        self.logs_model = None
         self._init_delegates()
 
     def _init_delegates(self):
-        logs_model = self.database.get_logs_model()
+        self.logs_model = self.database.get_logs_model()
         self.view.logs_table.setItemDelegateForColumn(
-            logs_model.fieldIndex("datetime"), TimestampDelegate()
+            self.logs_model.fieldIndex("datetime"), TimestampDelegate()
         )
 
     def load_logs_model(self):
-        logs_model = self.database.get_logs_model()
-        logs_model.select()
+        self.logs_model = self.database.get_logs_model()
+        self.logs_model.select()
+        self.view.logs_table.setModel(self.logs_model)
 
-        self.view.logs_table.setModel(logs_model)
-        self.translate_model(logs_model)
-
-    def translate_model(self, logs_model: QSqlTableModel):
-        logs_model.setHeaderData(
-            logs_model.fieldIndex("id"), Qt.Orientation.Horizontal, self.tr("ID")
-        )
-        logs_model.setHeaderData(
-            logs_model.fieldIndex("datetime"),
-            Qt.Orientation.Horizontal,
-            self.tr("Datetime"),
-        )
-        logs_model.setHeaderData(
-            logs_model.fieldIndex("level_number"),
-            Qt.Orientation.Horizontal,
-            self.tr("Level Number"),
-        )
-        logs_model.setHeaderData(
-            logs_model.fieldIndex("message"),
-            Qt.Orientation.Horizontal,
-            self.tr("Message"),
-        )
+    def translate_ui(self):
+        self.logs_model.translate()
