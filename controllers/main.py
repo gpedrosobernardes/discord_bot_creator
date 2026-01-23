@@ -18,6 +18,7 @@ from PySide6.QtWidgets import QCompleter, QInputDialog, QMessageBox, QMenu
 from qextrawidgets.icons import QThemeResponsiveIcon
 
 from controllers.config import ConfigController
+from controllers.group import GroupController
 from controllers.message import MessageController
 from core.bot_thread import QBotThread
 from core.database import DatabaseController
@@ -69,6 +70,7 @@ class MainController(QObject):
 
         # 2. State & Context
         self.message_windows = []
+        self.group_windows = []
         self.messages_model = self.database.get_messages_model()
         self.messages_proxy_model = QSortFilterProxyModel()
         self.groups_model = QStandardItemModel()
@@ -269,7 +271,9 @@ class MainController(QObject):
         )
 
     def _setup_group_actions(self):
-        self.config_group_action = self._create_action("fa6s.gear")
+        self.config_group_action = self._create_action(
+            "fa6s.gear", triggered=self.on_config_group_action
+        )
         self.quit_group_action = self._create_action("fa6s.arrow-right-from-bracket")
 
         self.view.config_group_button.setDefaultAction(self.config_group_action)
@@ -633,3 +637,30 @@ class MainController(QObject):
         if matches:
             item = self.groups_model.itemFromIndex(matches[0])
             item.setText(guild.name)
+
+    @Slot()
+    def on_config_group_action(self):
+        index = self.view.groups_list_widget.currentIndex()
+        if not index.isValid():
+            return
+
+        item = self.groups_model.itemFromIndex(index)
+        group_id = item.data(Qt.ItemDataRole.UserRole)
+
+        # Retrieve the discord.Guild object
+        guilds = self.bot_thread.groups()
+        discord_group = guilds.get(group_id)
+
+        if not discord_group:
+            QMessageBox.warning(
+                self.view,
+                self.tr("Error"),
+                self.tr("Could not find the guild information."),
+            )
+            return
+
+        controller = GroupController(self.database, discord_group)
+        controller.set_group(group_id)
+        self.group_windows.append(controller)
+        controller.view.finished.connect(lambda: self.group_windows.remove(controller))
+        controller.view.show()

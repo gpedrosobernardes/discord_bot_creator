@@ -45,8 +45,6 @@ class Application:
             self.log_handler,
         )
 
-        self.group_controller = GroupController()
-
         self.setup_connections()
         self.main_controller.load_initial_state()
         sys.exit(self.application.exec())

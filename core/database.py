@@ -89,7 +89,7 @@ class DatabaseController:
         self.exec(
             """
             CREATE TABLE IF NOT EXISTS groups (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                id INTEGER PRIMARY KEY,
                 welcome_message TEXT,
                 welcome_message_channel INTEGER,
                 goodbye_message TEXT,
