@@ -278,6 +278,16 @@ class MessageController(QObject):
             else:
                 print(f"Erro do modelo: {model.lastError().text()}")
 
+    @staticmethod
+    def _has_visible_rows(view: typing.Union[QListView, QTableView]) -> bool:
+        model = view.model()
+        if not model:
+            return False
+        for row in range(model.rowCount()):
+            if not view.isRowHidden(row):
+                return True
+        return False
+
     def _show_emoji_picker(
         self, button_position: QPoint, callback: typing.Callable[[str], None]
     ):
@@ -335,7 +345,10 @@ class MessageController(QObject):
         menu = QMenu(self.view.window)
         if index.isValid() and list_view.selectionModel().isSelected(index):
             menu.addAction(self.delete_replies_action)
-        menu.addAction(self.clear_replies_action)
+        
+        if self._has_visible_rows(list_view):
+            menu.addAction(self.clear_replies_action)
+        
         menu.exec(list_view.mapToGlobal(position))
 
     def _open_reply_emoji_picker(self):
@@ -399,7 +412,10 @@ class MessageController(QObject):
             index
         ):
             menu.addAction(self.delete_reactions_action)
-        menu.addAction(self.clear_reactions_action)
+        
+        if self._has_visible_rows(self.view.reactions_grid):
+            menu.addAction(self.clear_reactions_action)
+        
         menu.exec(self.view.reactions_grid.mapToGlobal(position))
 
     def _open_reaction_emoji_picker(self):
@@ -468,7 +484,10 @@ class MessageController(QObject):
         menu = QMenu(self.view.window)
         if index.isValid() and table_view.selectionModel().isSelected(index):
             menu.addAction(self.delete_conditions_action)
-        menu.addAction(self.clear_conditions_action)
+        
+        if self._has_visible_rows(table_view):
+            menu.addAction(self.clear_conditions_action)
+
         menu.exec(self.view.listbox_conditions.map_to_global(position))
 
     # --- Validation & Form ---
