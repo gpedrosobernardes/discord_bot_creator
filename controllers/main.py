@@ -13,8 +13,15 @@ from PySide6.QtCore import (
     Signal,
     QPoint,
 )
-from PySide6.QtGui import QAction, QKeySequence, QStandardItemModel, QStandardItem
-from PySide6.QtWidgets import QCompleter, QInputDialog, QMessageBox, QMenu
+from PySide6.QtGui import (
+    QAction,
+    QKeySequence,
+    QStandardItemModel,
+    QStandardItem,
+    QGuiApplication,
+)
+from PySide6.QtWidgets import QCompleter, QInputDialog, QMessageBox, QMenu, QDialog
+from discord import utils
 from qextrawidgets.icons import QThemeResponsiveIcon
 
 from controllers.config import ConfigController
@@ -25,6 +32,7 @@ from core.database import DatabaseController
 from core.log_handler import LogHandler
 from utils.token_validator import TokenValidator
 from views.credits import CreditsView
+from views.invite import InviteDialog
 from views.logs import LogsView
 from views.main import MainView
 
@@ -287,9 +295,13 @@ class MainController(QObject):
             "fa6s.gear", "Ctrl+G", triggered=self.on_config_group_action
         )
         self.quit_group_action = self._create_action("fa6s.arrow-right-from-bracket")
+        self.generate_invite_action = self._create_action(
+            "fa6s.link", triggered=self.on_generate_invite_action
+        )
 
         self.view.config_group_button.setDefaultAction(self.config_group_action)
         self.view.quit_group_button.setDefaultAction(self.quit_group_action)
+        self.view.generate_invite_button.setDefaultAction(self.generate_invite_action)
 
     def _setup_help_actions(self):
         self.discord_applications_action = self._create_action(
@@ -345,6 +357,7 @@ class MainController(QObject):
         # Groups
         self.config_group_action.setText(self.tr("Config group"))
         self.quit_group_action.setText(self.tr("Quit group"))
+        self.generate_invite_action.setText(self.tr("Generate invite"))
 
         # Help
         self.credits_action.setText(self.tr("Credits"))
@@ -613,6 +626,8 @@ class MainController(QObject):
         menu = QMenu(self.view)
         menu.addAction(self.config_group_action)
         menu.addAction(self.quit_group_action)
+        menu.addSeparator()
+        menu.addAction(self.generate_invite_action)
         global_position = self.view.groups_list_widget.mapToGlobal(position)
         menu.exec(global_position)
 
@@ -622,14 +637,14 @@ class MainController(QObject):
         index = self.view.messages_list_view.indexAt(position)
 
         menu = QMenu(self.view)
-        
+
         if index.isValid():
             menu.addAction(self.edit_message_action)
             menu.addAction(self.remove_message_action)
             menu.addSeparator()
-        
+
         menu.addAction(self.remove_all_message_action)
-        
+
         global_position = self.view.messages_list_view.mapToGlobal(position)
         menu.exec(global_position)
 
@@ -703,3 +718,39 @@ class MainController(QObject):
         self.group_windows.append(controller)
         controller.view.finished.connect(lambda: self.group_windows.remove(controller))
         controller.view.show()
+
+    @Slot()
+    def on_generate_invite_action(self):
+        dialog = InviteDialog(self.view)
+
+        if bot_id := self.bot_thread.get_bot_id():
+            dialog.set_client_id(str(bot_id))
+
+        if dialog.exec() == QDialog.DialogCode.Accepted:
+            client_id_str = dialog.get_client_id()
+            if not client_id_str.isdigit():
+                QMessageBox.warning(
+                    self.view, self.tr("Error"), self.tr("Invalid Client ID.")
+                )
+                return
+
+            client_id = int(client_id_str)
+            permissions = dialog.get_permissions()
+
+            try:
+                invite_url = utils.oauth_url(
+                    client_id,
+                    permissions=permissions,
+                    scopes=["bot", "applications.commands"],
+                )
+
+                clipboard = QGuiApplication.clipboard()
+                clipboard.setText(invite_url)
+
+                QMessageBox.information(
+                    self.view,
+                    self.tr("Invite Generated"),
+                    self.tr("The invite URL has been copied to your clipboard."),
+                )
+            except Exception as e:
+                QMessageBox.critical(self.view, self.tr("Error"), str(e))

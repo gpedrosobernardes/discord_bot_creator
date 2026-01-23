@@ -67,6 +67,7 @@ class MainView(QMainWindow):
         self.groups_list_widget = QGroupsList()
         self.config_group_button = QToolButton()
         self.quit_group_button = QToolButton()
+        self.generate_invite_button = QToolButton()
 
         # --- Left Side: Messages Tab ---
         self.search_messages_line_edit = QSearchLineEdit()
@@ -154,6 +155,7 @@ class MainView(QMainWindow):
         toolbar_layout.addStretch()
         toolbar_layout.addWidget(self.config_group_button)
         toolbar_layout.addWidget(self.quit_group_button)
+        toolbar_layout.addWidget(self.generate_invite_button)
 
         # Main Layout
         layout = QVBoxLayout()

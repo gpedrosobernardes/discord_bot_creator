@@ -74,6 +74,17 @@ class QBotThread(QThread):
             return {guild.id: guild for guild in self._bot.guilds}
         return {}
 
+    def get_bot_id(self) -> Optional[int]:
+        """
+        Retrieves the bot's user ID safely.
+
+        Returns:
+            Optional[int]: The bot's ID or None if not ready.
+        """
+        if self._bot and self._bot.is_ready() and self._bot.user:
+            return self._bot.user.id
+        return None
+
     def leave_group(self, group_id: int) -> None:
         """
         Schedules a task to leave a guild in the bot's async loop safely.
