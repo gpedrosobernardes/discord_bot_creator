@@ -10,6 +10,8 @@ from PySide6.QtCore import (
     QSettings,
     Qt,
     Slot,
+    QObject,
+    Signal,
 )
 from PySide6.QtGui import QAction, QKeySequence
 from PySide6.QtWidgets import QCompleter, QInputDialog, QMessageBox
@@ -26,13 +28,15 @@ from views.logs import LogsView
 from views.main import MainView
 
 
-class MainController:
+class MainController(QObject):
     """
     Controller for the Main Window.
 
     Orchestrates the interaction between the MainView, DatabaseController,
     and other sub-controllers/views.
     """
+
+    switch_project = Signal()
 
     def __init__(
         self,
@@ -80,7 +84,6 @@ class MainController:
 
         # 5. Initial State
         self.translate_ui()
-        self._load_initial_state()
         self.view.show()
 
     # --- Initialization ---
@@ -135,7 +138,7 @@ class MainController:
         # Log Handler Connections
         self.log_handler.signaler.log.connect(self.view.logs_text_edit.add_log)
 
-    def _load_initial_state(self):
+    def load_initial_state(self):
         """Load initial state from settings."""
         self.view.token_line_edit.setText(self.user_settings.value("token"))
 
@@ -330,6 +333,7 @@ class MainController:
         self._refresh_models()
         self.view.setWindowTitle(f"Discord Bot Creator - {project_name}")
         self.bot_thread.set_database_name(project_name)
+        self.switch_project.emit()
 
     def _refresh_models(self):
         self.messages_model = self.database.get_messages_model()

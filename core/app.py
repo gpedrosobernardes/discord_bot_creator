@@ -34,7 +34,7 @@ class Application:
         logging.getLogger("core").addHandler(self.log_handler)
 
         self.config_controller = ConfigController(self.translator, self.user_settings)
-        self.logs_controller = LogsController()
+        self.logs_controller = LogsController(self.database)
         self.credits_controller = CreditsController()
         self.main_controller = MainController(
             self.database,
@@ -48,6 +48,7 @@ class Application:
         self.group_controller = GroupController()
 
         self.setup_connections()
+        self.main_controller.load_initial_state()
         sys.exit(self.application.exec())
 
     def setup_connections(self):
@@ -57,6 +58,10 @@ class Application:
             self.logs_controller.view,
         ):
             self.config_controller.language_changed.connect(view.translate_ui)
+
+        self.main_controller.switch_project.connect(
+            self.logs_controller.load_logs_model
+        )
 
     @staticmethod
     def create_user_settings() -> QSettings:
