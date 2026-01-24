@@ -47,8 +47,8 @@ Ensure you have Python 3.10 or higher installed. This project specifically targe
 
 1.  **Clone the repository:**
     ```bash
-    git clone [https://github.com/yourusername/discord-bot-creator.git](https://github.com/yourusername/discord-bot-creator.git)
-    cd discord-bot-creator
+    git clone https://github.com/gpedrosobernardes/discord_bot_creator
+    cd discord_bot_creator
     ```
 
 2.  **Install dependencies:**
@@ -67,7 +67,7 @@ Ensure you have Python 3.10 or higher installed. This project specifically targe
 Upon launching the application, you will need to provide your Discord Bot Token.
 1.  Go to the [Discord Developer Portal](https://discord.com/developers/applications).
 2.  Create a new application and generate a Bot Token.
-3.  Paste the token into the application's **Token** field or manually into `config.yaml`.
+3.  Paste the token into the application's **Token** field.
 
 ### 2. Creating Logic
 Use the **Editor Window** to define how your bot reacts:
@@ -76,7 +76,7 @@ Use the **Editor Window** to define how your bot reacts:
 * **Actions:** Define what happens (Reply "Hi there!", React with 😎, etc.).
 
 ### 3. Running the Bot
-Click the **"Turn on Bot"** button in the interface. You can view real-time logs in the "Logs" tab.
+Click the **"Turn on Bot"** button in the interface. You can view real-time logs in the "Logs" window.
 
 Alternatively, you can run the bot process headless (without GUI):
 ```bash
@@ -119,8 +119,6 @@ pyside6-lupdate -extensions py ./source -no-obsolete -ts translations/generated/
 ```bash
 pyside6-lrelease translations/generated/en_us.ts -qm translations/build/en_us.qm
 ```
-
-
 
 ## 📄 License
 
