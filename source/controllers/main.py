@@ -529,7 +529,9 @@ class MainController(QObject):
     @Slot()
     def on_edit_message_action(self):
         index = self.view.messages_list_view.currentIndex()
-        if not index.isValid():
+        selection_model = self.view.messages_list_view.selectionModel()
+
+        if not index.isValid() or not selection_model.isSelected(index):
             QMessageBox.warning(
                 self.view,
                 self.tr("Error"),
@@ -537,14 +539,17 @@ class MainController(QObject):
             )
             return
 
-        id_index = index.siblingAtColumn(self.messages_model.fieldIndex("id"))
+        source_index = self.messages_proxy_model.mapToSource(index)
+        id_index = source_index.siblingAtColumn(self.messages_model.fieldIndex("id"))
         data = self.messages_model.data(id_index)
         self._new_message_controller(data)
 
     @Slot()
     def on_remove_message_action(self):
         index = self.view.messages_list_view.currentIndex()
-        if not index.isValid():
+        selection_model = self.view.messages_list_view.selectionModel()
+
+        if not index.isValid() or not selection_model.isSelected(index):
             QMessageBox.warning(
                 self.view,
                 self.tr("Error"),
@@ -552,7 +557,8 @@ class MainController(QObject):
             )
             return
 
-        id_index = index.siblingAtColumn(self.messages_model.fieldIndex("id"))
+        source_index = self.messages_proxy_model.mapToSource(index)
+        id_index = source_index.siblingAtColumn(self.messages_model.fieldIndex("id"))
         data = self.messages_model.data(id_index)
         self.database.delete_message_by_id(data)
         self.messages_model.select()
@@ -744,7 +750,9 @@ class MainController(QObject):
     @Slot()
     def on_config_group_action(self):
         index = self.view.groups_list_widget.currentIndex()
-        if not index.isValid():
+        selection_model = self.view.groups_list_widget.selectionModel()
+
+        if not index.isValid() or not selection_model.isSelected(index):
             QMessageBox.warning(
                 self.view,
                 self.tr("Error"),
@@ -776,7 +784,9 @@ class MainController(QObject):
     @Slot()
     def on_quit_group_action(self):
         index = self.view.groups_list_widget.currentIndex()
-        if not index.isValid():
+        selection_model = self.view.groups_list_widget.selectionModel()
+
+        if not index.isValid() or not selection_model.isSelected(index):
             QMessageBox.warning(
                 self.view,
                 self.tr("Error"),
