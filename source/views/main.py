@@ -14,6 +14,7 @@ from PySide6.QtWidgets import (
     QMenu,
     QMenuBar,
     QHBoxLayout,
+    QGroupBox,
 )
 from qextrawidgets import QColorButton, QPasswordLineEdit, QSearchLineEdit
 
@@ -65,6 +66,7 @@ class MainView(QMainWindow):
         # --- Left Side: Groups Tab ---
         self.search_groups = QSearchLineEdit()
         self.groups_list_widget = QGroupsList()
+
         self.config_group_button = QToolButton()
         self.quit_group_button = QToolButton()
         self.generate_invite_button = QToolButton()
@@ -127,8 +129,8 @@ class MainView(QMainWindow):
         messages_tab = self._create_messages_tab()
         groups_tab = self._create_groups_tab()
 
-        self.left_tab_widget.addTab(messages_tab, "")
-        self.left_tab_widget.addTab(groups_tab, "")
+        self.left_tab_widget.addTab(messages_tab, qtawesome.icon("fa6s.message"), "")
+        self.left_tab_widget.addTab(groups_tab, qtawesome.icon("fa6s.users"), "")
 
         # 2. Create Right Panel
         right_panel = self._create_right_panel()
