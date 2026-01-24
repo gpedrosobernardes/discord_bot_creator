@@ -16,7 +16,7 @@ class Application(BaseApplication):
         self.database = DatabaseController(self.user_settings.value("database"), "main")
 
         self.log_handler = LogHandler(self.database)
-        logging.getLogger("core").addHandler(self.log_handler)
+        logging.getLogger("source.core").addHandler(self.log_handler)
 
         self.config_controller = ConfigController(self.translator, self.user_settings)
         self.logs_controller = LogsController(self.database)

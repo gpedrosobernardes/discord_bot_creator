@@ -89,7 +89,7 @@ class ConfigController(QObject):
     @staticmethod
     def apply_logging_config(user_settings: QSettings):
         selected_log_level = user_settings.value("log_level", type=int)
-        logger = logging.getLogger("core")
+        logger = logging.getLogger("source.core")
         logger.setLevel(selected_log_level)
 
     def setup_connections(self, user_settings: QSettings, translator: QTranslator):
