@@ -1,6 +1,7 @@
+from source.controllers.base import BaseController
 from source.views.credits import CreditsView
 
 
-class CreditsController:
+class CreditsController(BaseController[CreditsView]):
     def __init__(self):
-        self.view = CreditsView()
+        super().__init__(CreditsView())

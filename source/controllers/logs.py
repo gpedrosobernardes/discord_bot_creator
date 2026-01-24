@@ -1,8 +1,9 @@
 from typing import Any
 
-from PySide6.QtCore import QLocale, QDateTime, QObject
+from PySide6.QtCore import QLocale, QDateTime
 from PySide6.QtWidgets import QStyledItemDelegate
 
+from source.controllers.base import BaseController
 from source.core.database import DatabaseController
 from source.views.logs import LogsView
 
@@ -38,10 +39,9 @@ class TimestampDelegate(QStyledItemDelegate):
             return super().displayText(value, locale)
 
 
-class LogsController(QObject):
+class LogsController(BaseController[LogsView]):
     def __init__(self, database: DatabaseController):
-        super().__init__()
-        self.view = LogsView()
+        super().__init__(LogsView())
         self.database = database
         self.logs_model = None
         self._init_delegates()

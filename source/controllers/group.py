@@ -1,10 +1,11 @@
 import typing
 
-from PySide6.QtCore import QCoreApplication, QObject, Slot, Qt
+from PySide6.QtCore import QCoreApplication, Slot, Qt
 from PySide6.QtGui import QStandardItemModel, QStandardItem
 from PySide6.QtWidgets import QDataWidgetMapper
 from discord import Guild, TextChannel, VoiceChannel
 
+from source.controllers.base import BaseController
 from source.core.database import DatabaseController
 from source.views.group import GroupView
 from source.qt.items.text_channel_item import TextChannelItem
@@ -13,10 +14,9 @@ from source.qt.items.voice_channel_item import VoiceChannelItem
 translate = QCoreApplication.translate
 
 
-class GroupController(QObject):
+class GroupController(BaseController[GroupView]):
     def __init__(self, database: DatabaseController, discord_group: Guild):
-        super().__init__()
-        self.view = GroupView()
+        super().__init__(GroupView())
         self.database = database
         self.group_id: typing.Optional[int] = None
         self.discord_group: Guild = discord_group

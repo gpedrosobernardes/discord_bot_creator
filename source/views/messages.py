@@ -1,7 +1,6 @@
 from PySide6.QtCore import (
     Qt,
     QRegularExpression,
-    QObject,
     QSize,
 )
 from PySide6.QtGui import (
@@ -29,19 +28,18 @@ from source.qt.widgets.condition_form import QConditionForm
 from source.qt.widgets.reply_form import QReplyForm
 
 
-class MessageView(QObject):
+class MessageView(QDialog):
     def __init__(
         self,
     ):
         super().__init__()
 
-        self.window = QDialog()
-        self.window.setWindowFlags(
-            self.window.windowFlags() | Qt.WindowType.WindowMaximizeButtonHint
+        self.setWindowFlags(
+            self.windowFlags() | Qt.WindowType.WindowMaximizeButtonHint
         )
-        self.window.setWindowIcon(QIcon("assets/icons/window-icon.svg"))
-        self.window.setMinimumSize(800, 600)
-        self.window.resize(1000, 800)
+        self.setWindowIcon(QIcon("assets/icons/window-icon.svg"))
+        self.setMinimumSize(800, 600)
+        self.resize(1000, 800)
 
         # models
 
@@ -138,11 +136,11 @@ class MessageView(QObject):
         vertical_layout.addWidget(self.name_line_edit)
         vertical_layout.addLayout(horizontal_layout)
 
-        self.window.setLayout(vertical_layout)
-        self.window.show()
+        self.setLayout(vertical_layout)
+        self.show()
 
     def translate_ui(self):
-        self.window.setWindowTitle(self.tr("Message"))
+        self.setWindowTitle(self.tr("Message"))
         self.name_text.setText(self.tr("Name"))
         self.name_line_edit.setToolTip(
             self.tr("The name can include letters (with accents), numbers, and spaces.")

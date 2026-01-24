@@ -9,7 +9,6 @@ from PySide6.QtCore import (
     QSettings,
     Qt,
     Slot,
-    QObject,
     Signal,
     QPoint,
 )
@@ -26,8 +25,10 @@ from PySide6.QtWidgets import QCompleter, QInputDialog, QMessageBox, QMenu, QDia
 from discord import utils
 from qextrawidgets.icons import QThemeResponsiveIcon
 
+from source.controllers.base import BaseController
 from source.controllers.config import ConfigController
 from source.controllers.group import GroupController
+from source.controllers.manager import ControllerManager
 from source.controllers.message import MessageController
 from source.core.bot_engine.bot_thread import QBotThread
 from source.core.database import DatabaseController
@@ -39,7 +40,7 @@ from source.views.logs import LogsView
 from source.views.main import MainView
 
 
-class MainController(QObject):
+class MainController(BaseController[MainView]):
     """
     Controller for the Main Window.
 
@@ -68,7 +69,7 @@ class MainController(QObject):
             logs_view: The logs view instance.
             credits_view: The credits view instance.
         """
-        super().__init__()
+        super().__init__(MainView())
         # 1. Dependency Injection
         self.database = database
         self.user_settings = user_settings
@@ -79,15 +80,12 @@ class MainController(QObject):
         self.log_handler = log_handler
 
         # 2. State & Context
-        self.message_windows = []
-        self.group_windows = []
+        self.message_controllers = ControllerManager[MessageController]()
+        self.group_controllers = ControllerManager[GroupController]()
         self.messages_model = self.database.get_messages_model()
         self.messages_proxy_model = QSortFilterProxyModel()
         self.groups_model = QStandardItemModel()
         self.bot_thread = QBotThread()
-
-        # 3. View Initialization
-        self.view = MainView()
 
         # 4. Init Sequence
         self._init_models()
@@ -512,15 +510,26 @@ class MainController(QObject):
     # --- Message Management Logic ---
 
     def _new_message_controller(self, index: Optional[int] = None):
+        # Check if already open
+        if index is not None:
+            if self.message_controllers.get(index):
+                self.message_controllers.activate(index)
+                return
+
         message_controller = MessageController(
             self.messages_model, self.database, self.user_settings, index
         )
-        window = message_controller.view.window
-        self.message_windows.append(message_controller)
-        window.destroyed.connect(
-            lambda: self.message_windows.remove(message_controller)
+        
+        # If it was a new message (index is None), the controller creates a row and assigns an ID.
+        # We need to get that ID to use as a key.
+        key = message_controller.message_id
+
+        self.message_controllers.add(
+            key, message_controller, message_controller.view.finished
         )
+        
         self.config_controller.language_changed.connect(message_controller.translate_ui)
+        message_controller.view.show()
 
     @Slot()
     def on_new_message_action(self):
@@ -560,6 +569,11 @@ class MainController(QObject):
         source_index = self.messages_proxy_model.mapToSource(index)
         id_index = source_index.siblingAtColumn(self.messages_model.fieldIndex("id"))
         data = self.messages_model.data(id_index)
+        
+        # Close the window if it's open
+        if controller := self.message_controllers.get(data):
+            controller.view.close()
+            
         self.database.delete_message_by_id(data)
         self.messages_model.select()
 
@@ -584,6 +598,10 @@ class MainController(QObject):
 
             if ret == QMessageBox.StandardButton.No:
                 return
+
+        # Close all message windows
+        for controller in self.message_controllers.get_all():
+             controller.view.close()
 
         self.database.delete_all_messages()
         self.messages_model.select()
@@ -763,6 +781,11 @@ class MainController(QObject):
         item = self.groups_model.itemFromIndex(index)
         group_id = item.data(Qt.ItemDataRole.UserRole)
 
+        # Check if already open
+        if self.group_controllers.get(group_id):
+            self.group_controllers.activate(group_id)
+            return
+
         # Retrieve the discord.Guild object
         guilds = self.bot_thread.groups()
         discord_group = guilds.get(group_id)
@@ -777,8 +800,11 @@ class MainController(QObject):
 
         controller = GroupController(self.database, discord_group)
         controller.set_group(group_id)
-        self.group_windows.append(controller)
-        controller.view.finished.connect(lambda: self.group_windows.remove(controller))
+        
+        self.group_controllers.add(
+            group_id, controller, controller.view.finished
+        )
+
         controller.view.show()
 
     @Slot()

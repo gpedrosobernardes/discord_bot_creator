@@ -3,19 +3,19 @@ from __future__ import annotations
 import locale
 import logging
 
-from PySide6.QtCore import QTranslator, QSettings, Signal, QObject
+from PySide6.QtCore import QTranslator, QSettings, Signal
 from PySide6.QtGui import QGuiApplication, Qt, QFontDatabase
 from PySide6.QtWidgets import QApplication
 
+from source.controllers.base import BaseController
 from source.views.config import ConfigView
 
 
-class ConfigController(QObject):
+class ConfigController(BaseController[ConfigView]):
     language_changed = Signal()
 
     def __init__(self, translator: QTranslator, user_settings: QSettings):
-        super().__init__()
-        self.view = ConfigView()
+        super().__init__(ConfigView())
         self.load_settings(user_settings)
         self.apply_theme(user_settings)
         self.apply_style(user_settings)

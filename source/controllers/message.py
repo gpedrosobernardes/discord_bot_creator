@@ -1,7 +1,7 @@
 import typing
 from enum import IntEnum
 
-from PySide6.QtCore import Qt, QPoint, QObject, QModelIndex, QCoreApplication, QSettings
+from PySide6.QtCore import Qt, QPoint, QModelIndex, QCoreApplication, QSettings
 from PySide6.QtGui import QAction, QKeySequence, QStandardItemModel, QStandardItem
 from PySide6.QtSql import QSqlTableModel
 from PySide6.QtWidgets import (
@@ -14,6 +14,7 @@ from PySide6.QtWidgets import (
 from qextrawidgets import QEmojiPicker
 from qextrawidgets.emoji_utils import EmojiImageProvider
 
+from source.controllers.base import BaseController
 from source.core.constants import StrField, IntField, StrComparator, IntComparator
 from source.core.database import DatabaseController
 from source.views.messages import MessageView
@@ -24,7 +25,7 @@ class MessageWindowContext(IntEnum):
     EDIT = 2
 
 
-class MessageController(QObject):
+class MessageController(BaseController[MessageView]):
     def __init__(
         self,
         message_model: QSqlTableModel,
@@ -32,7 +33,7 @@ class MessageController(QObject):
         user_settings: QSettings,
         message_id: int = None,
     ):
-        super().__init__()
+        super().__init__(MessageView())
         self.database = database
         self.model = message_model
         self.user_settings = user_settings
@@ -54,7 +55,6 @@ class MessageController(QObject):
         self._int_comparator_model = QStandardItemModel()
 
         # View
-        self.view = MessageView()
         self.emoji_picker = self._create_emoji_picker()
         self._emoji_picker_signal = None
 
@@ -161,8 +161,8 @@ class MessageController(QObject):
     def _setup_connections(self):
         # Main Window
         self.view.confirm_button.clicked.connect(self.validate)
-        self.view.window.accepted.connect(self.on_accepted)
-        self.view.window.rejected.connect(self.on_rejected)
+        self.view.accepted.connect(self.on_accepted)
+        self.view.rejected.connect(self.on_rejected)
 
         # Replies
         self.view.listbox_replies.addButtonPressed.connect(self.add_reply)
@@ -303,7 +303,7 @@ class MessageController(QObject):
             return True
 
         reply = QMessageBox.question(
-            self.view.window,
+            self.view,
             title,
             text,
             QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
@@ -342,7 +342,7 @@ class MessageController(QObject):
         list_view = self.view.listbox_replies.list_view()
         index = list_view.indexAt(position)
 
-        menu = QMenu(self.view.window)
+        menu = QMenu(self.view)
         if index.isValid() and list_view.selectionModel().isSelected(index):
             menu.addAction(self.delete_replies_action)
 
@@ -407,7 +407,7 @@ class MessageController(QObject):
     def _show_reactions_menu(self, position: QPoint):
         index = self.view.reactions_grid.indexAt(position)
 
-        menu = QMenu(self.view.window)
+        menu = QMenu(self.view)
         if index.isValid() and self.view.reactions_grid.selectionModel().isSelected(
             index
         ):
@@ -481,7 +481,7 @@ class MessageController(QObject):
         table_view = self.view.listbox_conditions.table_view()
         index = table_view.indexAt(position)
 
-        menu = QMenu(self.view.window)
+        menu = QMenu(self.view)
         if index.isValid() and table_view.selectionModel().isSelected(index):
             menu.addAction(self.delete_conditions_action)
 
@@ -501,10 +501,10 @@ class MessageController(QObject):
             self._show_error(self.tr("Invalid name"))
             name_edit.setFocus()
         else:
-            self.view.window.accept()
+            self.view.accept()
 
     def _show_error(self, message: str):
-        QMessageBox.warning(self.view.window, self.tr("Error"), message)
+        QMessageBox.warning(self.view, self.tr("Error"), message)
 
     def on_accepted(self):
         # Submit all changes manually
