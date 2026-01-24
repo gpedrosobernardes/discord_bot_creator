@@ -2,7 +2,7 @@
 __pycache__
 .idea
 log.txt
-source/config.json
+assets/config.json
 config.yaml
 test.py
 build

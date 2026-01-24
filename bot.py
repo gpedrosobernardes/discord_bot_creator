@@ -1,5 +1,5 @@
-from core.base_app import BaseApplication
-from core.bot import Bot
+from source.core.base_app import BaseApplication
+from source.core.bot_engine.bot import Bot
 
 
 if __name__ == "__main__":

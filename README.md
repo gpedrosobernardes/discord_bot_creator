@@ -1,5 +1,5 @@
 <p style="text-align: center;">
-  <img src="source/icons/icon.svg" alt="Logo">
+  <img src="assets/icons/icon.svg" alt="Logo">
 </p>
 
 # Discord Bot Creator
@@ -39,7 +39,7 @@ python main.py
 
 Para inserir o token, clique no campo Token da interface, insira e aperte Enter para salvar.
 
-![token.png](source/images/token.png)
+![token.png](assets/images/token.png)
 
 Se preferir pode copiar o token do seu bot e inserir no arquivo config.yaml, por exemplo:
 
@@ -51,7 +51,7 @@ token: <seu token>
 
 Para iniciar o ‘Bot’ basta clicar no botão Ligar ‘Bot’:
 
-![turn_on_bot.png](source/images/turn_on_bot.png)
+![turn_on_bot.png](assets/images/turn_on_bot.png)
 
 Ou se já tiver uma configuração de mensagens e desejar executar o ‘bot’ separadamente, digite no cmd:
 
@@ -112,15 +112,15 @@ pasta do Qt), pois iremos utilizá-lo para traduzir cada widget da ‘interface�
 Vamos começar gerando os arquivos .ts a partir das ‘interfaces’, exemplo:
     
 ```bash
-pyside6-lupdate -extensions py ./views ./controllers ./core ./widgets -no-obsolete -ts translations/pt_br.ts
-pyside6-lupdate -extensions py ./views ./controllers ./core ./widgets -no-obsolete -ts translations/en_us.ts
+pyside6-lupdate -extensions py ./source -no-obsolete -ts translations/generated/pt_br.ts
+pyside6-lupdate -extensions py ./source -no-obsolete -ts translations/generated/en_us.ts
 ```
 
 Agora abra o arquivo .ts gerado e traduza cada widget, após isso, compile o arquivo com o comando:
 
 ```bash
-pyside6-lrelease translations/pt_br.ts -qm translations/build/pt_br.qm
-pyside6-lrelease translations/en_us.ts -qm translations/build/en_us.qm
+pyside6-lrelease translations/generated/pt_br.ts -qm translations/build/pt_br.qm
+pyside6-lrelease translations/generated/en_us.ts -qm translations/build/en_us.qm
 ```
 
 ## Compilando:
