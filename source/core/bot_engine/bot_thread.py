@@ -97,6 +97,34 @@ class QBotThread(QThread):
                     logger.error(f"Failed to download icon for guild {guild_id}: {e}")
         return None
 
+    def get_bot_name(self) -> str:
+        """
+        Retrieves the bot's name safely.
+
+        Returns:
+            str: The bot's name or "Unknown" if not ready.
+        """
+        if self._bot and self._bot.is_ready() and self._bot.user:
+            return self._bot.user.name
+        return "Unknown"
+
+    def get_bot_icon_data(self) -> Optional[bytes]:
+        """
+        Retrieves the bot's avatar icon data safely.
+
+        Returns:
+            Optional[bytes]: The icon bytes or None if not found/error.
+        """
+        if self._bot and self._bot.is_ready() and self._bot.user and self._bot.user.avatar:
+            try:
+                future = asyncio.run_coroutine_threadsafe(
+                    self._bot.user.avatar.read(), self._bot.loop
+                )
+                return future.result(timeout=5)
+            except Exception as e:
+                logger.error(f"Failed to download bot avatar: {e}")
+        return None
+
     def get_bot_id(self) -> Optional[int]:
         """
         Retrieves the bot's user ID safely.

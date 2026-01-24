@@ -88,6 +88,16 @@ class MainView(QMainWindow):
         self.token_label = QLabel()
         self.token_line_edit = QPasswordLineEdit()
         self.token_line_edit.setMaxLength(100)
+        
+        # Bot Info Widget (Icon + Name)
+        self.bot_info_widget = QWidget()
+        self.bot_info_widget.setVisible(False)
+
+        self.bot_icon_label = QLabel()
+        self.bot_icon_label.setFixedSize(32, 32)
+        self.bot_icon_label.setScaledContents(True)
+
+        self.bot_name_label = QLabel()
 
         self._init_switch_button()
 
@@ -106,6 +116,13 @@ class MainView(QMainWindow):
 
     def _init_layout(self):
         """Initialize Layouts and add widgets to them."""
+        # Setup Bot Info Widget Layout
+        bot_info_layout = QHBoxLayout(self.bot_info_widget)
+        bot_info_layout.setContentsMargins(0, 0, 0, 0)
+        bot_info_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        bot_info_layout.addWidget(self.bot_icon_label)
+        bot_info_layout.addWidget(self.bot_name_label)
+
         # 1. Create Left Panel (Tabs)
         messages_tab = self._create_messages_tab()
         groups_tab = self._create_groups_tab()
@@ -178,6 +195,7 @@ class MainView(QMainWindow):
             self.cmd_line_edit,
             self.token_label,
             self.token_line_edit,
+            self.bot_info_widget,
             self.switch_bot_button,
         )
 

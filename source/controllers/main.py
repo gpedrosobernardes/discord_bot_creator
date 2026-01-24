@@ -654,6 +654,7 @@ class MainController(BaseController[MainView]):
             self.view.switch_bot_button.setChecked(False)
         self.view.token_line_edit.setReadOnly(False)
         self.groups_model.clear()
+        self.view.bot_info_widget.setVisible(False)
 
     @Slot()
     def on_bot_ready(self):
@@ -670,6 +671,23 @@ class MainController(BaseController[MainView]):
                 item.setIcon(QIcon(pixmap))
             
             self.groups_model.appendRow(item)
+            
+        # Update Bot Info Label
+        bot_name = self.bot_thread.get_bot_name()
+        bot_icon_data = self.bot_thread.get_bot_icon_data()
+        
+        self.view.bot_name_label.setText(bot_name)
+        if bot_icon_data:
+            pixmap = QPixmap()
+            pixmap.loadFromData(bot_icon_data)
+            # Resize icon to a reasonable size, e.g., 32x32
+            self.view.bot_icon_label.setPixmap(pixmap.scaled(32, 32, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation))
+        else:
+             # Fallback or clear pixmap if no icon
+             self.view.bot_icon_label.setPixmap(QPixmap())
+             self.view.bot_name_label.setText(bot_name) # Ensure text is set if no pixmap
+
+        self.view.bot_info_widget.setVisible(True)
 
     @Slot(QPoint)
     def on_groups_list_context_menu(self, position: QPoint):
