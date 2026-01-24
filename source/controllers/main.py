@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import sys
-import urllib.request
 import webbrowser
 from typing import Optional
 
@@ -640,15 +639,11 @@ class MainController(QObject):
             item = QStandardItem(guild.name)
             item.setData(guild_id, Qt.ItemDataRole.UserRole)
             
-            icon_url = self.bot_thread.get_guild_icon(guild_id)
-            if icon_url:
-                try:
-                    data = urllib.request.urlopen(icon_url).read()
-                    pixmap = QPixmap()
-                    pixmap.loadFromData(data)
-                    item.setIcon(QIcon(pixmap))
-                except Exception:
-                    pass
+            icon_data = self.bot_thread.get_guild_icon_data(guild_id)
+            if icon_data:
+                pixmap = QPixmap()
+                pixmap.loadFromData(icon_data)
+                item.setIcon(QIcon(pixmap))
             
             self.groups_model.appendRow(item)
 
@@ -699,15 +694,11 @@ class MainController(QObject):
             item = QStandardItem(guild.name)
             item.setData(guild_id, Qt.ItemDataRole.UserRole)
             
-            icon_url = self.bot_thread.get_guild_icon(guild_id)
-            if icon_url:
-                try:
-                    data = urllib.request.urlopen(icon_url).read()
-                    pixmap = QPixmap()
-                    pixmap.loadFromData(data)
-                    item.setIcon(QIcon(pixmap))
-                except Exception:
-                    pass
+            icon_data = self.bot_thread.get_guild_icon_data(guild_id)
+            if icon_data:
+                pixmap = QPixmap()
+                pixmap.loadFromData(icon_data)
+                item.setIcon(QIcon(pixmap))
             
             self.groups_model.appendRow(item)
 
@@ -744,15 +735,11 @@ class MainController(QObject):
             item = self.groups_model.itemFromIndex(matches[0])
             item.setText(guild.name)
             
-            icon_url = self.bot_thread.get_guild_icon(guild_id)
-            if icon_url:
-                try:
-                    data = urllib.request.urlopen(icon_url).read()
-                    pixmap = QPixmap()
-                    pixmap.loadFromData(data)
-                    item.setIcon(QIcon(pixmap))
-                except Exception:
-                    pass
+            icon_data = self.bot_thread.get_guild_icon_data(guild_id)
+            if icon_data:
+                pixmap = QPixmap()
+                pixmap.loadFromData(icon_data)
+                item.setIcon(QIcon(pixmap))
 
     @Slot()
     def on_config_group_action(self):

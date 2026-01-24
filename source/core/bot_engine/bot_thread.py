@@ -74,20 +74,27 @@ class QBotThread(QThread):
             return {guild.id: guild for guild in self._bot.guilds}
         return {}
 
-    def get_guild_icon(self, guild_id: int) -> Optional[str]:
+    def get_guild_icon_data(self, guild_id: int) -> Optional[bytes]:
         """
-        Retrieves the icon URL of a guild safely.
+        Retrieves the icon data of a guild safely using discord.py's read().
 
         Args:
             guild_id (int): The ID of the guild.
 
         Returns:
-            Optional[str]: The icon URL or None if not found.
+            Optional[bytes]: The icon bytes or None if not found/error.
         """
         if self._bot and self._bot.is_ready():
             guild = self._bot.get_guild(guild_id)
             if guild and guild.icon:
-                return guild.icon.url
+                try:
+                    # Executa o método assíncrono .read() no loop do bot e aguarda o resultado
+                    future = asyncio.run_coroutine_threadsafe(
+                        guild.icon.read(), self._bot.loop
+                    )
+                    return future.result(timeout=5)
+                except Exception as e:
+                    logger.error(f"Failed to download icon for guild {guild_id}: {e}")
         return None
 
     def get_bot_id(self) -> Optional[int]:
