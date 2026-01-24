@@ -74,6 +74,22 @@ class QBotThread(QThread):
             return {guild.id: guild for guild in self._bot.guilds}
         return {}
 
+    def get_guild_icon(self, guild_id: int) -> Optional[str]:
+        """
+        Retrieves the icon URL of a guild safely.
+
+        Args:
+            guild_id (int): The ID of the guild.
+
+        Returns:
+            Optional[str]: The icon URL or None if not found.
+        """
+        if self._bot and self._bot.is_ready():
+            guild = self._bot.get_guild(guild_id)
+            if guild and guild.icon:
+                return guild.icon.url
+        return None
+
     def get_bot_id(self) -> Optional[int]:
         """
         Retrieves the bot's user ID safely.

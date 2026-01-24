@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import sys
+import urllib.request
 import webbrowser
 from typing import Optional
 
@@ -19,6 +20,8 @@ from PySide6.QtGui import (
     QStandardItemModel,
     QStandardItem,
     QGuiApplication,
+    QIcon,
+    QPixmap,
 )
 from PySide6.QtWidgets import QCompleter, QInputDialog, QMessageBox, QMenu, QDialog
 from discord import utils
@@ -636,6 +639,17 @@ class MainController(QObject):
         for guild_id, guild in self.bot_thread.groups().items():
             item = QStandardItem(guild.name)
             item.setData(guild_id, Qt.ItemDataRole.UserRole)
+            
+            icon_url = self.bot_thread.get_guild_icon(guild_id)
+            if icon_url:
+                try:
+                    data = urllib.request.urlopen(icon_url).read()
+                    pixmap = QPixmap()
+                    pixmap.loadFromData(data)
+                    item.setIcon(QIcon(pixmap))
+                except Exception:
+                    pass
+            
             self.groups_model.appendRow(item)
 
     @Slot(QPoint)
@@ -684,6 +698,17 @@ class MainController(QObject):
         if guild:
             item = QStandardItem(guild.name)
             item.setData(guild_id, Qt.ItemDataRole.UserRole)
+            
+            icon_url = self.bot_thread.get_guild_icon(guild_id)
+            if icon_url:
+                try:
+                    data = urllib.request.urlopen(icon_url).read()
+                    pixmap = QPixmap()
+                    pixmap.loadFromData(data)
+                    item.setIcon(QIcon(pixmap))
+                except Exception:
+                    pass
+            
             self.groups_model.appendRow(item)
 
     @Slot(str)
@@ -718,6 +743,16 @@ class MainController(QObject):
         if matches:
             item = self.groups_model.itemFromIndex(matches[0])
             item.setText(guild.name)
+            
+            icon_url = self.bot_thread.get_guild_icon(guild_id)
+            if icon_url:
+                try:
+                    data = urllib.request.urlopen(icon_url).read()
+                    pixmap = QPixmap()
+                    pixmap.loadFromData(data)
+                    item.setIcon(QIcon(pixmap))
+                except Exception:
+                    pass
 
     @Slot()
     def on_config_group_action(self):
