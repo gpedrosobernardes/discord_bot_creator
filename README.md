@@ -1,132 +1,127 @@
 <p style="text-align: center;">
-  <img src="assets/icons/icon.svg" alt="Logo">
+  <img src="assets/icons/icon.svg" alt="Discord Bot Creator Logo" width="128" height="128">
 </p>
 
-# Discord Bot Creator
+<h1 style="text-align: center;">Discord Bot Creator</h1>
 
-## Sobre:
+<p style="text-align: center;">
+  <strong>A powerful, open-source GUI tool to create and manage Discord bots without writing code.</strong>
+</p>
 
-**Discord Bot Creator**, é um ‘software’ gratuito para criação de ‘bots’ no Discord, com uma ‘interface’ interativa capaz
-de executar o ‘bot’.
+<p style="text-align: center;">
+  Built with <strong>Python 3.13</strong> and <strong>PySide 6</strong>.
+</p>
 
-## Como iniciar:
+---
 
-### 1.º Passo: Instalando dependências e bibliotecas
+## 📖 About
 
-##### Linguagens:
+**Discord Bot Creator** is a desktop application designed to simplify the process of creating Discord bots. It provides a user-friendly interface to configure commands, automated replies, and moderation actions. Whether you are a beginner looking to make your first bot or a developer needing a quick GUI solution, this tool utilizes the robust **discord.py** library and a modern **MVC architecture** to deliver performance and stability.
 
-* [Python 3.13.3](https://www.python.org/downloads/release/python-3133/)
+## ✨ Key Features
 
-#### Instalação:
+* **Interactive Interface:** Clean and responsive GUI built with Qt 6 (PySide 6.10).
+* **Logic Builder:** Create complex message triggers using conditions (Equal to, Contains, Starts with, Regex).
+* **Automated Responses:** Configure replies, reactions, and delays.
+* **Moderation Actions:** Set up auto-kick, auto-ban, pin messages, or delete messages based on triggers.
+* **Multi-Language Support:** Fully localized interface (English and Portuguese).
+* **Visual Feedback:** Real-time logs and status indicators.
 
-Abra o cmd e digite:
+## 🛠️ Tech Stack
 
-```bash
-pip install -r requirements.txt
-```
+This project relies on modern Python libraries to ensure a native and fluid experience:
 
-Esse processo pode ser realizado a partir da ‘interface’.
+* **Core:** [Python 3.13+](https://www.python.org/)
+* **GUI Framework:** [PySide6](https://pypi.org/project/PySide6/) (v6.10.1) & [QtAwesome](https://pypi.org/project/QtAwesome/)
+* **Bot Logic:** [discord.py](https://discordpy.readthedocs.io/en/stable/)
+* **Widgets:** [QExtraWidgets](https://github.com/gpedrosobernardes/QExtraWidgets)
+* **Emojis:** Twemoji API & Emoji Data Python
 
-### 2.º Passo: Interface
+## 🚀 Getting Started
 
-Para iniciar a interface do bot, digite no cmd:
+### Prerequisites
 
-```bash
-python main.py
-```
+Ensure you have Python 3.10 or higher installed. This project specifically targets **Python 3.13.3**.
 
-### 3.º Passo: Inserindo o token
+### Installation
 
-Para inserir o token, clique no campo Token da interface, insira e aperte Enter para salvar.
+1.  **Clone the repository:**
+    ```bash
+    git clone [https://github.com/yourusername/discord-bot-creator.git](https://github.com/yourusername/discord-bot-creator.git)
+    cd discord-bot-creator
+    ```
 
-![token.png](assets/images/token.png)
+2.  **Install dependencies:**
+    ```bash
+    pip install -r requirements.txt
+    ```
 
-Se preferir pode copiar o token do seu bot e inserir no arquivo config.yaml, por exemplo:
+3.  **Run the application:**
+    ```bash
+    python main.py
+    ```
 
-```yaml
-token: <seu token>
-```
+## ⚙️ Usage
 
-### 4.º Passo: Iniciando ‘Bot’
+### 1. Token Setup
+Upon launching the application, you will need to provide your Discord Bot Token.
+1.  Go to the [Discord Developer Portal](https://discord.com/developers/applications).
+2.  Create a new application and generate a Bot Token.
+3.  Paste the token into the application's **Token** field or manually into `config.yaml`.
 
-Para iniciar o ‘Bot’ basta clicar no botão Ligar ‘Bot’:
+### 2. Creating Logic
+Use the **Editor Window** to define how your bot reacts:
+* **Expected Message:** The trigger (e.g., "!hello").
+* **Conditions:** Refine the trigger (e.g., *User is not admin* OR *Channel name contains "general"*).
+* **Actions:** Define what happens (Reply "Hi there!", React with 😎, etc.).
 
-![turn_on_bot.png](assets/images/turn_on_bot.png)
+### 3. Running the Bot
+Click the **"Turn on Bot"** button in the interface. You can view real-time logs in the "Logs" tab.
 
-Ou se já tiver uma configuração de mensagens e desejar executar o ‘bot’ separadamente, digite no cmd:
-
+Alternatively, you can run the bot process headless (without GUI):
 ```bash
 python bot.py
 ```
 
-## Não tem um ‘token’?
+## 📦 Building from Source
 
-### Para vincular o seu ‘bot’ ao Discord, siga este passo a passo:
+To create a standalone executable (`.exe`) for distribution, use the included `setup.py` script which utilizes `cx_Freeze`.
 
-* Acesse o site do desenvolvedor do [Discord](https://discord.com/developers) e clique em "Applications", 
-  depois selecione "New Application".
-* Dê um nome ao seu ‘bot’ e clique em "Create". Você será redirecionado para um painel onde poderá adicionar mais 
-  informações, como imagem, descrição e tags.
-* No menu à esquerda, clique na opção "Bot" e, em seguida, em "Add Bot".
-
-Após a criação você deve encontrar o ‘Token’ na mesma pagina.
-
-## Modificando o bot:
-
-### Janela inicial:
-
-Na janela inicial podemos criar, editar, excluir e visualizar as mensagens que configuramos,
-podemos também executar o bot e visualizar as mensagens de retorno (logs).
-
-Ao clicar no botão de adicionar ou editar podemos visualizar uma nova janela.
-
-### Janela de edição:
-
-Nessa janela podemos criar ou editar uma mensagem, que configura como o ‘Bot’ deve reagir às mensagens enviadas no
-servidor ou privado. Agora vamos introduzir como podem ser utilizados os cinco campos de preenchimento:
-
-* **Nome**: O nome que deseja salvar essa mensagem.
-* **Mensagem esperada**: Mensagem que será utilizada pelas condições de "expected message" e "not expected message", nesse
-  campo se tivermos mais de uma mensagem, todas serão enviadas, separando uma mensagem com ¨ podemos definir mensagens
-  aleatórias.
-* **Resposta**: São as mensagens que devemos enviar como reposta caso todas as condições forem satisfeitas.
-* **Reações**: O ‘bot’ irá reagir com todas as reações definidas.
-* **Condições**: Define condições as mensagens que deverão ser respondidas.
-
-#### Configurando a resposta:
-
-Podemos configurar as "formas" de resposta, como:
-
-* Resposta no grupo ou privada.
-* Banimento ou expulsão como resposta.
-* Onde serão adicionadas as reações (‘bot’ ou utilizador).
-* Delay na resposta.
-* Remover ou fixar a mensagem.
-
-# Para desenvolvedores:
-
-## Desenvolvendo traduções:
-
-Para iniciar o desenvolvimento de traduções, você precisa ter o **Qt Linguist** instalado (O Qt Linguist deve estar na 
-pasta do Qt), pois iremos utilizá-lo para traduzir cada widget da ‘interface’.
-Vamos começar gerando os arquivos .ts a partir das ‘interfaces’, exemplo:
-    
-```bash
-pyside6-lupdate -extensions py ./source -no-obsolete -ts translations/generated/pt_br.ts
-pyside6-lupdate -extensions py ./source -no-obsolete -ts translations/generated/en_us.ts
-```
-
-Agora abra o arquivo .ts gerado e traduza cada widget, após isso, compile o arquivo com o comando:
-
-```bash
-pyside6-lrelease translations/generated/pt_br.ts -qm translations/build/pt_br.qm
-pyside6-lrelease translations/generated/en_us.ts -qm translations/build/en_us.qm
-```
-
-## Compilando:
-
-Para compilar o programa, basta executar o seguinte comando:
 ```bash
 python setup.py build
 ```
-Mais configurações podem ser realizadas no setup.py.
+
+The executable will be generated in the `build/` directory, including all necessary assets and translations.
+
+## 💻 For Developers
+
+This project follows a strict **Model-View-Controller (MVC)** architectural pattern to ensure scalability and maintainability.
+
+### Project Structure
+
+* `source/models`: Data logic, database interactions, and strict typing.
+* `source/views`: GUI layouts using Qt Model/View delegates.
+* `source/controllers`: Connects models to views and handles business logic.
+* `translations/`: Contains `.ts` and compiled `.qm` files for i18n.
+
+### Contributing Translations
+
+To add or update languages, you need **Qt Linguist** tools.
+
+1. **Generate/Update translation files:**
+```bash
+pyside6-lupdate -extensions py ./source -no-obsolete -ts translations/generated/en_us.ts
+```
+
+2. **Edit the `.ts` file** using Qt Linguist.
+
+3. **Compile to `.qm`:**
+```bash
+pyside6-lrelease translations/generated/en_us.ts -qm translations/build/en_us.qm
+```
+
+
+
+## 📄 License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
