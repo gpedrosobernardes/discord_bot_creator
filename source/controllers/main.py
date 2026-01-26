@@ -165,6 +165,7 @@ class MainController(BaseController[MainView]):
 
         # Bot Thread Connections
         self.bot_thread.signals.login_failure.connect(self.on_bot_login_failure)
+        self.bot_thread.signals.privileged_intents_error.connect(self.on_bot_privileged_intents_error)
         self.bot_thread.finished.connect(self.on_bot_finished)
         self.bot_thread.signals.bot_ready.connect(self.on_bot_ready)
         self.bot_thread.signals.guild_join.connect(self.on_guild_join)
@@ -668,6 +669,21 @@ class MainController(BaseController[MainView]):
             self.view,
             self.tr("Login Failed"),
             self.tr("Invalid token. Please check your token and try again."),
+        )
+        self.view.switch_bot_button.setChecked(False)
+        self.view.token_line_edit.setReadOnly(False)
+
+    @Slot()
+    def on_bot_privileged_intents_error(self):
+        """Called when privileged intents are missing."""
+        QMessageBox.critical(
+            self.view,
+            self.tr("Privileged Intents Error"),
+            self.tr(
+                "Critical Bot Error: Shard ID None is requesting privileged intents that have not been explicitly enabled in the developer portal.\n\n"
+                "It is recommended to go to https://discord.com/developers/applications/ and explicitly enable the privileged intents within your application's page.\n\n"
+                "If this is not possible, then consider disabling the privileged intents instead."
+            ),
         )
         self.view.switch_bot_button.setChecked(False)
         self.view.token_line_edit.setReadOnly(False)

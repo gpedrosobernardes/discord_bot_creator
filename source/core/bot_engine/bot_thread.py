@@ -4,7 +4,7 @@ from typing import Dict, Optional
 
 import discord
 from PySide6.QtCore import QThread
-from discord import LoginFailure
+from discord import LoginFailure, PrivilegedIntentsRequired
 
 from source.core.bot_engine.integrated_bot import IntegratedBot, BotSignals
 
@@ -54,6 +54,9 @@ class QBotThread(QThread):
         except LoginFailure:
             self.signals.login_failure.emit()
             logging.error("Login failed: Invalid Token.")
+        except PrivilegedIntentsRequired:
+            self.signals.privileged_intents_error.emit()
+            logging.critical("Critical Bot Error: Privileged intents not enabled.")
         except Exception as e:
             logging.critical(f"Critical Bot Error: {e}")
         finally:

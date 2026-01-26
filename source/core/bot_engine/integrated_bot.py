@@ -12,6 +12,7 @@ class BotSignals(QObject):
 
     bot_ready = Signal()
     login_failure = Signal()
+    privileged_intents_error = Signal()
     guild_join = Signal(str)
     guild_remove = Signal(str)
     guild_update = Signal(str)
