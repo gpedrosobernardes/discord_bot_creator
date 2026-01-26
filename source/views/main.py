@@ -1,6 +1,6 @@
 import qtawesome
 from PySide6.QtCore import QSize, Qt
-from PySide6.QtGui import QIcon
+from PySide6.QtGui import QIcon, QPixmap
 from PySide6.QtWidgets import (
     QWidget,
     QVBoxLayout,
@@ -18,6 +18,8 @@ from PySide6.QtWidgets import (
 )
 from qextrawidgets import QColorButton, QPasswordLineEdit, QSearchLineEdit
 
+from source.qt.helpers.pixmap import PixmapHelper
+from source.qt.widgets.bot_info import BotInfoWidget
 from source.qt.widgets.groups_list import QGroupsList
 from source.qt.widgets.log_textedit import QLogTextEdit
 
@@ -25,9 +27,7 @@ from source.qt.widgets.log_textedit import QLogTextEdit
 class MainView(QMainWindow):
     """
     Main Window View for the Discord Bot Creator application.
-
-    This class handles the main UI layout, including the menu bar,
-    tabs for messages and groups, and the configuration panel.
+    Refactored for better visual hierarchy and grouping.
     """
 
     def __init__(self):
@@ -40,8 +40,8 @@ class MainView(QMainWindow):
 
     def _init_ui(self):
         """Initialize widgets and configure their properties."""
-        self.setMinimumSize(800, 600)
-        self.resize(1000, 800)
+        self.setMinimumSize(900, 650) # Aumentei um pouco o mínimo para conforto
+        self.resize(1100, 800)
         self.setWindowIcon(QIcon("assets/icons/window-icon.svg"))
         self.setWindowTitle("Discord Bot Creator")
 
@@ -81,50 +81,43 @@ class MainView(QMainWindow):
         self.remove_all_message_tool_button = QToolButton()
 
         self.left_tab_widget = QTabWidget()
-        self.left_tab_widget.setMinimumWidth(280)
+        self.left_tab_widget.setMinimumWidth(300)
 
         # --- Right Side ---
         self.logs_text_edit = QLogTextEdit()
         self.cmd_line_edit = QLineEdit()
 
+        # Connection Group
+        self.connection_group = QGroupBox() # Title defined in translate_ui
         self.token_label = QLabel()
         self.token_line_edit = QPasswordLineEdit()
         self.token_line_edit.setMaxLength(100)
-        
+
         # Bot Info Widget (Icon + Name)
-        self.bot_info_widget = QWidget()
-        self.bot_info_widget.setVisible(False)
+        self.bot_info_widget = BotInfoWidget()
 
-        self.bot_icon_label = QLabel()
-        self.bot_icon_label.setFixedSize(32, 32)
-        self.bot_icon_label.setScaledContents(True)
-
-        self.bot_name_label = QLabel()
+        self.reset_bot_info()
 
         self._init_switch_button()
 
     def _init_switch_button(self):
         """Initialize the switch bot button with icons."""
         switch_icon = QIcon()
-        pixmap_play = qtawesome.icon("fa6s.play").pixmap(QSize(48, 48))
+        pixmap_play = qtawesome.icon("fa6s.play", color="white").pixmap(QSize(24, 24))
         switch_icon.addPixmap(pixmap_play, QIcon.Mode.Normal, QIcon.State.Off)
 
-        pixmap_stop = qtawesome.icon("fa6s.stop").pixmap(QSize(48, 48))
+        pixmap_stop = qtawesome.icon("fa6s.stop", color="white").pixmap(QSize(24, 24))
         switch_icon.addPixmap(pixmap_stop, QIcon.Mode.Normal, QIcon.State.On)
 
-        self.switch_bot_button = QColorButton("#599E5E", "", "white", "#C94F4F")
+        # Ajustei as cores para ficarem mais suaves e profissionais
+        self.switch_bot_button = QColorButton("#4CAF50", "", "white", "#F44336")
         self.switch_bot_button.setCheckable(True)
         self.switch_bot_button.setIcon(switch_icon)
+        self.switch_bot_button.setMinimumHeight(45) # Botão mais robusto
+        self.switch_bot_button.setCursor(Qt.CursorShape.PointingHandCursor)
 
     def _init_layout(self):
         """Initialize Layouts and add widgets to them."""
-        # Setup Bot Info Widget Layout
-        bot_info_layout = QHBoxLayout(self.bot_info_widget)
-        bot_info_layout.setContentsMargins(0, 0, 0, 0)
-        bot_info_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        bot_info_layout.addWidget(self.bot_icon_label)
-        bot_info_layout.addWidget(self.bot_name_label)
-
         # 1. Create Left Panel (Tabs)
         messages_tab = self._create_messages_tab()
         groups_tab = self._create_groups_tab()
@@ -139,31 +132,35 @@ class MainView(QMainWindow):
         splitter = QSplitter(Qt.Orientation.Horizontal)
         splitter.addWidget(self.left_tab_widget)
         splitter.addWidget(right_panel)
-        splitter.setStretchFactor(1, 1)
+        splitter.setStretchFactor(0, 1) # Esquerda cresce menos
+        splitter.setStretchFactor(1, 3) # Direita tem prioridade de espaço (3x)
 
         self.setCentralWidget(splitter)
 
     def _create_messages_tab(self) -> QWidget:
         """Create the messages tab widget."""
-        # Toolbar
+        # Toolbar (Cleaned up)
         toolbar_layout = QHBoxLayout()
+        toolbar_layout.setSpacing(2)
         toolbar_layout.addStretch()
         for btn in (
-            self.new_message_tool_button,
-            self.edit_message_tool_button,
-            self.remove_message_tool_button,
-            self.remove_all_message_tool_button,
+                self.new_message_tool_button,
+                self.edit_message_tool_button,
+                self.remove_message_tool_button,
+                self.remove_all_message_tool_button,
         ):
+            btn.setFixedSize(30, 30) # Tamanho uniforme
             toolbar_layout.addWidget(btn)
 
         # Main Layout
         layout = QVBoxLayout()
+        layout.setContentsMargins(5, 5, 5, 5)
+        layout.setSpacing(5)
         layout.addWidget(self.search_messages_line_edit)
         layout.addWidget(self.messages_list_view)
         layout.addLayout(toolbar_layout)
 
         container = QWidget()
-        container.setContentsMargins(5, 5, 5, 5)
         container.setLayout(layout)
         return container
 
@@ -171,43 +168,73 @@ class MainView(QMainWindow):
         """Create the groups tab widget."""
         # Toolbar
         toolbar_layout = QHBoxLayout()
+        toolbar_layout.setSpacing(2)
         toolbar_layout.addStretch()
-        toolbar_layout.addWidget(self.config_group_button)
-        toolbar_layout.addWidget(self.quit_group_button)
-        toolbar_layout.addWidget(self.generate_invite_button)
+        for btn in (self.config_group_button, self.quit_group_button, self.generate_invite_button):
+            btn.setFixedSize(30, 30)
+            toolbar_layout.addWidget(btn)
 
         # Main Layout
         layout = QVBoxLayout()
+        layout.setContentsMargins(5, 5, 5, 5)
+        layout.setSpacing(5)
         layout.addWidget(self.search_groups)
         layout.addWidget(self.groups_list_widget)
+
         layout.addLayout(toolbar_layout)
 
         container = QWidget()
-        container.setContentsMargins(5, 5, 5, 5)
         container.setLayout(layout)
         return container
 
     def _create_right_panel(self) -> QWidget:
-        """Create the right panel widget."""
-        layout = QVBoxLayout()
-        layout.setContentsMargins(10, 10, 10, 10)
+        """Create the right panel widget with improved grouping."""
+        main_layout = QVBoxLayout()
+        main_layout.setContentsMargins(15, 15, 15, 15)
+        main_layout.setSpacing(15)
 
-        widgets = (
-            self.logs_text_edit,
-            self.cmd_line_edit,
-            self.token_label,
-            self.token_line_edit,
-            self.bot_info_widget,
-            self.switch_bot_button,
-        )
+        # --- Section 1: Connection Settings (Group Box) ---
+        # Organiza o token dentro de uma caixa para não ficar "flutuando"
+        conn_layout = QHBoxLayout()
+        conn_layout.addWidget(self.token_label)
+        conn_layout.addWidget(self.token_line_edit)
+        self.connection_group.setLayout(conn_layout)
 
-        for widget in widgets:
-            layout.addWidget(widget)
+        # --- Section 2: Console (Logs + Command) ---
+        console_layout = QVBoxLayout()
+        console_layout.setSpacing(2) # Cmd colado no log
+        console_layout.addWidget(QLabel(self.tr("System Logs:"))) # Label explícita
+        console_layout.addWidget(self.logs_text_edit)
+        console_layout.addWidget(self.cmd_line_edit)
+
+        # --- Section 3: Action Area (Bot Info + Switch) ---
+        action_layout = QHBoxLayout()
+        action_layout.addWidget(self.bot_info_widget, stretch=True)
+        action_layout.addWidget(self.switch_bot_button)
+
+        # Adicionar tudo ao layout principal
+        main_layout.addLayout(action_layout)
+        main_layout.addWidget(self.connection_group)
+        main_layout.addLayout(console_layout, stretch=True) # Log ocupa o espaço sobrando
 
         container = QWidget()
         container.setMinimumWidth(520)
-        container.setLayout(layout)
+        container.setLayout(main_layout)
         return container
+
+    def set_bot_info(self, name: str, icon: QPixmap = None):
+        """Sets the bot's name and icon and makes the widget visible."""
+        dpr = self.devicePixelRatio()
+
+        if not icon:
+            icon = PixmapHelper.create_icon_with_background("fa6s.robot", "gray", 40, dpr)
+
+        circular_icon = PixmapHelper.get_circular_pixmap(icon, 40, dpr)
+        self.bot_info_widget.set_info(name, circular_icon)
+
+    def reset_bot_info(self):
+        """Resets the bot info widget to offline state."""
+        self.set_bot_info(self.tr("Offline"))
 
     def translate_ui(self):
         """Translate UI texts."""
@@ -225,7 +252,8 @@ class MainView(QMainWindow):
         self.search_groups.setPlaceholderText(self.tr("Search groups..."))
 
         # Right Panel
-        self.cmd_line_edit.setPlaceholderText(self.tr("Type a command"))
-        self.token_label.setText(self.tr("Token"))
-        self.switch_bot_button.setText(self.tr("Turn on/off bot"))
-        self.logs_text_edit.setPlaceholderText(self.tr("No logs at moment"))
+        self.connection_group.setTitle(self.tr("Connection Settings"))
+        self.cmd_line_edit.setPlaceholderText(self.tr("Type a command..."))
+        self.token_label.setText(self.tr("Bot Token:"))
+        self.switch_bot_button.setText(self.tr("Start Bot"))
+        self.logs_text_edit.setPlaceholderText(self.tr("Waiting for bot to start..."))

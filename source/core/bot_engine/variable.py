@@ -1,17 +1,19 @@
-import discord
+from datetime import datetime
 
-from source.core.functions import get_time
+import discord
 
 
 class Variable:
     def __init__(self, message: discord.Message):
+        now = datetime.now()
+
         self.keys = {
             "author name": message.author.name,
             "guild name": message.guild.name if message.guild else "N/A",
-            "day": get_time("%d"),
-            "month": get_time("%m"),
-            "year": get_time("%Y"),
-            "d-m-y": get_time("%d/%m/%Y"),
+            "day": now.strftime("%d"),
+            "month": now.strftime("%m"),
+            "year": now.strftime("%Y"),
+            "d-m-y": now.strftime("%d/%m/%Y"),
         }
 
     def apply_variable(self, string: str):

@@ -11,6 +11,7 @@ from PySide6.QtCore import (
     Slot,
     Signal,
     QPoint,
+    QByteArray,
 )
 from PySide6.QtGui import (
     QAction,
@@ -32,7 +33,9 @@ from source.controllers.manager import ControllerManager
 from source.controllers.message import MessageController
 from source.core.bot_engine.bot_thread import QBotThread
 from source.core.database import DatabaseController
+from source.core.discord_api import BotIdentityFetcher
 from source.core.log_handler import LogHandler
+from source.qt.helpers.pixmap import PixmapHelper
 from source.qt.validators.token_validator import TokenValidator
 from source.views.credits import CreditsView
 from source.views.invite import InviteDialog
@@ -86,6 +89,7 @@ class MainController(BaseController[MainView]):
         self.messages_proxy_model = QSortFilterProxyModel()
         self.groups_model = QStandardItemModel()
         self.bot_thread = QBotThread()
+        self._bot_info_fetcher = BotIdentityFetcher(self)
 
         # 4. Init Sequence
         self._init_models()
@@ -97,6 +101,7 @@ class MainController(BaseController[MainView]):
         # 5. Initial State
         self.translate_ui()
         self.view.show()
+        self.load_initial_state()
 
     # --- Initialization ---
 
@@ -168,6 +173,10 @@ class MainController(BaseController[MainView]):
 
         # Log Handler Connections
         self.log_handler.signaler.log.connect(self.view.logs_text_edit.add_log)
+
+        # Bot Info Fetcher Connections
+        self._bot_info_fetcher.info_received.connect(self._on_bot_info_fetched)
+        self._bot_info_fetcher.failed.connect(self.view.reset_bot_info)
 
     def load_initial_state(self):
         """Load initial state from settings."""
@@ -379,6 +388,12 @@ class MainController(BaseController[MainView]):
         self._refresh_models()
         self.view.setWindowTitle(f"Discord Bot Creator - {project_name}")
         self.bot_thread.set_database_name(project_name)
+        
+        # Try to load bot info if token exists
+        token = self.user_settings.value("token")
+        if token:
+            self._bot_info_fetcher.fetch(token)
+            
         self.switch_project.emit()
 
     def _refresh_models(self):
@@ -611,7 +626,17 @@ class MainController(BaseController[MainView]):
     @Slot()
     def on_token_changed(self):
         if self.view.token_line_edit.hasAcceptableInput():
-            self.user_settings.setValue("token", self.view.token_line_edit.text())
+            token = self.view.token_line_edit.text()
+            self.user_settings.setValue("token", token)
+            self._bot_info_fetcher.fetch(token)
+
+    @Slot(str, QByteArray)
+    def _on_bot_info_fetched(self, username: str, avatar_bytes: QByteArray):
+        pixmap = None
+        if not avatar_bytes.isEmpty():
+            pixmap = QPixmap()
+            pixmap.loadFromData(avatar_bytes)
+        self.view.set_bot_info(username, pixmap)
 
     # --- Bot Logic ---
 
@@ -654,7 +679,6 @@ class MainController(BaseController[MainView]):
             self.view.switch_bot_button.setChecked(False)
         self.view.token_line_edit.setReadOnly(False)
         self.groups_model.clear()
-        self.view.bot_info_widget.setVisible(False)
 
     @Slot()
     def on_bot_ready(self):
@@ -668,26 +692,10 @@ class MainController(BaseController[MainView]):
             if icon_data:
                 pixmap = QPixmap()
                 pixmap.loadFromData(icon_data)
-                item.setIcon(QIcon(pixmap))
+                circular_icon = PixmapHelper.get_circular_pixmap(pixmap, 24, self.view.devicePixelRatio())
+                item.setIcon(circular_icon)
             
             self.groups_model.appendRow(item)
-            
-        # Update Bot Info Label
-        bot_name = self.bot_thread.get_bot_name()
-        bot_icon_data = self.bot_thread.get_bot_icon_data()
-        
-        self.view.bot_name_label.setText(bot_name)
-        if bot_icon_data:
-            pixmap = QPixmap()
-            pixmap.loadFromData(bot_icon_data)
-            # Resize icon to a reasonable size, e.g., 32x32
-            self.view.bot_icon_label.setPixmap(pixmap.scaled(32, 32, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation))
-        else:
-             # Fallback or clear pixmap if no icon
-             self.view.bot_icon_label.setPixmap(QPixmap())
-             self.view.bot_name_label.setText(bot_name) # Ensure text is set if no pixmap
-
-        self.view.bot_info_widget.setVisible(True)
 
     @Slot(QPoint)
     def on_groups_list_context_menu(self, position: QPoint):
@@ -740,7 +748,8 @@ class MainController(BaseController[MainView]):
             if icon_data:
                 pixmap = QPixmap()
                 pixmap.loadFromData(icon_data)
-                item.setIcon(QIcon(pixmap))
+                circular_icon = PixmapHelper.get_circular_pixmap(pixmap, 24, self.view.devicePixelRatio())
+                item.setIcon(circular_icon)
             
             self.groups_model.appendRow(item)
 
