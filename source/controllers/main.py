@@ -368,6 +368,7 @@ class MainController(BaseController[MainView]):
     def translate_ui(self):
         """Translate UI texts for actions."""
         self.view.translate_ui()
+        self.emoji_picker.translateUI()
 
         # Project
         self.new_project_action.setText(self.tr("New"))

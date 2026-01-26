@@ -2,6 +2,64 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="en_US" sourcelanguage="en_US">
 <context>
+    <name></name>
+    <message>
+        <location filename="../../.venv/Lib/site-packages/qextrawidgets/widgets/emoji_picker/emoji_picker.py" line="35"/>
+        <source>Activities</source>
+        <translation>Activities</translation>
+    </message>
+    <message>
+        <location filename="../../.venv/Lib/site-packages/qextrawidgets/widgets/emoji_picker/emoji_picker.py" line="36"/>
+        <source>Food &amp; Drink</source>
+        <translation>Food &amp; Drink</translation>
+    </message>
+    <message>
+        <location filename="../../.venv/Lib/site-packages/qextrawidgets/widgets/emoji_picker/emoji_picker.py" line="37"/>
+        <source>Animals &amp; Nature</source>
+        <translation>Animals &amp; Nature</translation>
+    </message>
+    <message>
+        <location filename="../../.venv/Lib/site-packages/qextrawidgets/widgets/emoji_picker/emoji_picker.py" line="38"/>
+        <source>People &amp; Body</source>
+        <translation>People &amp; Body</translation>
+    </message>
+    <message>
+        <location filename="../../.venv/Lib/site-packages/qextrawidgets/widgets/emoji_picker/emoji_picker.py" line="39"/>
+        <source>Symbols</source>
+        <translation>Symbols</translation>
+    </message>
+    <message>
+        <location filename="../../.venv/Lib/site-packages/qextrawidgets/widgets/emoji_picker/emoji_picker.py" line="40"/>
+        <source>Flags</source>
+        <translation>Flags</translation>
+    </message>
+    <message>
+        <location filename="../../.venv/Lib/site-packages/qextrawidgets/widgets/emoji_picker/emoji_picker.py" line="41"/>
+        <source>Travel &amp; Places</source>
+        <translation>Travel &amp; Places</translation>
+    </message>
+    <message>
+        <location filename="../../.venv/Lib/site-packages/qextrawidgets/widgets/emoji_picker/emoji_picker.py" line="42"/>
+        <source>Objects</source>
+        <translation>Objects</translation>
+    </message>
+    <message>
+        <location filename="../../.venv/Lib/site-packages/qextrawidgets/widgets/emoji_picker/emoji_picker.py" line="43"/>
+        <source>Smileys &amp; Emotion</source>
+        <translation>Smileys &amp; Emotion</translation>
+    </message>
+    <message>
+        <location filename="../../.venv/Lib/site-packages/qextrawidgets/widgets/emoji_picker/emoji_picker.py" line="44"/>
+        <source>Favorites</source>
+        <translation>Favorites</translation>
+    </message>
+    <message>
+        <location filename="../../.venv/Lib/site-packages/qextrawidgets/widgets/emoji_picker/emoji_picker.py" line="45"/>
+        <source>Recents</source>
+        <translation>Recents</translation>
+    </message>
+</context>
+<context>
     <name>Bot</name>
     <message>
         <location filename="../../source/core/bot_engine/bot.py" line="26"/>
@@ -667,243 +725,243 @@
 <context>
     <name>MainController</name>
     <message>
-        <location filename="../../source/controllers/main.py" line="202"/>
+        <location filename="../../source/controllers/main.py" line="219"/>
         <source>&lt;Create New Project&gt;</source>
         <translation>&lt;Create New Project&gt;</translation>
     </message>
     <message>
-        <location filename="../../source/controllers/main.py" line="207"/>
-        <location filename="../../source/controllers/main.py" line="462"/>
-        <location filename="../../source/controllers/main.py" line="472"/>
+        <location filename="../../source/controllers/main.py" line="224"/>
+        <location filename="../../source/controllers/main.py" line="479"/>
+        <location filename="../../source/controllers/main.py" line="489"/>
         <source>Load Project</source>
         <translation>Load Project</translation>
     </message>
     <message>
-        <location filename="../../source/controllers/main.py" line="208"/>
+        <location filename="../../source/controllers/main.py" line="225"/>
         <source>Select a project or create a new one:</source>
         <translation>Select a project or create a new one:</translation>
     </message>
     <message>
-        <location filename="../../source/controllers/main.py" line="357"/>
+        <location filename="../../source/controllers/main.py" line="374"/>
         <source>Load</source>
         <translation>Load</translation>
     </message>
     <message>
-        <location filename="../../source/controllers/main.py" line="358"/>
+        <location filename="../../source/controllers/main.py" line="375"/>
         <source>Save as</source>
         <translation>Save as</translation>
     </message>
     <message>
-        <location filename="../../source/controllers/main.py" line="356"/>
+        <location filename="../../source/controllers/main.py" line="373"/>
         <source>New</source>
         <translation>New</translation>
     </message>
     <message>
-        <location filename="../../source/controllers/main.py" line="359"/>
+        <location filename="../../source/controllers/main.py" line="376"/>
         <source>Rename</source>
         <translation>Rename</translation>
     </message>
     <message>
-        <location filename="../../source/controllers/main.py" line="360"/>
+        <location filename="../../source/controllers/main.py" line="377"/>
         <source>Configuration</source>
         <translation>Configuration</translation>
     </message>
     <message>
-        <location filename="../../source/controllers/main.py" line="361"/>
+        <location filename="../../source/controllers/main.py" line="378"/>
         <source>Exit</source>
         <translation>Exit</translation>
     </message>
     <message>
-        <location filename="../../source/controllers/main.py" line="364"/>
+        <location filename="../../source/controllers/main.py" line="381"/>
         <source>New message</source>
         <translation>New message</translation>
     </message>
     <message>
-        <location filename="../../source/controllers/main.py" line="365"/>
+        <location filename="../../source/controllers/main.py" line="382"/>
         <source>Edit message</source>
         <translation>Edit message</translation>
     </message>
     <message>
-        <location filename="../../source/controllers/main.py" line="366"/>
+        <location filename="../../source/controllers/main.py" line="383"/>
         <source>Remove message</source>
         <translation>Remove message</translation>
     </message>
     <message>
-        <location filename="../../source/controllers/main.py" line="367"/>
+        <location filename="../../source/controllers/main.py" line="384"/>
         <source>Remove all messages</source>
         <translation>Remove all messages</translation>
     </message>
     <message>
-        <location filename="../../source/controllers/main.py" line="370"/>
+        <location filename="../../source/controllers/main.py" line="387"/>
         <source>Config group</source>
         <translation>Config group</translation>
     </message>
     <message>
-        <location filename="../../source/controllers/main.py" line="371"/>
+        <location filename="../../source/controllers/main.py" line="388"/>
         <source>Quit group</source>
         <translation>Quit group</translation>
     </message>
     <message>
-        <location filename="../../source/controllers/main.py" line="372"/>
+        <location filename="../../source/controllers/main.py" line="389"/>
         <source>Generate invite</source>
         <translation>Generate invite</translation>
     </message>
     <message>
-        <location filename="../../source/controllers/main.py" line="375"/>
+        <location filename="../../source/controllers/main.py" line="392"/>
         <source>Credits</source>
         <translation>Credits</translation>
     </message>
     <message>
-        <location filename="../../source/controllers/main.py" line="376"/>
+        <location filename="../../source/controllers/main.py" line="393"/>
         <source>Logs</source>
         <translation>Logs</translation>
     </message>
     <message>
-        <location filename="../../source/controllers/main.py" line="377"/>
+        <location filename="../../source/controllers/main.py" line="394"/>
         <source>Project</source>
         <translation>Project</translation>
     </message>
     <message>
-        <location filename="../../source/controllers/main.py" line="378"/>
+        <location filename="../../source/controllers/main.py" line="395"/>
         <source>Report bug</source>
         <translation>Report bug</translation>
     </message>
     <message>
-        <location filename="../../source/controllers/main.py" line="379"/>
+        <location filename="../../source/controllers/main.py" line="396"/>
         <source>Discord applications</source>
         <translation>Discord applications</translation>
     </message>
     <message>
-        <location filename="../../source/controllers/main.py" line="412"/>
-        <location filename="../../source/controllers/main.py" line="415"/>
+        <location filename="../../source/controllers/main.py" line="429"/>
+        <location filename="../../source/controllers/main.py" line="432"/>
         <source>New Project</source>
         <translation>New Project</translation>
     </message>
     <message>
-        <location filename="../../source/controllers/main.py" line="416"/>
+        <location filename="../../source/controllers/main.py" line="433"/>
         <source>Project Name:</source>
         <translation>Project Name:</translation>
     </message>
     <message>
-        <location filename="../../source/controllers/main.py" line="433"/>
-        <location filename="../../source/controllers/main.py" line="440"/>
-        <location filename="../../source/controllers/main.py" line="499"/>
-        <location filename="../../source/controllers/main.py" line="520"/>
-        <location filename="../../source/controllers/main.py" line="562"/>
-        <location filename="../../source/controllers/main.py" line="580"/>
-        <location filename="../../source/controllers/main.py" line="601"/>
-        <location filename="../../source/controllers/main.py" line="652"/>
-        <location filename="../../source/controllers/main.py" line="819"/>
-        <location filename="../../source/controllers/main.py" line="839"/>
-        <location filename="../../source/controllers/main.py" line="861"/>
-        <location filename="../../source/controllers/main.py" line="894"/>
-        <location filename="../../source/controllers/main.py" line="917"/>
+        <location filename="../../source/controllers/main.py" line="450"/>
+        <location filename="../../source/controllers/main.py" line="457"/>
+        <location filename="../../source/controllers/main.py" line="516"/>
+        <location filename="../../source/controllers/main.py" line="537"/>
+        <location filename="../../source/controllers/main.py" line="588"/>
+        <location filename="../../source/controllers/main.py" line="606"/>
+        <location filename="../../source/controllers/main.py" line="627"/>
+        <location filename="../../source/controllers/main.py" line="696"/>
+        <location filename="../../source/controllers/main.py" line="863"/>
+        <location filename="../../source/controllers/main.py" line="883"/>
+        <location filename="../../source/controllers/main.py" line="905"/>
+        <location filename="../../source/controllers/main.py" line="938"/>
+        <location filename="../../source/controllers/main.py" line="961"/>
         <source>Error</source>
         <translation>Error</translation>
     </message>
     <message>
-        <location filename="../../source/controllers/main.py" line="434"/>
+        <location filename="../../source/controllers/main.py" line="451"/>
         <source>Project name cannot be empty.</source>
         <translation>Project name cannot be empty.</translation>
     </message>
     <message>
-        <location filename="../../source/controllers/main.py" line="441"/>
+        <location filename="../../source/controllers/main.py" line="458"/>
         <source>A project with this name already exists.</source>
         <translation>A project with this name already exists.</translation>
     </message>
     <message>
-        <location filename="../../source/controllers/main.py" line="463"/>
+        <location filename="../../source/controllers/main.py" line="480"/>
         <source>No projects found.</source>
         <translation>No projects found.</translation>
     </message>
     <message>
-        <location filename="../../source/controllers/main.py" line="473"/>
+        <location filename="../../source/controllers/main.py" line="490"/>
         <source>Select Project:</source>
         <translation>Select Project:</translation>
     </message>
     <message>
-        <location filename="../../source/controllers/main.py" line="485"/>
+        <location filename="../../source/controllers/main.py" line="502"/>
         <source>Save Project As</source>
         <translation>Save Project As</translation>
     </message>
     <message>
-        <location filename="../../source/controllers/main.py" line="486"/>
+        <location filename="../../source/controllers/main.py" line="503"/>
         <source>New Project Name:</source>
         <translation>New Project Name:</translation>
     </message>
     <message>
-        <location filename="../../source/controllers/main.py" line="493"/>
+        <location filename="../../source/controllers/main.py" line="510"/>
         <source>Project Saved</source>
         <translation>Project Saved</translation>
     </message>
     <message>
-        <location filename="../../source/controllers/main.py" line="494"/>
+        <location filename="../../source/controllers/main.py" line="511"/>
         <source>Project &apos;{name}&apos; saved successfully.</source>
         <translation>Project &apos;{name}&apos; saved successfully.</translation>
     </message>
     <message>
-        <location filename="../../source/controllers/main.py" line="501"/>
+        <location filename="../../source/controllers/main.py" line="518"/>
         <source>Failed to save project. The name might already exist or be invalid.</source>
         <translation>Failed to save project. The name might already exist or be invalid.</translation>
     </message>
     <message>
-        <location filename="../../source/controllers/main.py" line="514"/>
+        <location filename="../../source/controllers/main.py" line="531"/>
         <source>Project Renamed</source>
         <translation>Project Renamed</translation>
     </message>
     <message>
-        <location filename="../../source/controllers/main.py" line="515"/>
+        <location filename="../../source/controllers/main.py" line="532"/>
         <source>Project renamed to &apos;{name}&apos; successfully.</source>
         <translation>Project renamed to &apos;{name}&apos; successfully.</translation>
     </message>
     <message>
-        <location filename="../../source/controllers/main.py" line="522"/>
+        <location filename="../../source/controllers/main.py" line="539"/>
         <source>Failed to rename project. The name might already exist or be invalid.</source>
         <translation>Failed to rename project. The name might already exist or be invalid.</translation>
     </message>
     <message>
-        <location filename="../../source/controllers/main.py" line="563"/>
-        <location filename="../../source/controllers/main.py" line="581"/>
+        <location filename="../../source/controllers/main.py" line="589"/>
+        <location filename="../../source/controllers/main.py" line="607"/>
         <source>No message selected</source>
         <translation>No message selected</translation>
     </message>
     <message>
-        <location filename="../../source/controllers/main.py" line="602"/>
+        <location filename="../../source/controllers/main.py" line="628"/>
         <source>No messages to delete</source>
         <translation>No messages to delete</translation>
     </message>
     <message>
-        <location filename="../../source/controllers/main.py" line="609"/>
+        <location filename="../../source/controllers/main.py" line="635"/>
         <source>Confirm Deletion</source>
         <translation>Confirm Deletion</translation>
     </message>
     <message>
-        <location filename="../../source/controllers/main.py" line="610"/>
+        <location filename="../../source/controllers/main.py" line="636"/>
         <source>Are you sure you want to delete all messages?</source>
         <translation>Are you sure you want to delete all messages?</translation>
     </message>
     <message>
-        <location filename="../../source/controllers/main.py" line="653"/>
+        <location filename="../../source/controllers/main.py" line="697"/>
         <source>Please enter a valid token.</source>
         <translation>Please enter a valid token.</translation>
     </message>
     <message>
-        <location filename="../../source/controllers/main.py" line="670"/>
+        <location filename="../../source/controllers/main.py" line="714"/>
         <source>Login Failed</source>
         <translation>Login Failed</translation>
     </message>
     <message>
-        <location filename="../../source/controllers/main.py" line="671"/>
+        <location filename="../../source/controllers/main.py" line="715"/>
         <source>Invalid token. Please check your token and try again.</source>
         <translation>Invalid token. Please check your token and try again.</translation>
     </message>
     <message>
-        <location filename="../../source/controllers/main.py" line="681"/>
+        <location filename="../../source/controllers/main.py" line="725"/>
         <source>Privileged Intents Error</source>
         <translation>Privileged Intents Error</translation>
     </message>
     <message>
-        <location filename="../../source/controllers/main.py" line="683"/>
+        <location filename="../../source/controllers/main.py" line="727"/>
         <source>Critical Bot Error: Shard ID None is requesting privileged intents that have not been explicitly enabled in the developer portal.
 
 It is recommended to go to https://discord.com/developers/applications/ and explicitly enable the privileged intents within your application&apos;s page.
@@ -916,38 +974,38 @@ It is recommended to go to https://discord.com/developers/applications/ and expl
 If this is not possible, then consider disabling the privileged intents instead.</translation>
     </message>
     <message>
-        <location filename="../../source/controllers/main.py" line="820"/>
-        <location filename="../../source/controllers/main.py" line="862"/>
+        <location filename="../../source/controllers/main.py" line="864"/>
+        <location filename="../../source/controllers/main.py" line="906"/>
         <source>No group selected</source>
         <translation>No group selected</translation>
     </message>
     <message>
-        <location filename="../../source/controllers/main.py" line="840"/>
+        <location filename="../../source/controllers/main.py" line="884"/>
         <source>Could not find the guild information.</source>
         <translation>Could not find the guild information.</translation>
     </message>
     <message>
-        <location filename="../../source/controllers/main.py" line="872"/>
+        <location filename="../../source/controllers/main.py" line="916"/>
         <source>Confirm Action</source>
         <translation>Confirm Action</translation>
     </message>
     <message>
-        <location filename="../../source/controllers/main.py" line="873"/>
+        <location filename="../../source/controllers/main.py" line="917"/>
         <source>Are you sure you want to leave this group?</source>
         <translation>Are you sure you want to leave this group?</translation>
     </message>
     <message>
-        <location filename="../../source/controllers/main.py" line="894"/>
+        <location filename="../../source/controllers/main.py" line="938"/>
         <source>Invalid Client ID.</source>
         <translation>Invalid Client ID.</translation>
     </message>
     <message>
-        <location filename="../../source/controllers/main.py" line="913"/>
+        <location filename="../../source/controllers/main.py" line="957"/>
         <source>Invite Generated</source>
         <translation>Invite Generated</translation>
     </message>
     <message>
-        <location filename="../../source/controllers/main.py" line="914"/>
+        <location filename="../../source/controllers/main.py" line="958"/>
         <source>The invite URL has been copied to your clipboard.</source>
         <translation>The invite URL has been copied to your clipboard.</translation>
     </message>
@@ -1041,87 +1099,87 @@ If this is not possible, then consider disabling the privileged intents instead.
 <context>
     <name>MessageController</name>
     <message>
-        <location filename="../../source/controllers/message.py" line="71"/>
+        <location filename="../../source/controllers/message.py" line="72"/>
         <source>New message</source>
         <translation>New message</translation>
     </message>
     <message>
-        <location filename="../../source/controllers/message.py" line="226"/>
+        <location filename="../../source/controllers/message.py" line="218"/>
         <source>Delete selected replie(s)</source>
         <translation>Delete selected replie(s)</translation>
     </message>
     <message>
-        <location filename="../../source/controllers/message.py" line="227"/>
+        <location filename="../../source/controllers/message.py" line="219"/>
         <source>Clear all replies</source>
         <translation>Clear all replies</translation>
     </message>
     <message>
-        <location filename="../../source/controllers/message.py" line="228"/>
+        <location filename="../../source/controllers/message.py" line="220"/>
         <source>Delete selected reaction(s)</source>
         <translation>Delete selected reaction(s)</translation>
     </message>
     <message>
-        <location filename="../../source/controllers/message.py" line="229"/>
+        <location filename="../../source/controllers/message.py" line="221"/>
         <source>Clear all reactions</source>
         <translation>Clear all reactions</translation>
     </message>
     <message>
-        <location filename="../../source/controllers/message.py" line="230"/>
+        <location filename="../../source/controllers/message.py" line="222"/>
         <source>Delete selected condition(s)</source>
         <translation>Delete selected condition(s)</translation>
     </message>
     <message>
-        <location filename="../../source/controllers/message.py" line="231"/>
+        <location filename="../../source/controllers/message.py" line="223"/>
         <source>Clear all conditions</source>
         <translation>Clear all conditions</translation>
     </message>
     <message>
-        <location filename="../../source/controllers/message.py" line="335"/>
+        <location filename="../../source/controllers/message.py" line="327"/>
         <source>Clear replies</source>
         <translation>Clear replies</translation>
     </message>
     <message>
-        <location filename="../../source/controllers/message.py" line="336"/>
+        <location filename="../../source/controllers/message.py" line="328"/>
         <source>Are you sure you want to delete all replies?</source>
         <translation>Are you sure you want to delete all replies?</translation>
     </message>
     <message>
-        <location filename="../../source/controllers/message.py" line="382"/>
+        <location filename="../../source/controllers/message.py" line="374"/>
         <source>The maximum number of reactions is 20.</source>
         <translation>The maximum number of reactions is 20.</translation>
     </message>
     <message>
-        <location filename="../../source/controllers/message.py" line="401"/>
+        <location filename="../../source/controllers/message.py" line="393"/>
         <source>Clear reactions</source>
         <translation>Clear reactions</translation>
     </message>
     <message>
-        <location filename="../../source/controllers/message.py" line="402"/>
+        <location filename="../../source/controllers/message.py" line="394"/>
         <source>Are you sure you want to delete all reactions?</source>
         <translation>Are you sure you want to delete all reactions?</translation>
     </message>
     <message>
-        <location filename="../../source/controllers/message.py" line="461"/>
+        <location filename="../../source/controllers/message.py" line="453"/>
         <source>Clear conditions</source>
         <translation>Clear conditions</translation>
     </message>
     <message>
-        <location filename="../../source/controllers/message.py" line="462"/>
+        <location filename="../../source/controllers/message.py" line="454"/>
         <source>Are you sure you want to delete all conditions?</source>
         <translation>Are you sure you want to delete all conditions?</translation>
     </message>
     <message>
-        <location filename="../../source/controllers/message.py" line="498"/>
+        <location filename="../../source/controllers/message.py" line="490"/>
         <source>Empty name</source>
         <translation>Empty name</translation>
     </message>
     <message>
-        <location filename="../../source/controllers/message.py" line="501"/>
+        <location filename="../../source/controllers/message.py" line="493"/>
         <source>Invalid name</source>
         <translation>Invalid name</translation>
     </message>
     <message>
-        <location filename="../../source/controllers/message.py" line="507"/>
+        <location filename="../../source/controllers/message.py" line="499"/>
         <source>Error</source>
         <translation>Error</translation>
     </message>
@@ -1279,6 +1337,103 @@ If this is not possible, then consider disabling the privileged intents instead.
         <location filename="../../source/qt/widgets/condition_form.py" line="96"/>
         <source>Case insensitive</source>
         <translation>Case insensitive</translation>
+    </message>
+</context>
+<context>
+    <name>QDualList</name>
+    <message>
+        <location filename="../../.venv/Lib/site-packages/qextrawidgets/widgets/dual_list.py" line="36"/>
+        <source>Available</source>
+        <translation>Available</translation>
+    </message>
+    <message>
+        <location filename="../../.venv/Lib/site-packages/qextrawidgets/widgets/dual_list.py" line="63"/>
+        <source>Selected</source>
+        <translation>Selected</translation>
+    </message>
+    <message>
+        <location filename="../../.venv/Lib/site-packages/qextrawidgets/widgets/dual_list.py" line="68"/>
+        <source>0 items</source>
+        <translation>0 items</translation>
+    </message>
+    <message>
+        <location filename="../../.venv/Lib/site-packages/qextrawidgets/widgets/dual_list.py" line="133"/>
+        <source>Filter...</source>
+        <translation>Filter...</translation>
+    </message>
+    <message>
+        <location filename="../../.venv/Lib/site-packages/qextrawidgets/widgets/dual_list.py" line="223"/>
+        <source>{} items</source>
+        <translation>{} items</translation>
+    </message>
+</context>
+<context>
+    <name>QEmojiPicker</name>
+    <message>
+        <location filename="../../.venv/Lib/site-packages/qextrawidgets/widgets/emoji_picker/emoji_picker.py" line="161"/>
+        <source>Search emoji...</source>
+        <translation>Search emoji...</translation>
+    </message>
+    <message>
+        <location filename="../../.venv/Lib/site-packages/qextrawidgets/widgets/emoji_picker/emoji_picker.py" line="274"/>
+        <source>Unfavorite</source>
+        <translation>Unfavorite</translation>
+    </message>
+    <message>
+        <location filename="../../.venv/Lib/site-packages/qextrawidgets/widgets/emoji_picker/emoji_picker.py" line="277"/>
+        <source>Favorite</source>
+        <translation>Favorite</translation>
+    </message>
+    <message>
+        <location filename="../../.venv/Lib/site-packages/qextrawidgets/widgets/emoji_picker/emoji_picker.py" line="280"/>
+        <source>Copy alias</source>
+        <translation>Copy alias</translation>
+    </message>
+</context>
+<context>
+    <name>QFilterPopup</name>
+    <message>
+        <location filename="../../.venv/Lib/site-packages/qextrawidgets/widgets/filterable_table/filter_popup.py" line="36"/>
+        <source>Order A to Z</source>
+        <translation>Order A to Z</translation>
+    </message>
+    <message>
+        <location filename="../../.venv/Lib/site-packages/qextrawidgets/widgets/filterable_table/filter_popup.py" line="39"/>
+        <source>Order Z to A</source>
+        <translation>Order Z to A</translation>
+    </message>
+    <message>
+        <location filename="../../.venv/Lib/site-packages/qextrawidgets/widgets/filterable_table/filter_popup.py" line="46"/>
+        <source>Clear filter</source>
+        <translation>Clear filter</translation>
+    </message>
+    <message>
+        <location filename="../../.venv/Lib/site-packages/qextrawidgets/widgets/filterable_table/filter_popup.py" line="50"/>
+        <source>Search...</source>
+        <translation>Search...</translation>
+    </message>
+    <message>
+        <location filename="../../.venv/Lib/site-packages/qextrawidgets/widgets/filterable_table/filter_popup.py" line="53"/>
+        <source>(Select All)</source>
+        <translation>(Select All)</translation>
+    </message>
+    <message>
+        <location filename="../../.venv/Lib/site-packages/qextrawidgets/widgets/filterable_table/filter_popup.py" line="60"/>
+        <source>Apply</source>
+        <translation>Apply</translation>
+    </message>
+    <message>
+        <location filename="../../.venv/Lib/site-packages/qextrawidgets/widgets/filterable_table/filter_popup.py" line="61"/>
+        <source>Cancel</source>
+        <translation>Cancel</translation>
+    </message>
+</context>
+<context>
+    <name>QPager</name>
+    <message>
+        <location filename="../../.venv/Lib/site-packages/qextrawidgets/widgets/pager.py" line="158"/>
+        <source>Click to type page</source>
+        <translation>Click to type page</translation>
     </message>
 </context>
 <context>
