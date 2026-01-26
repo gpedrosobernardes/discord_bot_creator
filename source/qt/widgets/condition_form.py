@@ -1,4 +1,4 @@
-from PySide6.QtCore import Qt, QSize, Signal, QEvent, QCoreApplication
+from PySide6.QtCore import Qt, QSize, Signal
 from PySide6.QtSql import QSqlTableModel
 from PySide6.QtWidgets import (
     QTableWidget,
@@ -10,72 +10,13 @@ from PySide6.QtWidgets import (
     QLineEdit,
     QTableView,
     QHeaderView,
-    QStyledItemDelegate,
-    QStyleOptionViewItem,
     QAbstractItemView,
 )
 from qextrawidgets.icons import QThemeResponsiveIcon
 
 from source.core.constants import StrField, IntField, StrComparator, IntComparator
-
-
-class TranslationDelegate(QStyledItemDelegate):
-    def __init__(self, parent=None, enums=None):
-        super().__init__(parent)
-        self.enums = enums or []
-
-    def initStyleOption(self, option, index):
-        super().initStyleOption(option, index)
-        value = index.data(Qt.ItemDataRole.DisplayRole)
-
-        if not value:
-            return
-
-        for enum_cls in self.enums:
-            for member in enum_cls:
-                if member.value == value:
-                    option.text = QCoreApplication.translate(enum_cls.__name__, value)
-                    return
-
-
-class BooleanDelegate(QStyledItemDelegate):
-    # noinspection PyUnresolvedReferences
-    def initStyleOption(self, option, index):
-        super().initStyleOption(option, index)
-
-        # Get value
-        value = index.data(Qt.ItemDataRole.EditRole)
-        checked = False
-        try:
-            checked = bool(int(value))
-        except (ValueError, TypeError):
-            pass
-
-        # Configure option to show checkbox
-        option.features |= QStyleOptionViewItem.ViewItemFeature.HasCheckIndicator
-        option.checkState = (
-            Qt.CheckState.Checked if checked else Qt.CheckState.Unchecked
-        )
-        option.features &= ~QStyleOptionViewItem.ViewItemFeature.HasDisplay  # Hide text
-        option.text = ""
-        option.displayAlignment = Qt.AlignmentFlag.AlignCenter
-
-    def createEditor(self, parent, option, index):
-        return None
-
-    def editorEvent(self, event, model, option, index):
-        if event.type() == QEvent.Type.MouseButtonRelease:
-            # Toggle value
-            value = index.data(Qt.ItemDataRole.EditRole)
-            try:
-                current_val = int(value)
-            except (ValueError, TypeError):
-                current_val = 0
-
-            new_val = 1 if current_val == 0 else 0
-            model.setData(index, new_val, Qt.ItemDataRole.EditRole)
-            return True
-        return False
+from source.qt.delegates.boolean import BooleanDelegate
+from source.qt.delegates.translation import TranslationDelegate
 
 
 class QConditionForm(QWidget):

@@ -10,13 +10,12 @@ from PySide6.QtWidgets import (
 from qextrawidgets import QPager, QFilterableTable
 
 
-class LogsView(QObject):
+class LogsView(QDialog):
     def __init__(self):
         super().__init__()
-        self.window = QDialog()
-        self.window.setMinimumSize(800, 600)
-        self.window.resize(1000, 800)
-        self.window.setWindowIcon(QIcon("assets/icons/window-icon.svg"))
+        self.setMinimumSize(800, 600)
+        self.resize(1000, 800)
+        self.setWindowIcon(QIcon("assets/icons/window-icon.svg"))
 
         self.logs_table = QFilterableTable()
         self.logs_table.horizontalHeader().setSectionResizeMode(
@@ -30,7 +29,7 @@ class LogsView(QObject):
         self.translate_ui()
 
     def translate_ui(self):
-        self.window.setWindowTitle(self.tr("Logs"))
+        self.setWindowTitle(self.tr("Logs"))
 
     def _setup_layout(self):
         bottom_layout = QHBoxLayout()
