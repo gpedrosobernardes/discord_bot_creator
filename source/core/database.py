@@ -200,6 +200,12 @@ class DatabaseController:
     def get_logs_model(self) -> LogsTableModel:
         return LogsTableModel(db=self.database)
 
+    def get_logs_count(self) -> int:
+        query = QSqlQuery("SELECT COUNT(*) FROM logs", self.database)
+        if query.exec() and query.next():
+            return query.value(0)
+        return 0
+
     def exec(self, sql: str):
         query = QSqlQuery(self.database)
         if not query.exec(sql):

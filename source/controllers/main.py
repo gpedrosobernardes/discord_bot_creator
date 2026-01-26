@@ -331,7 +331,7 @@ class MainController(BaseController[MainView]):
             )
         )
         self.logs_action = self._create_action(
-            shortcut="Ctrl+L", triggered=self.logs_view.window.show
+            shortcut="Ctrl+L", triggered=self.logs_view.show
         )
         self.credits_action = self._create_action(
             shortcut="F1", triggered=self.credits_view.window.show

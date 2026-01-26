@@ -40,4 +40,4 @@ class LogsView(QDialog):
         layout = QVBoxLayout()
         layout.addWidget(self.logs_table, 1)
         layout.addLayout(bottom_layout)
-        self.window.setLayout(layout)
+        self.setLayout(layout)
