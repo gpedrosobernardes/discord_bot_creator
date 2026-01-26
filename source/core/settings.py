@@ -17,6 +17,8 @@ class Settings(QSettings):
             "database": ":memory:",
             "style": "windows11",
             "emoji_font": QEmojiFonts.loadTwemojiFont(),
+            "recent_emojis": [],
+            "favorite_emojis": [],
         }
         for key, value in default_values.items():
             if not self.contains(key):

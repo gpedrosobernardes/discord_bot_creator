@@ -31,6 +31,7 @@ class MessageController(BaseController[MessageView]):
         message_model: QSqlTableModel,
         database: DatabaseController,
         user_settings: QSettings,
+        emoji_picker: QEmojiPicker,
         message_id: int = None,
     ):
         super().__init__(MessageView())
@@ -55,7 +56,7 @@ class MessageController(BaseController[MessageView]):
         self._int_comparator_model = QStandardItemModel()
 
         # View
-        self.emoji_picker = self._create_emoji_picker()
+        self.emoji_picker = emoji_picker
         self._emoji_picker_signal = None
 
         # Initial State
@@ -78,15 +79,6 @@ class MessageController(BaseController[MessageView]):
         id_field = self.model.fieldIndex("id")
         self.model.setData(self.model.index(row, id_field), row)
         return row
-
-    @staticmethod
-    def _create_emoji_picker() -> QEmojiPicker:
-        picker = QEmojiPicker()
-        picker.setContentsMargins(10, 10, 10, 10)
-        picker.setWindowFlags(Qt.WindowType.Popup | Qt.WindowType.FramelessWindowHint)
-        picker.setFixedSize(500, 500)
-        picker.setEmojiPixmapGetter(EmojiImageProvider.getPixmap)
-        return picker
 
     def _setup_models(self):
         # Reactions

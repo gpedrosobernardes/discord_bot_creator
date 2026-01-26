@@ -11,7 +11,7 @@ from PySide6.QtCore import (
     Slot,
     Signal,
     QPoint,
-    QByteArray,
+    QByteArray, QSignalBlocker,
 )
 from PySide6.QtGui import (
     QAction,
@@ -24,7 +24,10 @@ from PySide6.QtGui import (
 )
 from PySide6.QtWidgets import QCompleter, QInputDialog, QMessageBox, QMenu, QDialog
 from discord import utils
+from qextrawidgets import QEmojiPicker
+from qextrawidgets.emoji_utils import EmojiImageProvider
 from qextrawidgets.icons import QThemeResponsiveIcon
+from qextrawidgets.widgets.emoji_picker import QEmojiDataRole
 
 from source.controllers.base import BaseController
 from source.controllers.config import ConfigController
@@ -89,6 +92,7 @@ class MainController(BaseController[MainView]):
         self.messages_proxy_model = QSortFilterProxyModel()
         self.groups_model = QStandardItemModel()
         self.bot_thread = QBotThread()
+        self.emoji_picker = self._create_emoji_picker()
         self._bot_info_fetcher = BotIdentityFetcher(self)
 
         # 4. Init Sequence
@@ -179,9 +183,22 @@ class MainController(BaseController[MainView]):
         self._bot_info_fetcher.info_received.connect(self._on_bot_info_fetched)
         self._bot_info_fetcher.failed.connect(self.view.reset_bot_info)
 
+        # Emoji Picker Connections
+        emoji_model = self.emoji_picker.model()
+        emoji_model.recentChanged.connect(self.on_recent_emojis_changed)
+        emoji_model.favoriteChanged.connect(self.on_favorite_emojis_changed)
+
     def load_initial_state(self):
         """Load initial state from settings."""
         self.view.token_line_edit.setText(self.user_settings.value("token"))
+
+        # Load emoji picker state
+        emoji_model = self.emoji_picker.model()
+
+        for emoji in self.user_settings.value("recent_emojis", type=list):
+            emoji_model.emojiItem(emoji).setData(True, QEmojiDataRole.RecentRole)
+        for emoji in self.user_settings.value("favorite_emojis", type=list):
+            emoji_model.emojiItem(emoji).setData(True, QEmojiDataRole.FavoriteRole)
 
         current_project = self.user_settings.value("current_project")
         projects = DatabaseController.list_projects()
@@ -533,7 +550,7 @@ class MainController(BaseController[MainView]):
                 return
 
         message_controller = MessageController(
-            self.messages_model, self.database, self.user_settings, index
+            self.messages_model, self.database, self.user_settings, self.emoji_picker, index
         )
         
         # If it was a new message (index is None), the controller creates a row and assigns an ID.
@@ -546,6 +563,15 @@ class MainController(BaseController[MainView]):
         
         self.config_controller.language_changed.connect(message_controller.translate_ui)
         message_controller.view.show()
+
+    @staticmethod
+    def _create_emoji_picker() -> QEmojiPicker:
+        picker = QEmojiPicker()
+        picker.setContentsMargins(10, 10, 10, 10)
+        picker.setWindowFlags(Qt.WindowType.Popup | Qt.WindowType.FramelessWindowHint)
+        picker.setFixedSize(500, 500)
+        picker.setEmojiPixmapGetter(EmojiImageProvider.getPixmap)
+        return picker
 
     @Slot()
     def on_new_message_action(self):
@@ -638,6 +664,24 @@ class MainController(BaseController[MainView]):
             pixmap = QPixmap()
             pixmap.loadFromData(avatar_bytes)
         self.view.set_bot_info(username, pixmap)
+
+    @Slot(str, bool)
+    def on_recent_emojis_changed(self, emoji: str, recent: bool):
+        emojis: list = self.user_settings.value("recent_emojis", type=list)
+        if recent and emoji not in emojis:
+            emojis.append(emoji)
+        else:
+            emojis.remove(emoji)
+        self.user_settings.setValue("recent_emojis", emojis[-20:])
+
+    @Slot(str, bool)
+    def on_favorite_emojis_changed(self, emoji: str, favorite: bool):
+        emojis: list = self.user_settings.value("favorite_emojis", type=list)
+        if favorite and emoji not in emojis:
+            emojis.append(emoji)
+        else:
+            emojis.remove(emoji)
+        self.user_settings.setValue("favorite_emojis", emojis)
 
     # --- Bot Logic ---
 
