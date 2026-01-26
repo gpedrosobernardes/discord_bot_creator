@@ -97,10 +97,11 @@ class MessageView(QDialog):
         self.listbox_replies = QReplyForm()
 
         self.accordion = QAccordion()
-        self.accordion.addSection("", self.listbox_conditions)
+        listbox_accordion_item = self.accordion.addSection("", self.listbox_conditions)
         self.accordion.addSection("", self.reactions_widget)
         self.accordion.addSection("", self.listbox_replies)
         self.accordion.setAnimationEnabled(False)
+        listbox_accordion_item.setExpanded(True)
 
         # 4. Botões de Ação (Alterado)
         self.cancel_button = QPushButton()
