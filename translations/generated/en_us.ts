@@ -1129,120 +1129,141 @@ If this is not possible, then consider disabling the privileged intents instead.
 <context>
     <name>MessageView</name>
     <message>
-        <location filename="../../source/views/messages.py" line="143"/>
-        <source>Message</source>
-        <translation>Message</translation>
-    </message>
-    <message>
-        <location filename="../../source/views/messages.py" line="144"/>
-        <source>Name</source>
-        <translation>Name</translation>
-    </message>
-    <message>
-        <location filename="../../source/views/messages.py" line="146"/>
+        <location filename="../../source/views/messages.py" line="173"/>
         <source>The name can include letters (with accents), numbers, and spaces.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../source/views/messages.py" line="150"/>
-        <source>Conditions</source>
-        <translation>Conditions</translation>
-    </message>
-    <message>
-        <location filename="../../source/views/messages.py" line="150"/>
+        <location filename="../../source/views/messages.py" line="179"/>
         <source>Reactions</source>
         <translation>Reactions</translation>
     </message>
     <message>
-        <location filename="../../source/views/messages.py" line="150"/>
+        <location filename="../../source/views/messages.py" line="179"/>
         <source>Replies</source>
         <translation>Replies</translation>
     </message>
     <message>
-        <location filename="../../source/views/messages.py" line="154"/>
-        <source>Action</source>
-        <translation>Action</translation>
-    </message>
-    <message>
-        <location filename="../../source/views/messages.py" line="156"/>
+        <location filename="../../source/views/messages.py" line="184"/>
         <source>Pin</source>
         <translation>Pin</translation>
     </message>
     <message>
-        <location filename="../../source/views/messages.py" line="156"/>
+        <location filename="../../source/views/messages.py" line="184"/>
         <source>Delete</source>
         <translation>Delete</translation>
     </message>
     <message>
-        <location filename="../../source/views/messages.py" line="156"/>
-        <location filename="../../source/views/messages.py" line="161"/>
-        <location filename="../../source/views/messages.py" line="172"/>
-        <location filename="../../source/views/messages.py" line="179"/>
+        <location filename="../../source/views/messages.py" line="184"/>
+        <location filename="../../source/views/messages.py" line="188"/>
+        <location filename="../../source/views/messages.py" line="198"/>
+        <location filename="../../source/views/messages.py" line="204"/>
         <source>None</source>
         <translation>None</translation>
     </message>
     <message>
-        <location filename="../../source/views/messages.py" line="159"/>
-        <source>Punishment</source>
-        <translation>Punishment</translation>
-    </message>
-    <message>
-        <location filename="../../source/views/messages.py" line="161"/>
+        <location filename="../../source/views/messages.py" line="188"/>
         <source>Kick</source>
         <translation>Kick</translation>
     </message>
     <message>
-        <location filename="../../source/views/messages.py" line="161"/>
+        <location filename="../../source/views/messages.py" line="188"/>
         <source>Ban</source>
         <translation>Ban</translation>
     </message>
     <message>
-        <location filename="../../source/views/messages.py" line="164"/>
-        <source>Where reply</source>
-        <translation>Where reply</translation>
+        <location filename="../../source/views/messages.py" line="169"/>
+        <source>Message Rule</source>
+        <translation>Message Rule</translation>
     </message>
     <message>
-        <location filename="../../source/views/messages.py" line="168"/>
+        <location filename="../../source/views/messages.py" line="170"/>
+        <source>Rule Name</source>
+        <translation>Rule Name</translation>
+    </message>
+    <message>
+        <location filename="../../source/views/messages.py" line="171"/>
+        <source>Ex: Anti-Spam Filter</source>
+        <translation>Ex: Anti-Spam Filter</translation>
+    </message>
+    <message>
+        <location filename="../../source/views/messages.py" line="176"/>
+        <source>Rule Configuration</source>
+        <translation>Rule Configuration</translation>
+    </message>
+    <message>
+        <location filename="../../source/views/messages.py" line="179"/>
+        <source>Conditions (Triggers)</source>
+        <translation>Conditions (Triggers)</translation>
+    </message>
+    <message>
+        <location filename="../../source/views/messages.py" line="183"/>
+        <source>Action:</source>
+        <translation>Action:</translation>
+    </message>
+    <message>
+        <location filename="../../source/views/messages.py" line="187"/>
+        <source>Punishment:</source>
+        <translation>Punishment:</translation>
+    </message>
+    <message>
+        <location filename="../../source/views/messages.py" line="191"/>
+        <source>Reply Scope:</source>
+        <translation>Reply Scope:</translation>
+    </message>
+    <message>
+        <location filename="../../source/views/messages.py" line="194"/>
         <source>Group</source>
         <translation>Group</translation>
     </message>
     <message>
-        <location filename="../../source/views/messages.py" line="169"/>
+        <location filename="../../source/views/messages.py" line="195"/>
         <source>Private</source>
         <translation>Private</translation>
     </message>
     <message>
-        <location filename="../../source/views/messages.py" line="170"/>
+        <location filename="../../source/views/messages.py" line="196"/>
         <source>Same Channel</source>
         <translation>Same Channel</translation>
     </message>
     <message>
-        <location filename="../../source/views/messages.py" line="171"/>
+        <location filename="../../source/views/messages.py" line="197"/>
         <source>Both</source>
         <translation>Both</translation>
     </message>
     <message>
-        <location filename="../../source/views/messages.py" line="177"/>
-        <source>Where react</source>
-        <translation>Where react</translation>
+        <location filename="../../source/views/messages.py" line="203"/>
+        <source>React Target:</source>
+        <translation>React Target:</translation>
     </message>
     <message>
-        <location filename="../../source/views/messages.py" line="179"/>
+        <location filename="../../source/views/messages.py" line="207"/>
+        <source>Execution Delay:</source>
+        <translation>Execution Delay:</translation>
+    </message>
+    <message>
+        <location filename="../../source/views/messages.py" line="210"/>
+        <source>Cancel</source>
+        <translation>Cancel</translation>
+    </message>
+    <message>
+        <location filename="../../source/views/messages.py" line="213"/>
+        <source> s</source>
+        <comment>Unit: Seconds</comment>
+        <translation> s</translation>
+    </message>
+    <message>
+        <location filename="../../source/views/messages.py" line="204"/>
         <source>Author</source>
         <translation>Author</translation>
     </message>
     <message>
-        <location filename="../../source/views/messages.py" line="179"/>
+        <location filename="../../source/views/messages.py" line="204"/>
         <source>Bot</source>
         <translation>Bot</translation>
     </message>
     <message>
-        <location filename="../../source/views/messages.py" line="182"/>
-        <source>Delay</source>
-        <translation>Delay</translation>
-    </message>
-    <message>
-        <location filename="../../source/views/messages.py" line="183"/>
+        <location filename="../../source/views/messages.py" line="211"/>
         <source>Confirm</source>
         <translation>Confirm</translation>
     </message>
