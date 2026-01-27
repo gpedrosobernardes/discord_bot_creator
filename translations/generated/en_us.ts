@@ -289,14 +289,24 @@
 <context>
     <name>CreditsView</name>
     <message>
-        <location filename="../../source/views/credits.py" line="23"/>
+        <location filename="../../source/views/credits.py" line="61"/>
         <source>Credits</source>
         <translation>Credits</translation>
     </message>
     <message>
-        <location filename="../../source/views/credits.py" line="25"/>
+        <location filename="../../source/views/credits.py" line="64"/>
         <source>Developed by: {name}</source>
         <translation>Developed by: {name}</translation>
+    </message>
+    <message>
+        <location filename="../../source/views/credits.py" line="66"/>
+        <source>About</source>
+        <translation>About</translation>
+    </message>
+    <message>
+        <location filename="../../source/views/credits.py" line="67"/>
+        <source>Third Party Licenses</source>
+        <translation>Third Party Licenses</translation>
     </message>
 </context>
 <context>
