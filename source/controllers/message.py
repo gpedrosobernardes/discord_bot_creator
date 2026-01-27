@@ -15,9 +15,9 @@ from qextrawidgets import QEmojiPicker
 from qextrawidgets.emoji_utils import EmojiImageProvider
 
 from source.controllers.base import BaseController
-from source.core.constants import StrField, IntField, StrComparator, IntComparator
+from source.core.constants import StrField, IntField, BoolField, StrComparator, IntComparator, BoolComparator
 from source.core.database import DatabaseController
-from source.views.messages import MessageView
+from source.views.message import MessageView
 
 
 class MessageWindowContext(IntEnum):
@@ -54,6 +54,7 @@ class MessageController(BaseController[MessageView]):
         # Helper Models
         self._str_comparator_model = QStandardItemModel()
         self._int_comparator_model = QStandardItemModel()
+        self._bool_comparator_model = QStandardItemModel()
 
         # View
         self.emoji_picker = emoji_picker
@@ -236,6 +237,10 @@ class MessageController(BaseController[MessageView]):
             self.view.listbox_conditions.add_field_item(
                 QCoreApplication.translate("IntField", field.value), field.value
             )
+        for field in BoolField:
+            self.view.listbox_conditions.add_field_item(
+                QCoreApplication.translate("BoolField", field.value), field.value
+            )
 
     def _populate_comparator_models(self):
         self._str_comparator_model.clear()
@@ -253,6 +258,14 @@ class MessageController(BaseController[MessageView]):
             )
             item.setData(comparator.value, Qt.ItemDataRole.UserRole)
             self._int_comparator_model.appendRow(item)
+
+        self._bool_comparator_model.clear()
+        for comparator in BoolComparator:
+            item = QStandardItem(
+                QCoreApplication.translate("BoolComparator", comparator.value)
+            )
+            item.setData(comparator.value, Qt.ItemDataRole.UserRole)
+            self._bool_comparator_model.appendRow(item)
 
     # --- Generic Helpers ---
 
@@ -463,11 +476,19 @@ class MessageController(BaseController[MessageView]):
                 self._str_comparator_model
             )
             self.view.listbox_conditions.set_case_insensitive_disabled(False)
-        else:
+            self.view.listbox_conditions.set_value_input_mode(is_boolean=False)
+        elif field in [f.value for f in IntField]:
             self.view.listbox_conditions.set_comparator_model(
                 self._int_comparator_model
             )
             self.view.listbox_conditions.set_case_insensitive_disabled(True)
+            self.view.listbox_conditions.set_value_input_mode(is_boolean=False)
+        elif field in [f.value for f in BoolField]:
+            self.view.listbox_conditions.set_comparator_model(
+                self._bool_comparator_model
+            )
+            self.view.listbox_conditions.set_case_insensitive_disabled(True)
+            self.view.listbox_conditions.set_value_input_mode(is_boolean=True)
 
     def _show_conditions_menu(self, position: QPoint):
         table_view = self.view.listbox_conditions.table_view()

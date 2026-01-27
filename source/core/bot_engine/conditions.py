@@ -8,7 +8,7 @@ import emoji_data_python
 from PySide6.QtCore import QCoreApplication
 from PySide6.QtSql import QSqlRecord
 
-from source.core.constants import StrField, IntField, StrComparator, IntComparator
+from source.core.constants import StrField, IntField, BoolField, StrComparator, IntComparator, BoolComparator
 
 logger = logging.getLogger(__name__)
 
@@ -42,7 +42,7 @@ class MessageConditionValidator:
 
         # 1. Data Extraction Strategies
         self._field_extractors: Dict[
-            str, Callable[[discord.Message], Union[str, int]]
+            str, Callable[[discord.Message], Union[str, int, bool]]
         ] = {
             StrField.MESSAGE.value: lambda m: str(m.clean_content),
             StrField.AUTHOR_NAME.value: lambda m: m.author.name,
@@ -52,8 +52,8 @@ class MessageConditionValidator:
                 [u for u in m.mentions if u.bot]
             ),
             IntField.MENTIONS.value: lambda m: len(m.mentions),
-            IntField.BOT_AUTHOR.value: lambda m: int(m.author.bot),
             IntField.EMOJIS.value: lambda m: len(self.emoji_regex.findall(m.content)),
+            BoolField.BOT_AUTHOR.value: lambda m: m.author.bot,
         }
 
         # 2. Integer Operators
@@ -72,6 +72,11 @@ class MessageConditionValidator:
             StrComparator.CONTAINS.value: operator.contains,
             StrComparator.STARTS_WITH.value: str.startswith,
             StrComparator.ENDS_WITH.value: str.endswith,
+        }
+
+        # 4. Boolean Operators
+        self._bool_operators: Dict[str, Callable[[bool, bool], bool]] = {
+            BoolComparator.EQUAL_TO.value: operator.eq,
         }
 
     def is_valid_all(self) -> bool:
@@ -105,7 +110,9 @@ class MessageConditionValidator:
         # Extract value from message (e.g., channel name, emoji count)
         message_value = extractor(self.message)
 
-        if isinstance(message_value, int):
+        if isinstance(message_value, bool):
+            result = self._validate_bool(condition, message_value)
+        elif isinstance(message_value, int):
             result = self._validate_int(condition, message_value)
         else:
             result = self._validate_str(condition, str(message_value))
@@ -135,6 +142,38 @@ class MessageConditionValidator:
         op_func = self._int_operators.get(comparator)
         if not op_func:
             raise ValueError(f"Invalid integer comparator: {comparator}")
+
+        result = op_func(msg_value, target_value)
+        self._log_validation(condition, msg_value, target_value, result)
+        return result
+
+    def _validate_bool(self, condition: QSqlRecord, msg_value: bool) -> bool:
+        """
+        Validate a boolean field.
+
+        Args:
+            condition: The condition record.
+            msg_value: The boolean value extracted from the message.
+
+        Returns:
+            True if valid, False otherwise.
+
+        Raises:
+            ValueError: If the boolean comparator is invalid.
+        """
+        # The value stored in DB for boolean is usually "1" or "0" or "true"/"false" string
+        # Assuming the UI saves it as "1" or "0" or "True"/"False"
+        raw_value = condition.value("value")
+        if isinstance(raw_value, str):
+            target_value = raw_value.lower() in ("true", "1", "yes")
+        else:
+            target_value = bool(raw_value)
+
+        comparator = condition.value("comparator")
+
+        op_func = self._bool_operators.get(comparator)
+        if not op_func:
+            raise ValueError(f"Invalid boolean comparator: {comparator}")
 
         result = op_func(msg_value, target_value)
         self._log_validation(condition, msg_value, target_value, result)
@@ -189,8 +228,8 @@ class MessageConditionValidator:
     def _log_validation(
         self,
         condition: QSqlRecord,
-        msg_value: Union[str, int],
-        target_value: Union[str, int],
+        msg_value: Union[str, int, bool],
+        target_value: Union[str, int, bool],
         result: bool,
         case_insensitive: bool = False,
     ) -> None:
@@ -212,11 +251,17 @@ class MessageConditionValidator:
         # 1. Translate dynamic components individually
         # This ensures "Author Name" becomes "Nome do Autor", etc.
         field_trans = QCoreApplication.translate("StrField", field)
+        if field_trans == field:
+             field_trans = QCoreApplication.translate("IntField", field)
+        if field_trans == field:
+             field_trans = QCoreApplication.translate("BoolField", field)
 
         comp_trans = QCoreApplication.translate("StrComparator", comparator)
         # Fallback to IntComparator if translation doesn't change (means not found in StrComparator)
         if comp_trans == comparator:
             comp_trans = QCoreApplication.translate("IntComparator", comparator)
+        if comp_trans == comparator:
+            comp_trans = QCoreApplication.translate("BoolComparator", comparator)
 
         # 2. Prepare Case Insensitive tag
         # It also needs to be translatable in isolation

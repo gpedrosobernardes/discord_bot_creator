@@ -14,7 +14,7 @@ from PySide6.QtWidgets import (
 )
 from qextrawidgets.icons import QThemeResponsiveIcon
 
-from source.core.constants import StrField, IntField, StrComparator, IntComparator
+from source.core.constants import StrField, IntField, BoolField, StrComparator, IntComparator, BoolComparator
 from source.qt.delegates.boolean import BooleanDelegate
 from source.qt.delegates.translation import TranslationDelegate
 
@@ -56,6 +56,9 @@ class QConditionForm(QWidget):
         self._case_insensitive_tool_button.setIconSize(icon_size)
 
         self._value_line_edit = QLineEdit()
+        self._value_combobox = QComboBox()
+        self._value_combobox.setVisible(False)
+        self._value_combobox.addItems(["True", "False"])
 
         self._add_button = QToolButton()
         self._add_button.setIcon(QThemeResponsiveIcon.fromAwesome("fa6s.arrow-right"))
@@ -78,6 +81,7 @@ class QConditionForm(QWidget):
         fields_layout.addWidget(self._comparator_combobox, stretch=1)
         fields_layout.addWidget(self._case_insensitive_tool_button)
         fields_layout.addWidget(self._value_line_edit, stretch=1)
+        fields_layout.addWidget(self._value_combobox, stretch=1)
         fields_layout.addWidget(self._add_button)
 
         main_layout = QVBoxLayout()
@@ -94,6 +98,8 @@ class QConditionForm(QWidget):
     def translate_ui(self):
         self._reverse_comparator_tool_button.setToolTip(self.tr("Reverse comparator"))
         self._case_insensitive_tool_button.setToolTip(self.tr("Case insensitive"))
+        self._value_combobox.setItemText(0, self.tr("True"))
+        self._value_combobox.setItemText(1, self.tr("False"))
 
     def set_field_model(self, model):
         self._field_combobox.setModel(model)
@@ -121,14 +127,14 @@ class QConditionForm(QWidget):
 
             # Translation delegates
             self._field_delegate = TranslationDelegate(
-                self._table_view, [StrField, IntField]
+                self._table_view, [StrField, IntField, BoolField]
             )
             self._table_view.setItemDelegateForColumn(
                 model.fieldIndex("field"), self._field_delegate
             )
 
             self._comparator_delegate = TranslationDelegate(
-                self._table_view, [StrComparator, IntComparator]
+                self._table_view, [StrComparator, IntComparator, BoolComparator]
             )
             self._table_view.setItemDelegateForColumn(
                 model.fieldIndex("comparator"), self._comparator_delegate
@@ -150,6 +156,14 @@ class QConditionForm(QWidget):
         return self._comparator_combobox.currentData()
 
     def get_value_data(self):
+        if self._value_combobox.isVisible():
+            # Return "1" for True and "0" for False to be consistent with DB storage if needed,
+            # or just the string "True"/"False" if the validator handles it.
+            # The validator handles "True"/"False" strings.
+            # But let's check what the combobox has.
+            # It has "True" and "False" items.
+            # Let's return "True" or "False" string.
+            return "True" if self._value_combobox.currentIndex() == 0 else "False"
         return self._value_line_edit.text()
 
     def get_case_insensitive_data(self):
@@ -165,6 +179,7 @@ class QConditionForm(QWidget):
         self._field_combobox.setCurrentIndex(0)
         self._comparator_combobox.setCurrentIndex(0)
         self._value_line_edit.clear()
+        self._value_combobox.setCurrentIndex(0)
         self._case_insensitive_tool_button.setChecked(False)
         self._reverse_comparator_tool_button.setChecked(False)
 
@@ -182,3 +197,11 @@ class QConditionForm(QWidget):
 
     def select_all(self):
         self._table_view.selectAll()
+
+    def set_value_input_mode(self, is_boolean: bool):
+        if is_boolean:
+            self._value_line_edit.setVisible(False)
+            self._value_combobox.setVisible(True)
+        else:
+            self._value_line_edit.setVisible(True)
+            self._value_combobox.setVisible(False)

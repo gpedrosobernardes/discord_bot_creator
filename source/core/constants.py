@@ -44,8 +44,11 @@ class StrField(Enum):
 class IntField(Enum):
     MENTIONS_TO_BOT = QT_TRANSLATE_NOOP("IntField", "Mentions to bot")
     MENTIONS = QT_TRANSLATE_NOOP("IntField", "Mentions")
-    BOT_AUTHOR = QT_TRANSLATE_NOOP("IntField", "Bot author")
     EMOJIS = QT_TRANSLATE_NOOP("IntField", "Emojis")
+
+
+class BoolField(Enum):
+    BOT_AUTHOR = QT_TRANSLATE_NOOP("BoolField", "Bot author")
 
 
 class StrComparator(Enum):
@@ -62,3 +65,7 @@ class IntComparator(Enum):
     LESS_THAN = QT_TRANSLATE_NOOP("IntComparator", "Less than")
     GREATER_OR_EQUAL_TO = QT_TRANSLATE_NOOP("IntComparator", "Greater or equal to")
     LESS_OR_EQUAL_TO = QT_TRANSLATE_NOOP("IntComparator", "Less or equal to")
+
+
+class BoolComparator(Enum):
+    EQUAL_TO = QT_TRANSLATE_NOOP("BoolComparator", "Equal to")
