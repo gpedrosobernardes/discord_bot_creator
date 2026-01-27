@@ -24,6 +24,8 @@ class InviteDialog(QDialog):
         self.client_id_edit = QLineEdit()
         self.client_id_edit.setPlaceholderText(self.tr("Client ID (Application ID)"))
 
+        self.open_browser_check = QCheckBox(self.tr("Open in browser"))
+
         self.select_all_btn = QPushButton(self.tr("Select All"))
         self.deselect_all_btn = QPushButton(self.tr("Deselect All"))
 
@@ -112,6 +114,7 @@ class InviteDialog(QDialog):
         scroll.setWidget(scroll_content)
 
         layout.addWidget(scroll)
+        layout.addWidget(self.open_browser_check)
         layout.addWidget(self.button_box)
 
     def _init_connections(self):
@@ -140,3 +143,6 @@ class InviteDialog(QDialog):
 
     def set_client_id(self, client_id: str):
         self.client_id_edit.setText(client_id)
+
+    def should_open_browser(self) -> bool:
+        return self.open_browser_check.isChecked()

@@ -944,6 +944,7 @@ class MainController(BaseController[MainView]):
 
             client_id = int(client_id_str)
             permissions = dialog.get_permissions()
+            open_in_browser = dialog.should_open_browser()
 
             try:
                 invite_url = utils.oauth_url(
@@ -954,6 +955,9 @@ class MainController(BaseController[MainView]):
 
                 clipboard = QGuiApplication.clipboard()
                 clipboard.setText(invite_url)
+
+                if open_in_browser:
+                    webbrowser.open(invite_url)
 
                 QMessageBox.information(
                     self.view,
