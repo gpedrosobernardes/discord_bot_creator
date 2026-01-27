@@ -1,5 +1,5 @@
 from PySide6.QtCore import Qt
-from PySide6.QtGui import QIcon
+from PySide6.QtGui import QIcon, QPalette
 from PySide6.QtWidgets import (
     QDialog,
     QHBoxLayout,
@@ -10,9 +10,10 @@ from PySide6.QtWidgets import (
     QComboBox,
     QPlainTextEdit,
     QCompleter,
+    QVBoxLayout,
+    QGroupBox,
+    QPushButton,  # Importado QPushButton
 )
-from qextrawidgets import QColorButton
-from qextrawidgets.icons import QThemeResponsiveIcon
 
 
 class GroupView(QDialog):
@@ -28,77 +29,104 @@ class GroupView(QDialog):
         self.translate_ui()
 
     def _init_ui(self):
-        self.welcome_message_label = QLabel()
+        # --- Welcome Section Widgets ---
         self.welcome_message_channel_label = QLabel()
         self.welcome_message_message_label = QLabel()
 
+        self.welcome_info_label = QLabel()
+        self._style_info_label(self.welcome_info_label)
+
         self.welcome_message_channels = QComboBox()
         self.welcome_message_channels.setEditable(True)
-        completer = self.welcome_message_channels.completer()
-        completer.setCaseSensitivity(Qt.CaseSensitivity.CaseInsensitive)
-        completer.setFilterMode(Qt.MatchFlag.MatchContains)
-        completer.setCompletionMode(QCompleter.CompletionMode.PopupCompletion)
+        self._setup_completer(self.welcome_message_channels)
 
         self.welcome_message_textedit = QPlainTextEdit()
-        self.welcome_message_textedit.setMaximumHeight(300)
+        self.welcome_message_textedit.setMaximumHeight(200)
 
-        self.goodbye_message_label = QLabel()
+        # --- Goodbye Section Widgets ---
         self.goodbye_message_channel_label = QLabel()
         self.goodbye_message_message_label = QLabel()
 
+        self.goodbye_info_label = QLabel()
+        self._style_info_label(self.goodbye_info_label)
+
         self.goodbye_message_channels = QComboBox()
         self.goodbye_message_channels.setEditable(True)
-        completer = self.goodbye_message_channels.completer()
+        self._setup_completer(self.goodbye_message_channels)
+
+        self.goodbye_message_textedit = QPlainTextEdit()
+        self.goodbye_message_textedit.setMaximumHeight(200)
+
+        # --- Footer Buttons (Alterado) ---
+        # Botões simples sem ícones
+        self.confirm_button = QPushButton()
+        self.cancel_button = QPushButton()
+
+    def _setup_completer(self, combobox: QComboBox):
+        completer = combobox.completer()
         completer.setCaseSensitivity(Qt.CaseSensitivity.CaseInsensitive)
         completer.setFilterMode(Qt.MatchFlag.MatchContains)
         completer.setCompletionMode(QCompleter.CompletionMode.PopupCompletion)
 
-        self.goodbye_message_textedit = QPlainTextEdit()
-        self.goodbye_message_textedit.setMaximumHeight(300)
-
-        self.save_button = QColorButton("#3DCC61")
-        self.save_button.setIcon(QThemeResponsiveIcon.fromAwesome("fa6s.floppy-disk"))
+    def _style_info_label(self, label: QLabel):
+        palette = label.palette()
+        color = palette.color(QPalette.ColorRole.PlaceholderText)
+        label.setStyleSheet(f"color: {color.name()}; font-size: 11px; margin-top: 2px;")
 
     def _init_layout(self):
-        main_layout = QFormLayout()
-        main_layout.addRow(self.welcome_message_label)
+        main_layout = QVBoxLayout()
 
-        main_layout.addRow(
-            self.welcome_message_channel_label, self.welcome_message_channels
-        )
-        main_layout.addRow(
-            self.welcome_message_message_label, self.welcome_message_textedit
-        )
+        # --- Grupo 1: Boas-vindas ---
+        self.welcome_group = QGroupBox()
+        welcome_layout = QFormLayout()
+        welcome_layout.addRow(self.welcome_message_channel_label, self.welcome_message_channels)
+        welcome_layout.addRow(self.welcome_message_message_label, self.welcome_message_textedit)
+        welcome_layout.addRow("", self.welcome_info_label)
+        self.welcome_group.setLayout(welcome_layout)
 
-        main_layout.addRow(self.goodbye_message_label)
+        main_layout.addWidget(self.welcome_group)
 
-        main_layout.addRow(
-            self.goodbye_message_channel_label, self.goodbye_message_channels
-        )
-        main_layout.addRow(
-            self.goodbye_message_message_label, self.goodbye_message_textedit
-        )
+        # --- Grupo 2: Despedida ---
+        self.goodbye_group = QGroupBox()
+        goodbye_layout = QFormLayout()
+        goodbye_layout.addRow(self.goodbye_message_channel_label, self.goodbye_message_channels)
+        goodbye_layout.addRow(self.goodbye_message_message_label, self.goodbye_message_textedit)
+        goodbye_layout.addRow("", self.goodbye_info_label)
+        self.goodbye_group.setLayout(goodbye_layout)
 
+        main_layout.addWidget(self.goodbye_group)
+
+        # Spacer
         main_layout.addItem(
-            QSpacerItem(
-                0, 0, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding
-            )
+            QSpacerItem(0, 0, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         )
+
+        # --- Layout dos Botões ---
         buttons_layout = QHBoxLayout()
-        buttons_layout.addWidget(
-            self.save_button, alignment=Qt.AlignmentFlag.AlignRight
-        )
-        main_layout.addItem(buttons_layout)
+        buttons_layout.addStretch() # Empurra os botões para a direita
+        buttons_layout.addWidget(self.cancel_button)  # Cancelar geralmente vem antes (ou à esquerda)
+        buttons_layout.addWidget(self.confirm_button) # Confirmar como ação principal à direita
+
+        main_layout.addLayout(buttons_layout)
         self.setLayout(main_layout)
 
     def translate_ui(self):
-        self.setWindowTitle(self.tr("Group Configuration"))
-        self.welcome_message_label.setText(self.tr("Welcome message:"))
-        self.welcome_message_channel_label.setText(self.tr("Channel:"))
-        self.welcome_message_message_label.setText(self.tr("Message:"))
+        self.setWindowTitle(self.tr("Group Configuration", "GroupView"))
 
-        self.goodbye_message_label.setText(self.tr("Goodbye message:"))
-        self.goodbye_message_channel_label.setText(self.tr("Channel:"))
-        self.goodbye_message_message_label.setText(self.tr("Message:"))
+        self.welcome_group.setTitle(self.tr("Welcome Settings", "GroupView"))
+        self.welcome_message_channel_label.setText(self.tr("Channel:", "GroupView"))
+        self.welcome_message_message_label.setText(self.tr("Message:", "GroupView"))
+        self.welcome_info_label.setText(
+            self.tr("Tip: You can use {member} to mention the user.", "GroupView")
+        )
 
-        self.save_button.setText(self.tr("Confirm and save"))
+        self.goodbye_group.setTitle(self.tr("Goodbye Settings", "GroupView"))
+        self.goodbye_message_channel_label.setText(self.tr("Channel:", "GroupView"))
+        self.goodbye_message_message_label.setText(self.tr("Message:", "GroupView"))
+        self.goodbye_info_label.setText(
+            self.tr("Tip: You can use {member} to mention the user.", "GroupView")
+        )
+
+        # Texto dos novos botões
+        self.confirm_button.setText(self.tr("Confirm", "GroupView"))
+        self.cancel_button.setText(self.tr("Cancel", "GroupView"))

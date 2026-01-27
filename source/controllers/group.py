@@ -49,7 +49,7 @@ class GroupController(BaseController[GroupView]):
         )
 
     def _init_connections(self):
-        self.view.save_button.clicked.connect(self.save)
+        self.view.confirm_button.clicked.connect(self.save)
 
     def _populate_channels(self):
         """Popula os comboboxes com os canais de texto e voz do grupo."""
@@ -120,14 +120,22 @@ class GroupController(BaseController[GroupView]):
         welcome_channel_id = self.view.welcome_message_channels.currentData()
         goodbye_channel_id = self.view.goodbye_message_channels.currentData()
 
-        # Atualizar o registro atual no modelo
-        # Como o mapper está no índice 0 (pois filtramos por ID), pegamos o record 0
-        if self.model.rowCount() > 0:
+        if self.model.rowCount() == 0:
+            record = self.model.record()
+            record.setValue("id", self.group_id)
+            record.setValue("welcome_message_channel", welcome_channel_id)
+            record.setValue("goodbye_message_channel", goodbye_channel_id)
+            record.setValue("welcome_message", self.view.welcome_message_textedit.toPlainText())
+            record.setValue("goodbye_message", self.view.goodbye_message_textedit.toPlainText())
+            self.model.insertRecord(-1, record)
+        else:
+            # Atualizar o registro atual no modelo
+            # Como o mapper está no índice 0 (pois filtramos por ID), pegamos o record 0
             record = self.model.record(0)
             record.setValue("welcome_message_channel", welcome_channel_id)
             record.setValue("goodbye_message_channel", goodbye_channel_id)
             self.model.setRecord(0, record)
+            self.mapper.submit()
 
-        self.mapper.submit()
         self.model.submitAll()
         self.view.accept()
