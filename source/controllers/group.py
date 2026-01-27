@@ -1,25 +1,32 @@
-import typing
-
-from PySide6.QtCore import QCoreApplication, Slot, Qt
+from PySide6.QtCore import Slot, Qt
 from PySide6.QtGui import QStandardItemModel, QStandardItem
-from PySide6.QtWidgets import QDataWidgetMapper
-from discord import Guild, TextChannel, VoiceChannel
+from PySide6.QtWidgets import QDataWidgetMapper, QMessageBox
 
 from source.controllers.base import BaseController
 from source.core.database import DatabaseController
-from source.views.group import GroupView
+from source.core.discord_api import DiscordAPIClient  # Importar cliente API
 from source.qt.items.text_channel_item import TextChannelItem
 from source.qt.items.voice_channel_item import VoiceChannelItem
+from source.views.group import GroupView
 
-translate = QCoreApplication.translate
 
+# Remover imports do discord.py (Guild, TextChannel, etc)
 
 class GroupController(BaseController[GroupView]):
-    def __init__(self, database: DatabaseController, discord_group: Guild):
+    # ALTERADO: Assinatura do __init__ recebe ID, Nome e Token
+    def __init__(self, database: DatabaseController, group_id: int, group_name: str, token: str):
         super().__init__(GroupView())
         self.database = database
-        self.group_id: typing.Optional[int] = None
-        self.discord_group: Guild = discord_group
+        self.group_id = group_id
+        self.group_name = group_name
+
+        self.view.setWindowTitle(f"Configuring: {group_name}")
+
+        # Configurar API Client localmente para este controller
+        self.discord_api = DiscordAPIClient(self)
+        self.discord_api.set_token(token)
+        self.discord_api.channels_received.connect(self._on_channels_received)
+        self.discord_api.request_failed.connect(self._on_api_error)
 
         self.model = self.database.get_groups_model()
         self.welcome_channels_model = QStandardItemModel()
@@ -30,62 +37,83 @@ class GroupController(BaseController[GroupView]):
 
         self._init_mapper()
         self._init_connections()
-        self._populate_channels()
+
+        # Iniciar busca dos canais
+        self.view.welcome_message_channels.setPlaceholderText("Loading channels...")
+        self.discord_api.fetch_channels(str(self.group_id))
 
     def _init_mapper(self):
+        # ... (código igual ao original) ...
         self.mapper = QDataWidgetMapper()
         self.mapper.setModel(self.model)
         self.mapper.setSubmitPolicy(QDataWidgetMapper.SubmitPolicy.ManualSubmit)
-
-        self.mapper.addMapping(
-            self.view.welcome_message_textedit,
-            self.model.fieldIndex("welcome_message"),
-            b"plainText",
-        )
-        self.mapper.addMapping(
-            self.view.goodbye_message_textedit,
-            self.model.fieldIndex("goodbye_message"),
-            b"plainText",
-        )
+        self.mapper.addMapping(self.view.welcome_message_textedit, self.model.fieldIndex("welcome_message"), b"plainText")
+        self.mapper.addMapping(self.view.goodbye_message_textedit, self.model.fieldIndex("goodbye_message"), b"plainText")
 
     def _init_connections(self):
         self.view.confirm_button.clicked.connect(self.save)
+        self.view.cancel_button.clicked.connect(self.view.close) # Botão cancelar funciona agora
 
-    def _populate_channels(self):
-        """Popula os comboboxes com os canais de texto e voz do grupo."""
-        if not self.discord_group:
-            return
+    @Slot(str)
+    def _on_api_error(self, error_msg: str):
+        QMessageBox.warning(self.view, "Error fetching channels", error_msg)
 
-        channels = []
-        for channel in self.discord_group.channels:
-            if isinstance(channel, (TextChannel, VoiceChannel)):
-                channels.append(channel)
+    @Slot(list)
+    def _on_channels_received(self, channels_data: list):
+        """Processa o JSON de canais recebido da API."""
+        # Tipos de canais (Discord API): 0 = Texto, 2 = Voz, 4 = Categoria, etc.
+        text_channels = []
+        voice_channels = []
 
-        # Ordenar por nome
-        channels.sort(key=lambda x: x.name)
+        for ch in channels_data:
+            ch_type = ch.get("type")
+            ch_name = ch.get("name", "Unknown")
+            ch_id = int(ch.get("id"))
 
+            if ch_type == 0: # GUILD_TEXT
+                text_channels.append((ch_name, ch_id))
+            elif ch_type == 2: # GUILD_VOICE
+                voice_channels.append((ch_name, ch_id))
+
+        # Ordenar
+        text_channels.sort(key=lambda x: x[0])
+        voice_channels.sort(key=lambda x: x[0])
+
+        self._populate_models(text_channels, voice_channels)
+
+        # Após popular, inicializa os dados do banco
+        self.set_group(self.group_id)
+
+    def _populate_models(self, text_channels, voice_channels):
         self.welcome_channels_model.clear()
         self.goodbye_channels_model.clear()
 
-        # Adicionar opção padrão/vazia
-        empty_item_welcome = QStandardItem(self.tr("Select a channel"))
-        empty_item_welcome.setData(None, Qt.ItemDataRole.UserRole)
-        self.welcome_channels_model.appendRow(empty_item_welcome)
+        # Itens padrão
+        for model in [self.welcome_channels_model, self.goodbye_channels_model]:
+            empty = QStandardItem(self.tr("Select a channel"))
+            empty.setData(None, Qt.ItemDataRole.UserRole)
+            model.appendRow(empty)
 
-        empty_item_goodbye = QStandardItem(self.tr("Select a channel"))
-        empty_item_goodbye.setData(None, Qt.ItemDataRole.UserRole)
-        self.goodbye_channels_model.appendRow(empty_item_goodbye)
+        # Adicionar canais de texto
+        for name, cid in text_channels:
+            # Você pode criar um item simples ou reutilizar suas classes de Item se ajustar o __init__ delas
+            item = TextChannelItem(name, cid)
+            # item.setIcon(QIcon("assets/icons/hashtag.svg")) # Exemplo se tiver ícone
+            self.welcome_channels_model.appendRow(item)
 
-        for channel in channels:
-            if isinstance(channel, TextChannel):
-                self.welcome_channels_model.appendRow(TextChannelItem(channel))
-                self.goodbye_channels_model.appendRow(TextChannelItem(channel))
-            elif isinstance(channel, VoiceChannel):
-                self.welcome_channels_model.appendRow(VoiceChannelItem(channel))
-                self.goodbye_channels_model.appendRow(VoiceChannelItem(channel))
+            item_copy = item.clone()
+            self.goodbye_channels_model.appendRow(item_copy)
+
+        # Adicionar canais de voz (se desejar permitir mensagens lá, o que é raro para texto, mas possível)
+        for name, cid in voice_channels:
+            item = VoiceChannelItem(name, cid)
+            self.welcome_channels_model.appendRow(item)
+
+            item_copy = item.clone()
+            self.goodbye_channels_model.appendRow(item_copy)
 
     def set_group(self, group_id: int):
-        self.group_id = group_id
+        # ... (código igual, apenas lógica de banco de dados) ...
         self.model.setFilter(f"id = {group_id}")
         self.model.select()
 
@@ -99,9 +127,10 @@ class GroupController(BaseController[GroupView]):
         self._load_channels_selection()
 
     def _load_channels_selection(self):
-        """Carrega a seleção correta nos comboboxes baseado nos dados do modelo."""
+        # ... (código igual) ...
         record = self.model.record(self.mapper.currentIndex())
 
+        # Lógica idêntica, apenas certifique-se que o findData funciona com Inteiros
         welcome_channel_id = record.value("welcome_message_channel")
         if welcome_channel_id:
             index = self.view.welcome_message_channels.findData(welcome_channel_id)
@@ -116,7 +145,7 @@ class GroupController(BaseController[GroupView]):
 
     @Slot()
     def save(self):
-        # Salvar manualmente os IDs dos canais no modelo antes de submeter
+        # ... (código igual) ...
         welcome_channel_id = self.view.welcome_message_channels.currentData()
         goodbye_channel_id = self.view.goodbye_message_channels.currentData()
 
@@ -129,8 +158,6 @@ class GroupController(BaseController[GroupView]):
             record.setValue("goodbye_message", self.view.goodbye_message_textedit.toPlainText())
             self.model.insertRecord(-1, record)
         else:
-            # Atualizar o registro atual no modelo
-            # Como o mapper está no índice 0 (pois filtramos por ID), pegamos o record 0
             record = self.model.record(0)
             record.setValue("welcome_message_channel", welcome_channel_id)
             record.setValue("goodbye_message_channel", goodbye_channel_id)

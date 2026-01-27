@@ -35,7 +35,7 @@ from source.controllers.manager import ControllerManager
 from source.controllers.message import MessageController
 from source.core.bot_engine.bot_thread import QBotThread
 from source.core.database import DatabaseController
-from source.core.discord_api import BotIdentityFetcher
+from source.core.discord_api import DiscordAPIClient
 from source.core.log_handler import LogHandler
 from source.qt.helpers.pixmap import PixmapHelper
 from source.qt.validators.token_validator import TokenValidator
@@ -92,7 +92,7 @@ class MainController(BaseController[MainView]):
         self.groups_model = QStandardItemModel()
         self.bot_thread = QBotThread()
         self.emoji_picker = self._create_emoji_picker()
-        self._bot_info_fetcher = BotIdentityFetcher(self)
+        self.discord_api = DiscordAPIClient(self)
         self._current_bot_id = None
 
 
@@ -152,7 +152,7 @@ class MainController(BaseController[MainView]):
         self.view.search_messages_line_edit.textChanged.connect(
             self.messages_proxy_model.setFilterFixedString
         )
-        self.view.token_line_edit.editingFinished.connect(self.on_token_changed)
+        self.view.token_line_edit.textChanged.connect(self.on_token_changed)
         self.view.switch_bot_button.clicked.connect(self.on_switch_bot_clicked)
 
         # Groups List Context Menu
@@ -184,9 +184,13 @@ class MainController(BaseController[MainView]):
         # Log Handler Connections
         self.log_handler.signaler.log.connect(self.view.logs_text_edit.add_log)
 
-        # Bot Info Fetcher Connections
-        self._bot_info_fetcher.info_received.connect(self._on_bot_info_fetched)
-        self._bot_info_fetcher.failed.connect(self.view.reset_bot_info)
+        # ALTERADO: Novas conexões da API
+        self.discord_api.bot_identity_received.connect(self._on_bot_info_fetched)
+        self.discord_api.guilds_received.connect(self._on_guilds_received)  # Nova conexão
+        self.discord_api.guild_icon_received.connect(self._on_guild_icon_received)
+
+        # Remover a conexão antiga de falha se não existir mais na nova classe ou adaptar
+        self.discord_api.request_failed.connect(lambda e: print(f"API Error: {e}"))
 
         # Emoji Picker Connections
         emoji_model = self.emoji_picker.model()
@@ -412,11 +416,6 @@ class MainController(BaseController[MainView]):
         self._refresh_models()
         self.view.setWindowTitle(f"Discord Bot Creator - {project_name}")
         self.bot_thread.set_database_name(project_name)
-        
-        # Try to load bot info if token exists
-        token = self.user_settings.value("token")
-        if token:
-            self._bot_info_fetcher.fetch(token)
             
         self.switch_project.emit()
 
@@ -665,7 +664,11 @@ class MainController(BaseController[MainView]):
         if self.view.token_line_edit.hasAcceptableInput():
             token = self.view.token_line_edit.text()
             self.user_settings.setValue("token", token)
-            self._bot_info_fetcher.fetch(token)
+
+            # ALTERADO: Configura token e busca dados iniciais
+            self.discord_api.set_token(token)
+            self.discord_api.fetch_bot_identity()
+            self.discord_api.fetch_guilds()  # Busca grupos imediatamente!
 
     @Slot(str, str, QByteArray)
     def _on_bot_info_fetched(self, username: str, user_id: str, avatar_bytes: QByteArray):
@@ -878,31 +881,21 @@ class MainController(BaseController[MainView]):
 
         item = self.groups_model.itemFromIndex(index)
         group_id = item.data(Qt.ItemDataRole.UserRole)
+        group_name = item.text()  # Pegamos o nome para passar ao controller
 
-        # Check if already open
         if self.group_controllers.get(group_id):
             self.group_controllers.activate(group_id)
             return
 
-        # Retrieve the discord.Guild object
-        guilds = self.bot_thread.groups()
-        discord_group = guilds.get(group_id)
+        # ALTERADO: Não buscamos mais no self.bot_thread.groups()
+        # Passamos o token para que o GroupController possa buscar os canais
+        token = self.user_settings.value("token")
 
-        if not discord_group:
-            QMessageBox.warning(
-                self.view,
-                self.tr("Error"),
-                self.tr("Could not find the guild information."),
-            )
-            return
+        controller = GroupController(self.database, group_id, group_name, token)
 
-        controller = GroupController(self.database, discord_group)
-        controller.set_group(group_id)
-        
         self.group_controllers.add(
             group_id, controller, controller.view.finished
         )
-
         controller.view.show()
 
     @Slot()
@@ -974,3 +967,59 @@ class MainController(BaseController[MainView]):
 
             except Exception as e:
                 QMessageBox.critical(self.view, self.tr("Error"), str(e))
+
+    @Slot(list)
+    def _on_guilds_received(self, guilds_data: list):
+        self.groups_model.clear()
+
+        for guild in guilds_data:
+            guild_id_str = guild["id"]
+            guild_name = guild["name"]
+            icon_hash = guild.get("icon")  # Pode ser None se não tiver ícone
+
+            item = QStandardItem(guild_name)
+            # Armazenamos o ID como int para compatibilidade ou str se preferir,
+            # mas vamos converter para int pois o GroupController espera int
+            item.setData(int(guild_id_str), Qt.ItemDataRole.UserRole)
+
+            # Define um ícone padrão (opcional)
+            # item.setIcon(QIcon("assets/icons/default_server.png"))
+
+            self.groups_model.appendRow(item)
+
+            # Se tiver hash de ícone, dispara o download
+            if icon_hash:
+                self.discord_api.fetch_guild_icon(guild_id_str, icon_hash)
+
+    @Slot(str, QByteArray)
+    def _on_guild_icon_received(self, guild_id_str: str, icon_bytes: QByteArray):
+        """Atualiza o ícone do item correspondente na lista."""
+        if icon_bytes.isEmpty():
+            return
+
+        guild_id = int(guild_id_str)
+
+        # Procura o item no modelo pelo ID (UserRole)
+        match = self.groups_model.match(
+            self.groups_model.index(0, 0),
+            Qt.ItemDataRole.UserRole,
+            guild_id,
+            1,
+            Qt.MatchFlag.MatchExactly
+        )
+
+        if match:
+            item = self.groups_model.itemFromIndex(match[0])
+
+            # Processa a imagem
+            pixmap = QPixmap()
+            pixmap.loadFromData(icon_bytes)
+
+            # Aplica o recorte circular (usando seu helper existente)
+            circular_icon = PixmapHelper.get_circular_pixmap(
+                pixmap,
+                24,  # Tamanho do ícone
+                self.view.devicePixelRatio()
+            )
+
+            item.setIcon(circular_icon)
