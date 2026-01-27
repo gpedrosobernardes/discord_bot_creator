@@ -126,8 +126,8 @@ class MainView(QMainWindow):
         messages_tab = self._create_messages_tab()
         groups_tab = self._create_groups_tab()
 
-        self.left_tab_widget.addTab(messages_tab, qtawesome.icon("fa6s.message"), "")
-        self.left_tab_widget.addTab(groups_tab, qtawesome.icon("fa6s.users"), "")
+        self.left_tab_widget.addTab(messages_tab, QThemeResponsiveIcon.fromAwesome("fa6s.message"), "")
+        self.left_tab_widget.addTab(groups_tab, QThemeResponsiveIcon.fromAwesome("fa6s.users"), "")
 
         # 2. Create Right Panel
         right_panel = self._create_right_panel()

@@ -159,6 +159,7 @@ class MainController(BaseController[MainView]):
         self.view.groups_list_widget.customContextMenuRequested.connect(
             self.on_groups_list_context_menu
         )
+        self.view.groups_list_widget.doubleClicked.connect(self.on_config_group_action)
 
         # Messages List Context Menu
         self.view.messages_list_view.setContextMenuPolicy(
