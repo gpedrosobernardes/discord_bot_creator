@@ -225,14 +225,9 @@ class MessageConditionValidator:
             # The space at the end is intentional to avoid sticking to the operator
             case_tag = QCoreApplication.translate("ConditionValidator", "[NoCase] ")
 
-        # 3. Define STATIC template (Translation Key)
-        # This string is fixed and never changes, regardless of values.
-        # The translator will see: "Validating ({current}/{total}): field {field}..."
-        log_template = "Validating condition ({current}/{total}): field {field} {value} {case_tag}{operator} {target} ({result})"
-
         # 4. Translate the template
         translated_template = QCoreApplication.translate(
-            "ConditionValidator", log_template
+            "ConditionValidator", "Validating condition ({current}/{total}): field {field} {value} {case_tag}{operator} {target} ({result})"
         )
 
         # 5. Inject variables into the ALREADY translated string
