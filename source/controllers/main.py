@@ -169,7 +169,8 @@ class MainController(BaseController[MainView]):
         )
         
         # Messages List Edit
-        self.messages_model.dataChanged.connect(self.on_message_data_changed)
+        item_delegate = self.view.messages_list_view.itemDelegate()
+        item_delegate.closeEditor.connect(self.on_message_data_changed)
 
         # Bot Thread Connections
         self.bot_thread.signals.login_failure.connect(self.on_bot_login_failure)
@@ -429,8 +430,6 @@ class MainController(BaseController[MainView]):
         self.view.messages_list_view.setModelColumn(
             self.messages_model.fieldIndex("name")
         )
-        # Reconnect dataChanged signal for the new model
-        self.messages_model.dataChanged.connect(self.on_message_data_changed)
 
     def _prompt_new_project_name(self, strict: bool = False) -> Optional[str]:
         default_name = self.tr("New Project")
