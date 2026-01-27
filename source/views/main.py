@@ -17,6 +17,7 @@ from PySide6.QtWidgets import (
     QGroupBox,
 )
 from qextrawidgets import QColorButton, QPasswordLineEdit, QSearchLineEdit
+from qextrawidgets.icons import QThemeResponsiveIcon
 
 from source.qt.helpers.pixmap import PixmapHelper
 from source.qt.widgets.bot_info import BotInfoWidget
@@ -105,7 +106,7 @@ class MainView(QMainWindow):
 
     def _init_switch_button(self):
         """Initialize the switch bot button with icons."""
-        switch_icon = QIcon()
+        switch_icon = QThemeResponsiveIcon()
         pixmap_play = qtawesome.icon("fa6s.play", color="white").pixmap(QSize(24, 24))
         switch_icon.addPixmap(pixmap_play, QIcon.Mode.Normal, QIcon.State.Off)
 

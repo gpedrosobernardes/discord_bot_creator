@@ -3,7 +3,7 @@ from __future__ import annotations
 import locale
 import logging
 
-from PySide6.QtCore import QTranslator, QSettings, Signal
+from PySide6.QtCore import QTranslator, QSettings, Signal, Slot
 from PySide6.QtGui import QGuiApplication, Qt, QFontDatabase
 from PySide6.QtWidgets import QApplication
 
@@ -65,9 +65,16 @@ class ConfigController(BaseController[ConfigView]):
         if index >= 0:
             self.view.emoji_font_combo.setCurrentIndex(index)
 
+        self._update_theme_ui_state()
+
     @staticmethod
     def apply_theme(user_settings: QSettings):
         selected_theme = user_settings.value("theme")
+        selected_style = user_settings.value("style")
+
+        if selected_style == "windowsvista":
+            selected_theme = "Light"
+
         style_hints = QGuiApplication.styleHints()
         if selected_theme == "Dark":
             style_hints.setColorScheme(Qt.ColorScheme.Dark)
@@ -97,6 +104,18 @@ class ConfigController(BaseController[ConfigView]):
             lambda: self.save_settings(user_settings, translator)
         )
         self.view.cancel_button.clicked.connect(self.view.close)
+        self.view.style_combo.currentIndexChanged.connect(self._update_theme_ui_state)
+
+    @Slot()
+    def _update_theme_ui_state(self):
+        current_style = self.view.style_combo.currentData()
+        if current_style == "windowsvista":
+            index = self.view.theme_combo.findData("Light")
+            if index >= 0:
+                self.view.theme_combo.setCurrentIndex(index)
+            self.view.theme_combo.setEnabled(False)
+        else:
+            self.view.theme_combo.setEnabled(True)
 
     def save_settings(self, user_settings: QSettings, translator: QTranslator):
         # Language
@@ -121,15 +140,17 @@ class ConfigController(BaseController[ConfigView]):
         user_settings.setValue("log_level", selected_log_level)
         self.apply_logging_config(user_settings)
 
-        # Theme
-        selected_theme = self.view.theme_combo.currentData()
-        user_settings.setValue("theme", selected_theme)
-        self.apply_theme(user_settings)
-
         # Style
         selected_style = self.view.style_combo.currentData()
         user_settings.setValue("style", selected_style)
         self.apply_style(user_settings)
+
+        # Theme
+        selected_theme = self.view.theme_combo.currentData()
+        if selected_style == "windowsvista":
+            selected_theme = "Light"
+        user_settings.setValue("theme", selected_theme)
+        self.apply_theme(user_settings)
 
         # Emoji Font
         selected_emoji_font = self.view.emoji_font_combo.currentData()
