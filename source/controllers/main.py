@@ -11,8 +11,7 @@ from PySide6.QtCore import (
     Slot,
     Signal,
     QPoint,
-    QByteArray, QSignalBlocker,
-)
+    QByteArray)
 from PySide6.QtGui import (
     QAction,
     QKeySequence,
@@ -94,6 +93,8 @@ class MainController(BaseController[MainView]):
         self.bot_thread = QBotThread()
         self.emoji_picker = self._create_emoji_picker()
         self._bot_info_fetcher = BotIdentityFetcher(self)
+        self._current_bot_id = None
+
 
         # 4. Init Sequence
         self._init_models()
@@ -658,8 +659,9 @@ class MainController(BaseController[MainView]):
             self.user_settings.setValue("token", token)
             self._bot_info_fetcher.fetch(token)
 
-    @Slot(str, QByteArray)
-    def _on_bot_info_fetched(self, username: str, avatar_bytes: QByteArray):
+    @Slot(str, str, QByteArray)
+    def _on_bot_info_fetched(self, username: str, user_id: str, avatar_bytes: QByteArray):
+        self._current_bot_id = user_id
         pixmap = None
         if not avatar_bytes.isEmpty():
             pixmap = QPixmap()
@@ -929,8 +931,8 @@ class MainController(BaseController[MainView]):
     def on_generate_invite_action(self):
         dialog = InviteDialog(self.view)
 
-        if bot_id := self.bot_thread.get_bot_id():
-            dialog.set_client_id(str(bot_id))
+        if self._current_bot_id:
+            dialog.set_client_id(self._current_bot_id)
 
         if dialog.exec() == QDialog.DialogCode.Accepted:
             client_id_str = dialog.get_client_id()

@@ -10,6 +10,7 @@ from source.core.database import DatabaseController
 from source.core.log_handler import LogHandler
 
 
+
 class Application(BaseApplication):
     def __init__(self):
         super().__init__()
