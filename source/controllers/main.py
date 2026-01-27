@@ -944,7 +944,7 @@ class MainController(BaseController[MainView]):
 
             client_id = int(client_id_str)
             permissions = dialog.get_permissions()
-            open_in_browser = dialog.should_open_browser()
+            copy_to_clipboard = dialog.should_copy_clipboard()
 
             try:
                 invite_url = utils.oauth_url(
@@ -953,16 +953,16 @@ class MainController(BaseController[MainView]):
                     scopes=["bot", "applications.commands"],
                 )
 
-                clipboard = QGuiApplication.clipboard()
-                clipboard.setText(invite_url)
-
-                if open_in_browser:
+                if copy_to_clipboard:
+                    clipboard = QGuiApplication.clipboard()
+                    clipboard.setText(invite_url)
+                    QMessageBox.information(
+                        self.view,
+                        self.tr("Invite Generated"),
+                        self.tr("The invite URL has been copied to your clipboard."),
+                    )
+                else:
                     webbrowser.open(invite_url)
 
-                QMessageBox.information(
-                    self.view,
-                    self.tr("Invite Generated"),
-                    self.tr("The invite URL has been copied to your clipboard."),
-                )
             except Exception as e:
                 QMessageBox.critical(self.view, self.tr("Error"), str(e))

@@ -21,10 +21,12 @@ class InviteDialog(QDialog):
         self.setWindowTitle(self.tr("Generate Invite Link"))
         self.resize(500, 600)
 
+        self._copy_clipboard = False
+
         self.client_id_edit = QLineEdit()
         self.client_id_edit.setPlaceholderText(self.tr("Client ID (Application ID)"))
 
-        self.open_browser_check = QCheckBox(self.tr("Open in browser"))
+        self.copy_btn = QPushButton(self.tr("Copy Link"))
 
         self.select_all_btn = QPushButton(self.tr("Select All"))
         self.deselect_all_btn = QPushButton(self.tr("Deselect All"))
@@ -35,6 +37,7 @@ class InviteDialog(QDialog):
         self.button_box = QDialogButtonBox(
             QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel
         )
+        self.button_box.button(QDialogButtonBox.StandardButton.Ok).setText(self.tr("Open in Browser"))
 
         self._init_permissions()
         self._init_layout()
@@ -114,14 +117,25 @@ class InviteDialog(QDialog):
         scroll.setWidget(scroll_content)
 
         layout.addWidget(scroll)
-        layout.addWidget(self.open_browser_check)
-        layout.addWidget(self.button_box)
+        
+        # Buttons layout
+        buttons_layout = QHBoxLayout()
+        buttons_layout.addWidget(self.copy_btn)
+        buttons_layout.addStretch()
+        buttons_layout.addWidget(self.button_box)
+        
+        layout.addLayout(buttons_layout)
 
     def _init_connections(self):
         self.select_all_btn.clicked.connect(self.select_all)
         self.deselect_all_btn.clicked.connect(self.deselect_all)
         self.button_box.accepted.connect(self.accept)
         self.button_box.rejected.connect(self.reject)
+        self.copy_btn.clicked.connect(self.on_copy_clicked)
+
+    def on_copy_clicked(self):
+        self._copy_clipboard = True
+        self.accept()
 
     def select_all(self):
         for cb in self.permissions_checks.values():
@@ -144,5 +158,5 @@ class InviteDialog(QDialog):
     def set_client_id(self, client_id: str):
         self.client_id_edit.setText(client_id)
 
-    def should_open_browser(self) -> bool:
-        return self.open_browser_check.isChecked()
+    def should_copy_clipboard(self) -> bool:
+        return self._copy_clipboard
