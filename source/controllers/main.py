@@ -167,6 +167,9 @@ class MainController(BaseController[MainView]):
         self.view.messages_list_view.customContextMenuRequested.connect(
             self.on_messages_list_context_menu
         )
+        
+        # Messages List Edit
+        self.messages_model.dataChanged.connect(self.on_message_data_changed)
 
         # Bot Thread Connections
         self.bot_thread.signals.login_failure.connect(self.on_bot_login_failure)
@@ -426,6 +429,8 @@ class MainController(BaseController[MainView]):
         self.view.messages_list_view.setModelColumn(
             self.messages_model.fieldIndex("name")
         )
+        # Reconnect dataChanged signal for the new model
+        self.messages_model.dataChanged.connect(self.on_message_data_changed)
 
     def _prompt_new_project_name(self, strict: bool = False) -> Optional[str]:
         default_name = self.tr("New Project")
@@ -649,6 +654,10 @@ class MainController(BaseController[MainView]):
 
         self.database.delete_all_messages()
         self.messages_model.select()
+        
+    @Slot()
+    def on_message_data_changed(self):
+        self.messages_model.submitAll()
 
     # --- App Logic ---
 

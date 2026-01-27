@@ -74,6 +74,9 @@ class MainView(QMainWindow):
         # --- Left Side: Messages Tab ---
         self.search_messages_line_edit = QSearchLineEdit()
         self.messages_list_view = QListView()
+        self.messages_list_view.setEditTriggers(
+            QListView.EditTrigger.DoubleClicked | QListView.EditTrigger.EditKeyPressed
+        )
 
         self.new_message_tool_button = QToolButton()
         self.edit_message_tool_button = QToolButton()
