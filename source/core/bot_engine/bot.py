@@ -319,6 +319,14 @@ class Bot(discord.Client):
     ) -> typing.Optional[discord.Message]:
         try:
             return await channel.send(message)
+        except discord.Forbidden:
+            logger.warning(
+                QCoreApplication.translate(
+                    "Bot",
+                    "Could not send message to {}. The recipient might have DMs disabled.",
+                ).format(channel)
+            )
+            return None
         except discord.errors.HTTPException as exception:
             if exception.code == 50035 and exception.status == 400:
                 logger.error(
