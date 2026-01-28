@@ -34,6 +34,7 @@ class MainView(QMainWindow):
     def __init__(self):
         """Initializes the MainView."""
         super().__init__()
+        self.force_quit = False
 
         self._init_ui()
         self._init_layout()
@@ -239,6 +240,14 @@ class MainView(QMainWindow):
     def reset_bot_info(self):
         """Resets the bot info widget to offline state."""
         self.set_bot_info(self.tr("Offline"))
+
+    def closeEvent(self, event):
+        """Override closeEvent to minimize to tray instead of closing."""
+        if self.force_quit:
+            event.accept()
+        else:
+            event.ignore()
+            self.hide()
 
     def translate_ui(self):
         """Translate UI texts."""

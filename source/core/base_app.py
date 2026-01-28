@@ -10,6 +10,7 @@ from source.core.settings import Settings
 class BaseApplication(QApplication):
     def __init__(self):
         super().__init__(sys.argv)
+        self.setQuitOnLastWindowClosed(False)
 
         self.user_settings = Settings()
 

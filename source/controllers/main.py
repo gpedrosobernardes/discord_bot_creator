@@ -21,7 +21,7 @@ from PySide6.QtGui import (
     QIcon,
     QPixmap,
 )
-from PySide6.QtWidgets import QCompleter, QInputDialog, QMessageBox, QMenu, QDialog
+from PySide6.QtWidgets import QCompleter, QInputDialog, QMessageBox, QMenu, QDialog, QSystemTrayIcon
 from discord import utils
 from qextrawidgets import QEmojiPicker
 from qextrawidgets.emoji_utils import EmojiImageProvider
@@ -94,6 +94,7 @@ class MainController(BaseController[MainView]):
         self.emoji_picker = self._create_emoji_picker()
         self.discord_api = DiscordAPIClient(self)
         self._current_bot_id = None
+        self.tray_icon = QSystemTrayIcon(QIcon("assets/icons/window-icon.svg"), self.view)
 
 
         # 4. Init Sequence
@@ -102,6 +103,7 @@ class MainController(BaseController[MainView]):
         self._init_validators()
         self._init_completers()
         self._init_connections()
+        self._init_tray_icon()
 
         # 5. Initial State
         self.translate_ui()
@@ -198,6 +200,24 @@ class MainController(BaseController[MainView]):
         emoji_model.recentChanged.connect(self.on_recent_emojis_changed)
         emoji_model.favoriteChanged.connect(self.on_favorite_emojis_changed)
 
+    def _init_tray_icon(self):
+        """Initialize the system tray icon."""
+        self.tray_icon.setToolTip("Discord Bot Creator")
+        
+        tray_menu = QMenu()
+        
+        show_action = QAction(self.tr("Show"), self.view)
+        show_action.triggered.connect(self.view.show)
+        tray_menu.addAction(show_action)
+        
+        quit_action = QAction(self.tr("Quit"), self.view)
+        quit_action.triggered.connect(self.on_quit_action)
+        tray_menu.addAction(quit_action)
+        
+        self.tray_icon.setContextMenu(tray_menu)
+        self.tray_icon.activated.connect(self.on_tray_icon_activated)
+        self.tray_icon.show()
+
     def load_initial_state(self):
         """Load initial state from settings."""
         self.view.token_line_edit.setText(self.user_settings.value("token"))
@@ -285,7 +305,7 @@ class MainController(BaseController[MainView]):
             shortcut="Ctrl+,", triggered=self.config_view.show
         )
         self.exit_action = self._create_action(
-            shortcut="Ctrl+Q", triggered=self.view.close
+            shortcut="Ctrl+Q", triggered=self.on_quit_action
         )
 
         self.view.project_menu.addActions(
@@ -1024,3 +1044,19 @@ class MainController(BaseController[MainView]):
             )
 
             item.setIcon(circular_icon)
+
+    @Slot(QSystemTrayIcon.ActivationReason)
+    def on_tray_icon_activated(self, reason: QSystemTrayIcon.ActivationReason):
+        """Handles tray icon activation."""
+        if reason == QSystemTrayIcon.ActivationReason.Trigger:
+            if self.view.isVisible():
+                self.view.hide()
+            else:
+                self.view.show()
+                self.view.activateWindow()
+
+    @Slot()
+    def on_quit_action(self):
+        """Handles the quit action from the tray icon."""
+        self.view.force_quit = True
+        self.view.close()
