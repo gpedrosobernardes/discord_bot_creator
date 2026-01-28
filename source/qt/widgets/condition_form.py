@@ -64,8 +64,8 @@ class QConditionForm(QWidget):
         self._add_button.setIcon(QThemeResponsiveIcon.fromAwesome("fa6s.arrow-right"))
         self._add_button.setIconSize(icon_size)
 
-        self.addButtonPressed = self._add_button.pressed
-        self.currentFieldIndexChanged = self._field_combobox.currentIndexChanged
+        self.add_button_pressed = self._add_button.clicked
+        self.current_field_index_changed = self._field_combobox.currentIndexChanged
 
         self._boolean_delegate = None
         self._field_delegate = None

@@ -10,6 +10,7 @@ from PySide6.QtWidgets import (
     QMenu,
     QListView,
     QTableView,
+    QToolButton,
 )
 from qextrawidgets import QEmojiPicker
 from qextrawidgets.emoji_utils import EmojiImageProvider
@@ -17,6 +18,7 @@ from qextrawidgets.emoji_utils import EmojiImageProvider
 from source.controllers.base import BaseController
 from source.core.constants import StrField, IntField, BoolField, StrComparator, IntComparator, BoolComparator
 from source.core.database import DatabaseController
+from source.qt.widgets.emoji_picker_menu import QEmojiPickerMenu
 from source.views.message import MessageView
 
 
@@ -58,11 +60,12 @@ class MessageController(BaseController[MessageView]):
 
         # View
         self.emoji_picker = emoji_picker
-        self._emoji_picker_signal = None
+        self._emoji_callback = None
 
         # Initial State
         self._setup_actions()
         self._setup_models()
+        self._setup_emoji_picker_menu()
         self._setup_connections()
         self._setup_data_mapper()
 
@@ -158,23 +161,23 @@ class MessageController(BaseController[MessageView]):
         self.view.rejected.connect(self.on_rejected)
 
         # Replies
-        self.view.listbox_replies.addButtonPressed.connect(self.add_reply)
-        self.view.listbox_replies.emoteButtonPressed.connect(
-            self._open_reply_emoji_picker
+        self.view.listbox_replies.add_button_pressed.connect(self.add_reply)
+        self.view.listbox_replies.emote_button_clicked.connect(
+            self._prepare_reply_emoji_picker
         )
         self.view.listbox_replies.customContextMenuRequested.connect(
             self._show_replies_menu
         )
 
         # Reactions
-        self.view.add_reaction_button.clicked.connect(self._open_reaction_emoji_picker)
+        self.view.add_reaction_button.clicked.connect(self._prepare_reaction_emoji_picker)
         self.view.reactions_grid.customContextMenuRequested.connect(
             self._show_reactions_menu
         )
 
         # Conditions
-        self.view.listbox_conditions.addButtonPressed.connect(self.add_condition)
-        self.view.listbox_conditions.currentFieldIndexChanged.connect(
+        self.view.listbox_conditions.add_button_pressed.connect(self.add_condition)
+        self.view.listbox_conditions.current_field_index_changed.connect(
             self.on_condition_field_changed
         )
         self.view.listbox_conditions.customContextMenuRequested.connect(
@@ -210,6 +213,29 @@ class MessageController(BaseController[MessageView]):
             self.view.delay_spin_box, self.model.fieldIndex("delay")
         )
         self.data_mapper.setCurrentIndex(self.message_id)
+
+    def _setup_emoji_picker_menu(self):
+        self.emoji_menu = QEmojiPickerMenu(self.view, self.emoji_picker)
+        self.emoji_menu.emojiPicked.connect(self._on_emoji_picked)
+
+        self.view.listbox_replies.set_emoji_button_menu(self.emoji_menu)
+
+        self.view.add_reaction_button.setMenu(self.emoji_menu)
+        self.view.add_reaction_button.setPopupMode(
+            QToolButton.ToolButtonPopupMode.DelayedPopup
+        )
+
+    def _prepare_reply_emoji_picker(self):
+        self._emoji_callback = self.view.listbox_replies.insert_text
+        self.view.listbox_replies.show_emoji_menu()
+
+    def _prepare_reaction_emoji_picker(self):
+        self._emoji_callback = self.add_reaction
+        self.view.add_reaction_button.showMenu()
+
+    def _on_emoji_picked(self, emoji: str):
+        if self._emoji_callback:
+            self._emoji_callback(emoji)
 
     def translate_ui(self):
         self.view.translate_ui()
@@ -293,16 +319,6 @@ class MessageController(BaseController[MessageView]):
                 return True
         return False
 
-    def _show_emoji_picker(
-        self, button_position: QPoint, callback: typing.Callable[[str], None]
-    ):
-        position = button_position - QPoint(0, self.emoji_picker.height())
-        self.emoji_picker.move(position)
-        if self._emoji_picker_signal:
-            self.emoji_picker.picked.disconnect(self._emoji_picker_signal)
-        self._emoji_picker_signal = self.emoji_picker.picked.connect(callback)
-        self.emoji_picker.show()
-
     def _confirm_deletion(self, title: str, text: str) -> bool:
         if not self.user_settings.value("confirm_actions", type=bool):
             return True
@@ -355,12 +371,6 @@ class MessageController(BaseController[MessageView]):
             menu.addAction(self.clear_replies_action)
 
         menu.exec(list_view.mapToGlobal(position))
-
-    def _open_reply_emoji_picker(self):
-        self._show_emoji_picker(
-            self.view.listbox_replies.emoji_button_position(),
-            self.view.listbox_replies.insert_text,
-        )
 
     # --- Reactions Logic ---
 
@@ -422,11 +432,6 @@ class MessageController(BaseController[MessageView]):
             menu.addAction(self.clear_reactions_action)
 
         menu.exec(self.view.reactions_grid.mapToGlobal(position))
-
-    def _open_reaction_emoji_picker(self):
-        self._show_emoji_picker(
-            self.view.add_reaction_button.mapToGlobal(QPoint(0, 0)), self.add_reaction
-        )
 
     # --- Conditions Logic ---
 

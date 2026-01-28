@@ -7,6 +7,7 @@ from PySide6.QtWidgets import (
     QWidget,
     QToolButton,
     QListView,
+    QMenu,
 )
 from qextrawidgets import (
     QExtraTextEdit,
@@ -33,8 +34,8 @@ class QReplyForm(QWidget):
 
         self._text_edit = QExtraTextEdit()
 
-        self.addButtonPressed = self._add_button.pressed
-        self.emoteButtonPressed = self._emote_button.pressed
+        self.add_button_pressed = self._add_button.pressed
+        self.emote_button_clicked = self._emote_button.clicked
 
         self._setup_layout()
         self._setup_connections()
@@ -72,12 +73,6 @@ class QReplyForm(QWidget):
     def set_model(self, model: QSqlTableModel):
         self._list_view.setModel(model)
 
-    def set_text_validator(self, validator: QValidator):
-        self._text_edit.setValidator(validator)
-
-    def emoji_button_position(self):
-        return self._emote_button.mapToGlobal(QPoint(0, 0))
-
     def add_list_view_action(self, action: QAction):
         self._list_view.addAction(action)
 
@@ -89,3 +84,10 @@ class QReplyForm(QWidget):
 
     def select_all(self):
         self._list_view.selectAll()
+
+    def set_emoji_button_menu(self, menu: QMenu):
+        self._emote_button.setMenu(menu)
+        self._emote_button.setPopupMode(QToolButton.ToolButtonPopupMode.DelayedPopup)
+
+    def show_emoji_menu(self):
+        self._emote_button.showMenu()
