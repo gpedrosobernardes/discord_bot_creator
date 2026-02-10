@@ -1,5 +1,4 @@
 from cx_Freeze import setup, Executable
-import sys
 
 # Tenta importar a função que ajuda a localizar plugins do Qt
 try:

@@ -1,24 +1,40 @@
 import typing
 from enum import IntEnum
 
-from PySide6.QtCore import Qt, QPoint, QModelIndex, QCoreApplication, QSettings
-from PySide6.QtGui import QAction, QKeySequence, QStandardItemModel, QStandardItem
+from PySide6.QtCore import (
+    QCoreApplication,
+    QModelIndex,
+    QPersistentModelIndex,
+    QPoint,
+    QSettings,
+    Qt,
+    Slot,
+)
+from PySide6.QtGui import QAction, QKeySequence, QStandardItem, QStandardItemModel
 from PySide6.QtSql import QSqlTableModel
 from PySide6.QtWidgets import (
-    QMessageBox,
     QDataWidgetMapper,
-    QMenu,
     QListView,
+    QMenu,
+    QMessageBox,
     QTableView,
     QToolButton,
 )
-from qextrawidgets import QEmojiPicker
-from qextrawidgets.emoji_utils import EmojiImageProvider
+from qextrawidgets.core.utils import QTwemojiImageProvider
+from qextrawidgets.gui.models import QEmojiPickerModel
+from qextrawidgets.gui.proxys.decoration_role_proxy import QDecorationRoleProxyModel
+from qextrawidgets.widgets.menus.emoji_picker_menu import QEmojiPickerMenu
 
 from source.controllers.base import BaseController
-from source.core.constants import StrField, IntField, BoolField, StrComparator, IntComparator, BoolComparator
+from source.core.constants import (
+    BoolComparator,
+    BoolField,
+    IntComparator,
+    IntField,
+    StrComparator,
+    StrField,
+)
 from source.core.database import DatabaseController
-from source.qt.widgets.emoji_picker_menu import QEmojiPickerMenu
 from source.views.message import MessageView
 
 
@@ -33,7 +49,7 @@ class MessageController(BaseController[MessageView]):
         message_model: QSqlTableModel,
         database: DatabaseController,
         user_settings: QSettings,
-        emoji_picker: QEmojiPicker,
+        emoji_picker_model: QEmojiPickerModel,
         message_id: int = None,
     ):
         super().__init__(MessageView())
@@ -48,6 +64,9 @@ class MessageController(BaseController[MessageView]):
             self.context = MessageWindowContext.NEW
             self.message_id = self._create_new_message_row()
 
+        # Proxys
+        self.reactions_proxy = QDecorationRoleProxyModel()
+
         # Models
         self.reactions_model = database.get_message_reactions_model()
         self.reply_model = database.get_message_replies_model()
@@ -59,8 +78,8 @@ class MessageController(BaseController[MessageView]):
         self._bool_comparator_model = QStandardItemModel()
 
         # View
-        self.emoji_picker = emoji_picker
-        self._emoji_callback = None
+
+        self.emoji_picker_model = emoji_picker_model
 
         # Initial State
         self._setup_actions()
@@ -88,12 +107,8 @@ class MessageController(BaseController[MessageView]):
         # Reactions
         self.reactions_model.setFilter(f"message_id = {self.message_id}")
         self.reactions_model.select()
-        proxy = self.view.reactions_grid.model()
-        proxy.setSourceModel(self.reactions_model)
-        self.view.reactions_grid.setModelColumn(
-            self.reactions_model.fieldIndex("reaction")
-        )
-        self.view.reactions_grid.setEmojiPixmapGetter(EmojiImageProvider.getPixmap)
+        self.reactions_proxy.setSourceModel(self.reactions_model)
+        self.view.reactions_grid.setModel(self.reactions_proxy)
 
         # Replies
         self.reply_model.setFilter(f"message_id = {self.message_id}")
@@ -162,15 +177,11 @@ class MessageController(BaseController[MessageView]):
 
         # Replies
         self.view.listbox_replies.add_button_pressed.connect(self.add_reply)
-        self.view.listbox_replies.emote_button_clicked.connect(
-            self._prepare_reply_emoji_picker
-        )
         self.view.listbox_replies.customContextMenuRequested.connect(
             self._show_replies_menu
         )
 
         # Reactions
-        self.view.add_reaction_button.clicked.connect(self._prepare_reaction_emoji_picker)
         self.view.reactions_grid.customContextMenuRequested.connect(
             self._show_reactions_menu
         )
@@ -183,6 +194,20 @@ class MessageController(BaseController[MessageView]):
         self.view.listbox_conditions.customContextMenuRequested.connect(
             self._show_conditions_menu
         )
+
+        # Emoji Picker Menus
+        self.reply_emoji_picker_menu.picked.connect(
+            lambda emoji_item: self.view.listbox_replies.insert_text(
+                emoji_item.coloredEmojiChar().char
+            )
+        )
+        self.reaction_emoji_picker_menu.picked.connect(
+            lambda emoji_item: self.add_reaction(emoji_item.coloredEmojiChar().char)
+        )
+
+        # Request Image
+        reactions_grid_delegate = self.view.reactions_grid.itemDelegate()
+        reactions_grid_delegate.requestImage.connect(self._on_request_reaction_image)
 
     def _setup_data_mapper(self):
         self.data_mapper = QDataWidgetMapper()
@@ -215,27 +240,18 @@ class MessageController(BaseController[MessageView]):
         self.data_mapper.setCurrentIndex(self.message_id)
 
     def _setup_emoji_picker_menu(self):
-        self.emoji_menu = QEmojiPickerMenu(self.view, self.emoji_picker)
-        self.emoji_menu.emojiPicked.connect(self._on_emoji_picked)
-
-        self.view.listbox_replies.set_emoji_button_menu(self.emoji_menu)
-
-        self.view.add_reaction_button.setMenu(self.emoji_menu)
-        self.view.add_reaction_button.setPopupMode(
-            QToolButton.ToolButtonPopupMode.DelayedPopup
+        self.reply_emoji_picker_menu = QEmojiPickerMenu(
+            self.view, self.emoji_picker_model
         )
+        self.view.listbox_replies.set_emoji_button_menu(self.reply_emoji_picker_menu)
 
-    def _prepare_reply_emoji_picker(self):
-        self._emoji_callback = self.view.listbox_replies.insert_text
-        self.view.listbox_replies.show_emoji_menu()
-
-    def _prepare_reaction_emoji_picker(self):
-        self._emoji_callback = self.add_reaction
-        self.view.add_reaction_button.showMenu()
-
-    def _on_emoji_picked(self, emoji: str):
-        if self._emoji_callback:
-            self._emoji_callback(emoji)
+        self.reaction_emoji_picker_menu = QEmojiPickerMenu(
+            self.view, self.emoji_picker_model
+        )
+        self.view.add_reaction_button.setMenu(self.reaction_emoji_picker_menu)
+        self.view.add_reaction_button.setPopupMode(
+            QToolButton.ToolButtonPopupMode.InstantPopup
+        )
 
     def translate_ui(self):
         self.view.translate_ui()
@@ -379,7 +395,7 @@ class MessageController(BaseController[MessageView]):
         start_index = self.reactions_model.index(0, reaction_idx)
         match_list = self.reactions_model.match(
             start_index,
-            Qt.ItemDataRole.DisplayRole,
+            Qt.ItemDataRole.EditRole,
             emoji,
             1,
             Qt.MatchFlag.MatchExactly,
@@ -387,10 +403,9 @@ class MessageController(BaseController[MessageView]):
 
         if match_list:
             source_index = match_list[0]
-            proxy_model = self.view.reactions_grid.model()
-            proxy_index = proxy_model.mapFromSource(source_index)
-            if proxy_index.isValid():
-                self.view.reactions_grid.setCurrentIndex(proxy_index)
+            sibling_index = self.reactions_model.index(source_index.row(), 0)
+            if sibling_index.isValid():
+                self.view.reactions_grid.setCurrentIndex(sibling_index)
             return
 
         if self.reactions_model.rowCount() >= 20:
@@ -432,6 +447,21 @@ class MessageController(BaseController[MessageView]):
             menu.addAction(self.clear_reactions_action)
 
         menu.exec(self.view.reactions_grid.mapToGlobal(position))
+
+    @Slot(QPersistentModelIndex)
+    def _on_request_reaction_image(self, persistent_index: QPersistentModelIndex):
+        index = self.reactions_proxy.mapToSource(persistent_index)
+        if not index.isValid():
+            return
+
+        emoji_index = self.reactions_model.fieldIndex("reaction")
+        sibling_index = self.reactions_model.index(index.row(), emoji_index)
+
+        emoji = self.reactions_model.data(sibling_index, Qt.ItemDataRole.EditRole)
+        emoji_pixmap = QTwemojiImageProvider.getPixmap(emoji, 0, 100)
+        self.reactions_proxy.setData(
+            persistent_index, emoji_pixmap, Qt.ItemDataRole.DecorationRole
+        )
 
     # --- Conditions Logic ---
 

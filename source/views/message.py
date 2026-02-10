@@ -1,31 +1,31 @@
 from PySide6.QtCore import (
-    Qt,
     QRegularExpression,
     QSize,
+    Qt,
 )
 from PySide6.QtGui import (
     QIcon,
     QRegularExpressionValidator,
 )
 from PySide6.QtWidgets import (
-    QVBoxLayout,
-    QHBoxLayout,
+    QComboBox,
+    QDialog,
     QGridLayout,
     QGroupBox,
-    QDialog,
+    QHBoxLayout,
     QLabel,
-    QPushButton,
     QLineEdit,
+    QPushButton,
     QSpinBox,
-    QComboBox,
     QToolButton,
+    QVBoxLayout,
     QWidget,
 )
-from qextrawidgets import QAccordion
-from qextrawidgets.icons import QThemeResponsiveIcon
-from qextrawidgets.widgets.emoji_picker import QEmojiGrid
+from qextrawidgets.gui.icons import QThemeResponsiveIcon
+from qextrawidgets.widgets.miscellaneous.accordion import QAccordion
+from qextrawidgets.widgets.views.grid_icon_view import QGridIconView
 
-from source.core.constants import Actions, Punishment, WhereReply, WhereReact
+from source.core.constants import Actions, Punishment, WhereReact, WhereReply
 from source.qt.widgets.condition_form import QConditionForm
 from source.qt.widgets.reply_form import QReplyForm
 
@@ -34,9 +34,7 @@ class MessageView(QDialog):
     def __init__(self):
         super().__init__()
 
-        self.setWindowFlags(
-            self.windowFlags() | Qt.WindowType.WindowMaximizeButtonHint
-        )
+        self.setWindowFlags(self.windowFlags() | Qt.WindowType.WindowMaximizeButtonHint)
         self.setWindowIcon(QIcon("assets/icons/window-icon.svg"))
         self.setMinimumSize(900, 700)
         self.resize(1000, 800)
@@ -80,19 +78,12 @@ class MessageView(QDialog):
 
         # Widget de Reações (Layout interno)
         self.reactions_widget = QWidget()
-        self.reactions_grid = QEmojiGrid(self.reactions_widget, 40, 0.2)
-        self.reactions_grid.setSelectionMode(QEmojiGrid.SelectionMode.MultiSelection)
+        self.reactions_grid = QGridIconView(self, QSize(40, 40))
         self.add_reaction_button = QToolButton()
         self.add_reaction_button.setIcon(
             QThemeResponsiveIcon.fromAwesome("fa6s.face-smile")
         )
         self.add_reaction_button.setIconSize(QSize(20, 20))
-
-        # Layout das reações
-        reactions_layout = QHBoxLayout()
-        reactions_layout.addWidget(self.reactions_grid)
-        reactions_layout.addWidget(self.add_reaction_button, 0, Qt.AlignmentFlag.AlignTop)
-        self.reactions_widget.setLayout(reactions_layout)
 
         self.listbox_replies = QReplyForm()
 
@@ -117,6 +108,14 @@ class MessageView(QDialog):
         main_layout = QVBoxLayout()
         main_layout.setSpacing(15)
         main_layout.setContentsMargins(20, 20, 20, 20)
+
+        # Layout das reações
+        reactions_layout = QHBoxLayout()
+        reactions_layout.addWidget(self.reactions_grid)
+        reactions_layout.addWidget(
+            self.add_reaction_button, 0, Qt.AlignmentFlag.AlignTop
+        )
+        self.reactions_widget.setLayout(reactions_layout)
 
         # --- BLOCO 1: Identificação ---
         name_layout = QVBoxLayout()
@@ -157,7 +156,7 @@ class MessageView(QDialog):
 
         # --- BLOCO 4: Rodapé (Botões à Direita) ---
         buttons_layout = QHBoxLayout()
-        buttons_layout.addStretch() # Empurra tudo para a direita
+        buttons_layout.addStretch()  # Empurra tudo para a direita
         buttons_layout.addWidget(self.cancel_button)
         buttons_layout.addWidget(self.confirm_button)
 
@@ -176,7 +175,7 @@ class MessageView(QDialog):
         self.settings_group.setTitle(self.tr("Rule Configuration"))
 
         for i, text in enumerate(
-                [self.tr("Conditions (Triggers)"), self.tr("Reactions"), self.tr("Replies")]
+            [self.tr("Conditions (Triggers)"), self.tr("Reactions"), self.tr("Replies")]
         ):
             self.accordion.setSectionTitle(i, text)
 
@@ -190,13 +189,13 @@ class MessageView(QDialog):
 
         self.where_reply_label.setText(self.tr("Reply Scope:"))
         for i, text in enumerate(
-                [
-                    self.tr("Group"),
-                    self.tr("Private"),
-                    self.tr("Same Channel"),
-                    self.tr("Both"),
-                    self.tr("None"),
-                ]
+            [
+                self.tr("Group"),
+                self.tr("Private"),
+                self.tr("Same Channel"),
+                self.tr("Both"),
+                self.tr("None"),
+            ]
         ):
             self.where_reply_combobox.setItemText(i, text)
 

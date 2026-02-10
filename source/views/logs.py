@@ -1,4 +1,3 @@
-from PySide6.QtCore import QObject
 from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import (
     QDialog,
@@ -7,7 +6,8 @@ from PySide6.QtWidgets import (
     QLabel,
     QHeaderView,
 )
-from qextrawidgets import QPager, QFilterableTable
+from qextrawidgets.widgets.miscellaneous.pager import QPager
+from qextrawidgets.widgets.views.filterable_table_view import QFilterableTableView
 
 
 class LogsView(QDialog):
@@ -17,7 +17,7 @@ class LogsView(QDialog):
         self.resize(1000, 800)
         self.setWindowIcon(QIcon("assets/icons/window-icon.svg"))
 
-        self.logs_table = QFilterableTable()
+        self.logs_table = QFilterableTableView()
         self.logs_table.horizontalHeader().setSectionResizeMode(
             QHeaderView.ResizeMode.Stretch
         )

@@ -1,5 +1,5 @@
-from PySide6.QtCore import Qt, QSize, QPoint
-from PySide6.QtGui import QValidator, QAction
+from PySide6.QtCore import Qt, QSize
+from PySide6.QtGui import QAction
 from PySide6.QtSql import QSqlTableModel
 from PySide6.QtWidgets import (
     QVBoxLayout,
@@ -9,10 +9,8 @@ from PySide6.QtWidgets import (
     QListView,
     QMenu,
 )
-from qextrawidgets import (
-    QExtraTextEdit,
-)
-from qextrawidgets.icons import QThemeResponsiveIcon
+from qextrawidgets.gui.icons import QThemeResponsiveIcon
+from qextrawidgets.widgets.inputs import QExtraTextEdit
 
 
 class QReplyForm(QWidget):
@@ -87,7 +85,7 @@ class QReplyForm(QWidget):
 
     def set_emoji_button_menu(self, menu: QMenu):
         self._emote_button.setMenu(menu)
-        self._emote_button.setPopupMode(QToolButton.ToolButtonPopupMode.DelayedPopup)
+        self._emote_button.setPopupMode(QToolButton.ToolButtonPopupMode.InstantPopup)
 
     def show_emoji_menu(self):
         self._emote_button.showMenu()

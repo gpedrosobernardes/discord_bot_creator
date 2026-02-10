@@ -1,0 +1,13 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Rodar Aplicação (Main)",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/main.py", 
+            "console": "integratedTerminal",
+            "justMyCode": true
+        }
+    ]
+}

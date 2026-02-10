@@ -1,7 +1,6 @@
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QStandardItem
-from discord import VoiceChannel
-from qextrawidgets.icons import QThemeResponsiveIcon
+from qextrawidgets.gui.icons import QThemeResponsiveIcon
 
 
 class VoiceChannelItem(QStandardItem):

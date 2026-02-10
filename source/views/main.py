@@ -16,8 +16,9 @@ from PySide6.QtWidgets import (
     QHBoxLayout,
     QGroupBox,
 )
-from qextrawidgets import QColorButton, QPasswordLineEdit, QSearchLineEdit
-from qextrawidgets.icons import QThemeResponsiveIcon
+from qextrawidgets.gui.icons import QThemeResponsiveIcon
+from qextrawidgets.widgets.inputs import QSearchLineEdit, QPasswordLineEdit
+from qextrawidgets.widgets.buttons import QColorButton
 
 from source.qt.helpers.pixmap import PixmapHelper
 from source.qt.widgets.bot_info import BotInfoWidget

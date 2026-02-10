@@ -15,7 +15,7 @@ from PySide6.QtWidgets import (
     QWidget,
     QGroupBox,
 )
-from qextrawidgets.utils import QEmojiFonts
+from qextrawidgets.core.utils import QEmojiFonts
 
 
 class ConfigView(QDialog):

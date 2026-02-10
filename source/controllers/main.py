@@ -1,6 +1,5 @@
-from __future__ import annotations
-
 import sys
+import typing
 import webbrowser
 from typing import Optional
 
@@ -23,10 +22,9 @@ from PySide6.QtGui import (
 )
 from PySide6.QtWidgets import QCompleter, QInputDialog, QMessageBox, QMenu, QDialog, QSystemTrayIcon
 from discord import utils
-from qextrawidgets import QEmojiPicker
-from qextrawidgets.emoji_utils import EmojiImageProvider
-from qextrawidgets.icons import QThemeResponsiveIcon
-from qextrawidgets.widgets.emoji_picker import QEmojiDataRole
+from qextrawidgets.gui.icons import QThemeResponsiveIcon
+from qextrawidgets.gui.items import QEmojiCategoryItem, QEmojiItem
+from qextrawidgets.gui.models.emoji_picker_model import QEmojiPickerModel, EmojiCategory
 
 from source.controllers.base import BaseController
 from source.controllers.config import ConfigController
@@ -56,13 +54,13 @@ class MainController(BaseController[MainView]):
     switch_project = Signal()
 
     def __init__(
-        self,
-        database: DatabaseController,
-        user_settings: QSettings,
-        config_controller: ConfigController,
-        logs_view: LogsView,
-        credits_view: CreditsView,
-        log_handler: LogHandler,
+            self,
+            database: DatabaseController,
+            user_settings: QSettings,
+            config_controller: ConfigController,
+            logs_view: LogsView,
+            credits_view: CreditsView,
+            log_handler: LogHandler,
     ):
         """
         Initializes the MainController.
@@ -91,11 +89,10 @@ class MainController(BaseController[MainView]):
         self.messages_proxy_model = QSortFilterProxyModel()
         self.groups_model = QStandardItemModel()
         self.bot_thread = QBotThread()
-        self.emoji_picker = self._create_emoji_picker()
+        self.emoji_picker_model = QEmojiPickerModel()
         self.discord_api = DiscordAPIClient(self)
         self._current_bot_id = None
         self.tray_icon = QSystemTrayIcon(QIcon("assets/icons/window-icon.svg"), self.view)
-
 
         # 4. Init Sequence
         self._init_models()
@@ -128,6 +125,8 @@ class MainController(BaseController[MainView]):
         )
 
         self.view.groups_list_widget.setModel(self.groups_model)
+
+        self.emoji_picker_model.populate()
 
     def _init_actions(self):
         """Initialize all QActions and assign them to menus/buttons."""
@@ -170,7 +169,7 @@ class MainController(BaseController[MainView]):
         self.view.messages_list_view.customContextMenuRequested.connect(
             self.on_messages_list_context_menu
         )
-        
+
         # Messages List Edit
         item_delegate = self.view.messages_list_view.itemDelegate()
         item_delegate.closeEditor.connect(self.on_message_data_changed)
@@ -196,24 +195,23 @@ class MainController(BaseController[MainView]):
         self.discord_api.request_failed.connect(lambda e: print(f"API Error: {e}"))
 
         # Emoji Picker Connections
-        emoji_model = self.emoji_picker.model()
-        emoji_model.recentChanged.connect(self.on_recent_emojis_changed)
-        emoji_model.favoriteChanged.connect(self.on_favorite_emojis_changed)
+        self.emoji_picker_model.emojiInserted.connect(self.on_emoji_item_inserted)
+        self.emoji_picker_model.emojiRemoved.connect(self.on_emoji_item_removed)
 
     def _init_tray_icon(self):
         """Initialize the system tray icon."""
         self.tray_icon.setToolTip("Discord Bot Creator")
-        
+
         tray_menu = QMenu()
-        
+
         show_action = QAction(self.tr("Show"), self.view)
         show_action.triggered.connect(self.view.show)
         tray_menu.addAction(show_action)
-        
+
         quit_action = QAction(self.tr("Quit"), self.view)
         quit_action.triggered.connect(self.on_quit_action)
         tray_menu.addAction(quit_action)
-        
+
         self.tray_icon.setContextMenu(tray_menu)
         self.tray_icon.activated.connect(self.on_tray_icon_activated)
         self.tray_icon.show()
@@ -222,13 +220,10 @@ class MainController(BaseController[MainView]):
         """Load initial state from settings."""
         self.view.token_line_edit.setText(self.user_settings.value("token"))
 
-        # Load emoji picker state
-        emoji_model = self.emoji_picker.model()
-
-        for emoji in self.user_settings.value("recent_emojis", type=list):
-            emoji_model.emojiItem(emoji).setData(True, QEmojiDataRole.RecentRole)
-        for emoji in self.user_settings.value("favorite_emojis", type=list):
-            emoji_model.emojiItem(emoji).setData(True, QEmojiDataRole.FavoriteRole)
+        for emoji in typing.cast(list, self.user_settings.value("recent_emojis", type=list)):
+            self.emoji_picker_model.addEmoji(EmojiCategory.Recents, QEmojiItem.fromEmoji(emoji))
+        for emoji in typing.cast(list, self.user_settings.value("favorite_emojis", type=list)):
+            self.emoji_picker_model.addEmoji(EmojiCategory.Favorites, QEmojiItem.fromEmoji(emoji))
 
         current_project = self.user_settings.value("current_project")
         projects = DatabaseController.list_projects()
@@ -273,10 +268,10 @@ class MainController(BaseController[MainView]):
     # --- Action Setup Helpers ---
 
     def _create_action(
-        self,
-        icon_name: Optional[str] = None,
-        shortcut: Optional[str] = None,
-        triggered=None,
+            self,
+            icon_name: Optional[str] = None,
+            shortcut: Optional[str] = None,
+            triggered=None,
     ) -> QAction:
         """Helper to create a QAction."""
         action = QAction(self.view)
@@ -398,7 +393,6 @@ class MainController(BaseController[MainView]):
     def translate_ui(self):
         """Translate UI texts for actions."""
         self.view.translate_ui()
-        self.emoji_picker.translateUI()
 
         # Project
         self.new_project_action.setText(self.tr("New"))
@@ -437,7 +431,7 @@ class MainController(BaseController[MainView]):
         self._refresh_models()
         self.view.setWindowTitle(f"Discord Bot Creator - {project_name}")
         self.bot_thread.set_database_name(project_name)
-            
+
         self.switch_project.emit()
 
     def _refresh_models(self):
@@ -576,9 +570,9 @@ class MainController(BaseController[MainView]):
                 return
 
         message_controller = MessageController(
-            self.messages_model, self.database, self.user_settings, self.emoji_picker, index
+            self.messages_model, self.database, self.user_settings, self.emoji_picker_model, index
         )
-        
+
         # If it was a new message (index is None), the controller creates a row and assigns an ID.
         # We need to get that ID to use as a key.
         key = message_controller.message_id
@@ -586,18 +580,9 @@ class MainController(BaseController[MainView]):
         self.message_controllers.add(
             key, message_controller, message_controller.view.finished
         )
-        
+
         self.config_controller.language_changed.connect(message_controller.translate_ui)
         message_controller.view.show()
-
-    @staticmethod
-    def _create_emoji_picker() -> QEmojiPicker:
-        picker = QEmojiPicker()
-        picker.setContentsMargins(10, 10, 10, 10)
-        picker.setWindowFlags(Qt.WindowType.Popup | Qt.WindowType.FramelessWindowHint)
-        picker.setFixedSize(500, 500)
-        picker.setEmojiPixmapGetter(EmojiImageProvider.getPixmap)
-        return picker
 
     @Slot()
     def on_new_message_action(self):
@@ -637,11 +622,11 @@ class MainController(BaseController[MainView]):
         source_index = self.messages_proxy_model.mapToSource(index)
         id_index = source_index.siblingAtColumn(self.messages_model.fieldIndex("id"))
         data = self.messages_model.data(id_index)
-        
+
         # Close the window if it's open
         if controller := self.message_controllers.get(data):
             controller.view.close()
-            
+
         self.database.delete_message_by_id(data)
         self.messages_model.select()
 
@@ -669,11 +654,11 @@ class MainController(BaseController[MainView]):
 
         # Close all message windows
         for controller in self.message_controllers.get_all():
-             controller.view.close()
+            controller.view.close()
 
         self.database.delete_all_messages()
         self.messages_model.select()
-        
+
     @Slot()
     def on_message_data_changed(self):
         self.messages_model.submitAll()
@@ -700,23 +685,41 @@ class MainController(BaseController[MainView]):
             pixmap.loadFromData(avatar_bytes)
         self.view.set_bot_info(username, pixmap)
 
-    @Slot(str, bool)
-    def on_recent_emojis_changed(self, emoji: str, recent: bool):
-        emojis: list = self.user_settings.value("recent_emojis", type=list)
-        if recent and emoji not in emojis:
-            emojis.append(emoji)
-        else:
-            emojis.remove(emoji)
-        self.user_settings.setValue("recent_emojis", emojis[-20:])
+    @Slot(QEmojiCategoryItem, QEmojiItem)
+    def on_emoji_item_inserted(self, emoji_category_item: QEmojiCategoryItem, emoji_item: QEmojiItem):
+        limit = -1
 
-    @Slot(str, bool)
-    def on_favorite_emojis_changed(self, emoji: str, favorite: bool):
-        emojis: list = self.user_settings.value("favorite_emojis", type=list)
-        if favorite and emoji not in emojis:
-            emojis.append(emoji)
+        if emoji_category_item.category() == EmojiCategory.Recents:
+            emojis_source = "recent_emojis"
+            limit = 20
+        elif emoji_category_item.category() == EmojiCategory.Favorites:
+            emojis_source = "favorite_emojis"
         else:
-            emojis.remove(emoji)
-        self.user_settings.setValue("favorite_emojis", emojis)
+            raise ValueError("Unknown emoji category")
+
+        emojis = typing.cast(list, self.user_settings.value(emojis_source, type=list))
+        emojis.append(emoji_item.emojiChar().char)
+        if limit:
+            emojis = emojis[-limit:]
+        self.user_settings.setValue(emojis_source, emojis)
+
+    @Slot(QEmojiCategoryItem, QEmojiItem)
+    def on_emoji_item_removed(self, emoji_category_item: QEmojiCategoryItem, emoji_item: QEmojiItem):
+        limit = -1
+
+        if emoji_category_item.category() == EmojiCategory.Recents:
+            emojis_source = "recent_emojis"
+            limit = 20
+        elif emoji_category_item.category() == EmojiCategory.Favorites:
+            emojis_source = "favorite_emojis"
+        else:
+            raise ValueError("Unknown emoji category")
+
+        emojis = typing.cast(list, self.user_settings.value(emojis_source, type=list))
+        emojis.remove(emoji_item.emojiChar().char)
+        if limit:
+            emojis = emojis[-limit:]
+        self.user_settings.setValue(emojis_source, emojis)
 
     # --- Bot Logic ---
 
@@ -782,14 +785,14 @@ class MainController(BaseController[MainView]):
         for guild_id, guild in self.bot_thread.groups().items():
             item = QStandardItem(guild.name)
             item.setData(guild_id, Qt.ItemDataRole.UserRole)
-            
+
             icon_data = self.bot_thread.get_guild_icon_data(guild_id)
             if icon_data:
                 pixmap = QPixmap()
                 pixmap.loadFromData(icon_data)
                 circular_icon = PixmapHelper.get_circular_pixmap(pixmap, 24, self.view.devicePixelRatio())
                 item.setIcon(circular_icon)
-            
+
             self.groups_model.appendRow(item)
 
     @Slot(QPoint)
@@ -800,7 +803,7 @@ class MainController(BaseController[MainView]):
         menu = QMenu(self.view)
 
         if index.isValid() and self.view.groups_list_widget.selectionModel().isSelected(
-            index
+                index
         ):
             menu.addAction(self.config_group_action)
             menu.addAction(self.quit_group_action)
@@ -818,7 +821,7 @@ class MainController(BaseController[MainView]):
         menu = QMenu(self.view)
 
         if index.isValid() and self.view.messages_list_view.selectionModel().isSelected(
-            index
+                index
         ):
             menu.addAction(self.edit_message_action)
             menu.addAction(self.remove_message_action)
@@ -838,14 +841,14 @@ class MainController(BaseController[MainView]):
         if guild:
             item = QStandardItem(guild.name)
             item.setData(guild_id, Qt.ItemDataRole.UserRole)
-            
+
             icon_data = self.bot_thread.get_guild_icon_data(guild_id)
             if icon_data:
                 pixmap = QPixmap()
                 pixmap.loadFromData(icon_data)
                 circular_icon = PixmapHelper.get_circular_pixmap(pixmap, 24, self.view.devicePixelRatio())
                 item.setIcon(circular_icon)
-            
+
             self.groups_model.appendRow(item)
 
     @Slot(str)
@@ -880,7 +883,7 @@ class MainController(BaseController[MainView]):
         if matches:
             item = self.groups_model.itemFromIndex(matches[0])
             item.setText(guild.name)
-            
+
             icon_data = self.bot_thread.get_guild_icon_data(guild_id)
             if icon_data:
                 pixmap = QPixmap()

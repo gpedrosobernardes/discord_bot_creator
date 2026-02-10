@@ -12,7 +12,7 @@ from PySide6.QtWidgets import (
     QHeaderView,
     QAbstractItemView,
 )
-from qextrawidgets.icons import QThemeResponsiveIcon
+from qextrawidgets.gui.icons import QThemeResponsiveIcon
 
 from source.core.constants import StrField, IntField, BoolField, StrComparator, IntComparator, BoolComparator
 from source.qt.delegates.boolean import BooleanDelegate
