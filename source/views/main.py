@@ -2,25 +2,25 @@ import qtawesome
 from PySide6.QtCore import QSize, Qt
 from PySide6.QtGui import QIcon, QPixmap
 from PySide6.QtWidgets import (
-    QWidget,
-    QVBoxLayout,
+    QGroupBox,
+    QHBoxLayout,
     QLabel,
-    QMainWindow,
-    QTabWidget,
-    QSplitter,
-    QToolButton,
-    QListView,
     QLineEdit,
+    QListView,
+    QMainWindow,
     QMenu,
     QMenuBar,
-    QHBoxLayout,
-    QGroupBox,
+    QSplitter,
+    QTabWidget,
+    QToolButton,
+    QVBoxLayout,
+    QWidget,
 )
+from qextrawidgets.core.utils import QIconGenerator
 from qextrawidgets.gui.icons import QThemeResponsiveIcon
-from qextrawidgets.widgets.inputs import QSearchLineEdit, QPasswordLineEdit
 from qextrawidgets.widgets.buttons import QColorButton
+from qextrawidgets.widgets.inputs import QPasswordLineEdit, QSearchLineEdit
 
-from source.qt.helpers.pixmap import PixmapHelper
 from source.qt.widgets.bot_info import BotInfoWidget
 from source.qt.widgets.groups_list import QGroupsList
 from source.qt.widgets.log_textedit import QLogTextEdit
@@ -43,7 +43,7 @@ class MainView(QMainWindow):
 
     def _init_ui(self):
         """Initialize widgets and configure their properties."""
-        self.setMinimumSize(900, 650) # Aumentei um pouco o mínimo para conforto
+        self.setMinimumSize(900, 650)  # Aumentei um pouco o mínimo para conforto
         self.resize(1100, 800)
         self.setWindowIcon(QIcon("assets/icons/window-icon.svg"))
         self.setWindowTitle("Discord Bot Creator")
@@ -94,7 +94,7 @@ class MainView(QMainWindow):
         self.cmd_line_edit = QLineEdit()
 
         # Connection Group
-        self.connection_group = QGroupBox() # Title defined in translate_ui
+        self.connection_group = QGroupBox()  # Title defined in translate_ui
         self.token_label = QLabel()
         self.token_line_edit = QPasswordLineEdit()
         self.token_line_edit.setMaxLength(100)
@@ -119,7 +119,7 @@ class MainView(QMainWindow):
         self.switch_bot_button = QColorButton("#4CAF50", "", "white", "#F44336")
         self.switch_bot_button.setCheckable(True)
         self.switch_bot_button.setIcon(switch_icon)
-        self.switch_bot_button.setMinimumHeight(45) # Botão mais robusto
+        self.switch_bot_button.setMinimumHeight(45)  # Botão mais robusto
         self.switch_bot_button.setCursor(Qt.CursorShape.PointingHandCursor)
 
     def _init_layout(self):
@@ -128,8 +128,12 @@ class MainView(QMainWindow):
         messages_tab = self._create_messages_tab()
         groups_tab = self._create_groups_tab()
 
-        self.left_tab_widget.addTab(messages_tab, QThemeResponsiveIcon.fromAwesome("fa6s.message"), "")
-        self.left_tab_widget.addTab(groups_tab, QThemeResponsiveIcon.fromAwesome("fa6s.users"), "")
+        self.left_tab_widget.addTab(
+            messages_tab, QThemeResponsiveIcon.fromAwesome("fa6s.message"), ""
+        )
+        self.left_tab_widget.addTab(
+            groups_tab, QThemeResponsiveIcon.fromAwesome("fa6s.users"), ""
+        )
 
         # 2. Create Right Panel
         right_panel = self._create_right_panel()
@@ -138,8 +142,8 @@ class MainView(QMainWindow):
         splitter = QSplitter(Qt.Orientation.Horizontal)
         splitter.addWidget(self.left_tab_widget)
         splitter.addWidget(right_panel)
-        splitter.setStretchFactor(0, 1) # Esquerda cresce menos
-        splitter.setStretchFactor(1, 3) # Direita tem prioridade de espaço (3x)
+        splitter.setStretchFactor(0, 1)  # Esquerda cresce menos
+        splitter.setStretchFactor(1, 3)  # Direita tem prioridade de espaço (3x)
 
         self.setCentralWidget(splitter)
 
@@ -150,12 +154,12 @@ class MainView(QMainWindow):
         toolbar_layout.setSpacing(2)
         toolbar_layout.addStretch()
         for btn in (
-                self.new_message_tool_button,
-                self.edit_message_tool_button,
-                self.remove_message_tool_button,
-                self.remove_all_message_tool_button,
+            self.new_message_tool_button,
+            self.edit_message_tool_button,
+            self.remove_message_tool_button,
+            self.remove_all_message_tool_button,
         ):
-            btn.setFixedSize(30, 30) # Tamanho uniforme
+            btn.setFixedSize(30, 30)  # Tamanho uniforme
             toolbar_layout.addWidget(btn)
 
         # Main Layout
@@ -176,7 +180,11 @@ class MainView(QMainWindow):
         toolbar_layout = QHBoxLayout()
         toolbar_layout.setSpacing(2)
         toolbar_layout.addStretch()
-        for btn in (self.config_group_button, self.quit_group_button, self.generate_invite_button):
+        for btn in (
+            self.config_group_button,
+            self.quit_group_button,
+            self.generate_invite_button,
+        ):
             btn.setFixedSize(30, 30)
             toolbar_layout.addWidget(btn)
 
@@ -208,8 +216,8 @@ class MainView(QMainWindow):
 
         # --- Section 2: Console (Logs + Command) ---
         console_layout = QVBoxLayout()
-        console_layout.setSpacing(2) # Cmd colado no log
-        console_layout.addWidget(QLabel(self.tr("System Logs:"))) # Label explícita
+        console_layout.setSpacing(2)  # Cmd colado no log
+        console_layout.addWidget(QLabel(self.tr("System Logs:")))  # Label explícita
         console_layout.addWidget(self.logs_text_edit)
         console_layout.addWidget(self.cmd_line_edit)
 
@@ -221,7 +229,9 @@ class MainView(QMainWindow):
         # Adicionar tudo ao layout principal
         main_layout.addLayout(action_layout)
         main_layout.addWidget(self.connection_group)
-        main_layout.addLayout(console_layout, stretch=True) # Log ocupa o espaço sobrando
+        main_layout.addLayout(
+            console_layout, stretch=True
+        )  # Log ocupa o espaço sobrando
 
         container = QWidget()
         container.setMinimumWidth(520)
@@ -233,9 +243,11 @@ class MainView(QMainWindow):
         dpr = self.devicePixelRatio()
 
         if not icon:
-            icon = PixmapHelper.create_icon_with_background("fa6s.robot", "gray", 40, dpr)
+            icon = QIconGenerator.createIconWithBackground(
+                "fa6s.robot", "gray", 40, dpr
+            )
 
-        circular_icon = PixmapHelper.get_circular_pixmap(icon, 40, dpr)
+        circular_icon = QIconGenerator.getCircularPixmap(icon, 40, dpr)
         self.bot_info_widget.set_info(name, circular_icon)
 
     def reset_bot_info(self):

@@ -3,28 +3,37 @@ import typing
 import webbrowser
 from typing import Optional
 
+from discord import utils
 from PySide6.QtCore import (
-    QSortFilterProxyModel,
-    QSettings,
-    Qt,
-    Slot,
-    Signal,
+    QByteArray,
     QPoint,
-    QByteArray)
+    QSettings,
+    QSortFilterProxyModel,
+    Qt,
+    Signal,
+    Slot,
+)
 from PySide6.QtGui import (
     QAction,
-    QKeySequence,
-    QStandardItemModel,
-    QStandardItem,
     QGuiApplication,
     QIcon,
+    QKeySequence,
     QPixmap,
+    QStandardItem,
+    QStandardItemModel,
 )
-from PySide6.QtWidgets import QCompleter, QInputDialog, QMessageBox, QMenu, QDialog, QSystemTrayIcon
-from discord import utils
+from PySide6.QtWidgets import (
+    QCompleter,
+    QDialog,
+    QInputDialog,
+    QMenu,
+    QMessageBox,
+    QSystemTrayIcon,
+)
+from qextrawidgets.core.utils import QIconGenerator
 from qextrawidgets.gui.icons import QThemeResponsiveIcon
 from qextrawidgets.gui.items import QEmojiCategoryItem, QEmojiItem
-from qextrawidgets.gui.models.emoji_picker_model import QEmojiPickerModel, EmojiCategory
+from qextrawidgets.gui.models.emoji_picker_model import EmojiCategory, QEmojiPickerModel
 
 from source.controllers.base import BaseController
 from source.controllers.config import ConfigController
@@ -35,7 +44,6 @@ from source.core.bot_engine.bot_thread import QBotThread
 from source.core.database import DatabaseController
 from source.core.discord_api import DiscordAPIClient
 from source.core.log_handler import LogHandler
-from source.qt.helpers.pixmap import PixmapHelper
 from source.qt.validators.token_validator import TokenValidator
 from source.views.credits import CreditsView
 from source.views.invite import InviteDialog
@@ -54,13 +62,13 @@ class MainController(BaseController[MainView]):
     switch_project = Signal()
 
     def __init__(
-            self,
-            database: DatabaseController,
-            user_settings: QSettings,
-            config_controller: ConfigController,
-            logs_view: LogsView,
-            credits_view: CreditsView,
-            log_handler: LogHandler,
+        self,
+        database: DatabaseController,
+        user_settings: QSettings,
+        config_controller: ConfigController,
+        logs_view: LogsView,
+        credits_view: CreditsView,
+        log_handler: LogHandler,
     ):
         """
         Initializes the MainController.
@@ -92,7 +100,9 @@ class MainController(BaseController[MainView]):
         self.emoji_picker_model = QEmojiPickerModel()
         self.discord_api = DiscordAPIClient(self)
         self._current_bot_id = None
-        self.tray_icon = QSystemTrayIcon(QIcon("assets/icons/window-icon.svg"), self.view)
+        self.tray_icon = QSystemTrayIcon(
+            QIcon("assets/icons/window-icon.svg"), self.view
+        )
 
         # 4. Init Sequence
         self._init_models()
@@ -176,7 +186,9 @@ class MainController(BaseController[MainView]):
 
         # Bot Thread Connections
         self.bot_thread.signals.login_failure.connect(self.on_bot_login_failure)
-        self.bot_thread.signals.privileged_intents_error.connect(self.on_bot_privileged_intents_error)
+        self.bot_thread.signals.privileged_intents_error.connect(
+            self.on_bot_privileged_intents_error
+        )
         self.bot_thread.finished.connect(self.on_bot_finished)
         self.bot_thread.signals.bot_ready.connect(self.on_bot_ready)
         self.bot_thread.signals.guild_join.connect(self.on_guild_join)
@@ -188,7 +200,9 @@ class MainController(BaseController[MainView]):
 
         # ALTERADO: Novas conexões da API
         self.discord_api.bot_identity_received.connect(self._on_bot_info_fetched)
-        self.discord_api.guilds_received.connect(self._on_guilds_received)  # Nova conexão
+        self.discord_api.guilds_received.connect(
+            self._on_guilds_received
+        )  # Nova conexão
         self.discord_api.guild_icon_received.connect(self._on_guild_icon_received)
 
         # Remover a conexão antiga de falha se não existir mais na nova classe ou adaptar
@@ -220,10 +234,18 @@ class MainController(BaseController[MainView]):
         """Load initial state from settings."""
         self.view.token_line_edit.setText(self.user_settings.value("token"))
 
-        for emoji in typing.cast(list, self.user_settings.value("recent_emojis", type=list)):
-            self.emoji_picker_model.addEmoji(EmojiCategory.Recents, QEmojiItem.fromEmoji(emoji))
-        for emoji in typing.cast(list, self.user_settings.value("favorite_emojis", type=list)):
-            self.emoji_picker_model.addEmoji(EmojiCategory.Favorites, QEmojiItem.fromEmoji(emoji))
+        for emoji in typing.cast(
+            list, self.user_settings.value("recent_emojis", type=list)
+        ):
+            self.emoji_picker_model.addEmoji(
+                EmojiCategory.Recents, QEmojiItem.fromEmoji(emoji)
+            )
+        for emoji in typing.cast(
+            list, self.user_settings.value("favorite_emojis", type=list)
+        ):
+            self.emoji_picker_model.addEmoji(
+                EmojiCategory.Favorites, QEmojiItem.fromEmoji(emoji)
+            )
 
         current_project = self.user_settings.value("current_project")
         projects = DatabaseController.list_projects()
@@ -268,10 +290,10 @@ class MainController(BaseController[MainView]):
     # --- Action Setup Helpers ---
 
     def _create_action(
-            self,
-            icon_name: Optional[str] = None,
-            shortcut: Optional[str] = None,
-            triggered=None,
+        self,
+        icon_name: Optional[str] = None,
+        shortcut: Optional[str] = None,
+        triggered=None,
     ) -> QAction:
         """Helper to create a QAction."""
         action = QAction(self.view)
@@ -570,7 +592,11 @@ class MainController(BaseController[MainView]):
                 return
 
         message_controller = MessageController(
-            self.messages_model, self.database, self.user_settings, self.emoji_picker_model, index
+            self.messages_model,
+            self.database,
+            self.user_settings,
+            self.emoji_picker_model,
+            index,
         )
 
         # If it was a new message (index is None), the controller creates a row and assigns an ID.
@@ -677,7 +703,9 @@ class MainController(BaseController[MainView]):
             self.discord_api.fetch_guilds()  # Busca grupos imediatamente!
 
     @Slot(str, str, QByteArray)
-    def _on_bot_info_fetched(self, username: str, user_id: str, avatar_bytes: QByteArray):
+    def _on_bot_info_fetched(
+        self, username: str, user_id: str, avatar_bytes: QByteArray
+    ):
         self._current_bot_id = user_id
         pixmap = None
         if not avatar_bytes.isEmpty():
@@ -686,7 +714,9 @@ class MainController(BaseController[MainView]):
         self.view.set_bot_info(username, pixmap)
 
     @Slot(QEmojiCategoryItem, QEmojiItem)
-    def on_emoji_item_inserted(self, emoji_category_item: QEmojiCategoryItem, emoji_item: QEmojiItem):
+    def on_emoji_item_inserted(
+        self, emoji_category_item: QEmojiCategoryItem, emoji_item: QEmojiItem
+    ):
         limit = -1
 
         if emoji_category_item.category() == EmojiCategory.Recents:
@@ -704,7 +734,9 @@ class MainController(BaseController[MainView]):
         self.user_settings.setValue(emojis_source, emojis)
 
     @Slot(QEmojiCategoryItem, QEmojiItem)
-    def on_emoji_item_removed(self, emoji_category_item: QEmojiCategoryItem, emoji_item: QEmojiItem):
+    def on_emoji_item_removed(
+        self, emoji_category_item: QEmojiCategoryItem, emoji_item: QEmojiItem
+    ):
         limit = -1
 
         if emoji_category_item.category() == EmojiCategory.Recents:
@@ -790,7 +822,9 @@ class MainController(BaseController[MainView]):
             if icon_data:
                 pixmap = QPixmap()
                 pixmap.loadFromData(icon_data)
-                circular_icon = PixmapHelper.get_circular_pixmap(pixmap, 24, self.view.devicePixelRatio())
+                circular_icon = QIconGenerator.getCircularPixmap(
+                    pixmap, 24, self.view.devicePixelRatio()
+                )
                 item.setIcon(circular_icon)
 
             self.groups_model.appendRow(item)
@@ -803,7 +837,7 @@ class MainController(BaseController[MainView]):
         menu = QMenu(self.view)
 
         if index.isValid() and self.view.groups_list_widget.selectionModel().isSelected(
-                index
+            index
         ):
             menu.addAction(self.config_group_action)
             menu.addAction(self.quit_group_action)
@@ -821,7 +855,7 @@ class MainController(BaseController[MainView]):
         menu = QMenu(self.view)
 
         if index.isValid() and self.view.messages_list_view.selectionModel().isSelected(
-                index
+            index
         ):
             menu.addAction(self.edit_message_action)
             menu.addAction(self.remove_message_action)
@@ -846,7 +880,9 @@ class MainController(BaseController[MainView]):
             if icon_data:
                 pixmap = QPixmap()
                 pixmap.loadFromData(icon_data)
-                circular_icon = PixmapHelper.get_circular_pixmap(pixmap, 24, self.view.devicePixelRatio())
+                circular_icon = QIconGenerator.getCircularPixmap(
+                    pixmap, 24, self.view.devicePixelRatio()
+                )
                 item.setIcon(circular_icon)
 
             self.groups_model.appendRow(item)
@@ -917,9 +953,7 @@ class MainController(BaseController[MainView]):
 
         controller = GroupController(self.database, group_id, group_name, token)
 
-        self.group_controllers.add(
-            group_id, controller, controller.view.finished
-        )
+        self.group_controllers.add(group_id, controller, controller.view.finished)
         controller.view.show()
 
     @Slot()
@@ -1029,7 +1063,7 @@ class MainController(BaseController[MainView]):
             Qt.ItemDataRole.UserRole,
             guild_id,
             1,
-            Qt.MatchFlag.MatchExactly
+            Qt.MatchFlag.MatchExactly,
         )
 
         if match:
@@ -1040,10 +1074,10 @@ class MainController(BaseController[MainView]):
             pixmap.loadFromData(icon_bytes)
 
             # Aplica o recorte circular (usando seu helper existente)
-            circular_icon = PixmapHelper.get_circular_pixmap(
+            circular_icon = QIconGenerator.getCircularPixmap(
                 pixmap,
                 24,  # Tamanho do ícone
-                self.view.devicePixelRatio()
+                self.view.devicePixelRatio(),
             )
 
             item.setIcon(circular_icon)
