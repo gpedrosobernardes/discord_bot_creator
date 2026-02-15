@@ -16,7 +16,10 @@
 
 ## 📖 About
 
-**Discord Bot Creator** is a desktop application designed to simplify the process of creating Discord bots. It provides a user-friendly interface to configure commands, automated replies, and moderation actions. Whether you are a beginner looking to make your first bot or a developer needing a quick GUI solution, this tool utilizes the robust **discord.py** library and a modern **MVC architecture** to deliver performance and stability.
+**Discord Bot Creator** is a desktop application designed to simplify the process of creating Discord bots. It provides
+a user-friendly interface to configure commands, automated replies, and moderation actions. Whether you are a beginner
+looking to make your first bot or a developer needing a quick GUI solution, this tool utilizes the robust **discord.py**
+library and a modern **MVC architecture** to deliver performance and stability.
 
 ## ✨ Key Features
 
@@ -32,7 +35,8 @@
 This project relies on modern Python libraries to ensure a native and fluid experience:
 
 * **Core:** [Python 3.13+](https://www.python.org/)
-* **GUI Framework:** [PySide6](https://pypi.org/project/PySide6/) (v6.10.1) & [QtAwesome](https://pypi.org/project/QtAwesome/)
+* **GUI Framework:** [PySide6](https://pypi.org/project/PySide6/) (
+  v6.10.1) & [QtAwesome](https://pypi.org/project/QtAwesome/)
 * **Bot Logic:** [discord.py](https://discordpy.readthedocs.io/en/stable/)
 * **Widgets:** [QExtraWidgets](https://github.com/gpedrosobernardes/QExtraWidgets)
 * **Emojis:** Twemoji API & Emoji Data Python
@@ -45,47 +49,64 @@ Ensure you have Python 3.10 or higher installed. This project specifically targe
 
 ### Installation
 
-1.  **Clone the repository:**
-    ```bash
-    git clone https://github.com/gpedrosobernardes/discord_bot_creator
-    cd discord_bot_creator
-    ```
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/gpedrosobernardes/discord_bot_creator
+   cd discord_bot_creator
+   ```
 
-2.  **Install dependencies:**
-    ```bash
-    pip install -r requirements.txt
-    ```
+2. **Install dependencies:**
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-3.  **Run the application:**
-    ```bash
-    python main.py
-    ```
+3. **Run the application:**
+   ```bash
+   python main.py
+   ```
+
+### ⚠️ Security Note (Windows)
+
+If you are running the compiled version (`.exe`) or launching the script for the first time, Windows SmartScreen may
+display a warning: **"Windows protected your PC"**.
+
+This happens because the application is not signed with a paid digital certificate. To run it:
+
+1. Click on **"More info"**.
+2. Click on **"Run anyway"**.
 
 ## ⚙️ Usage
 
 ### 1. Token Setup
+
 Upon launching the application, you will need to provide your Discord Bot Token.
-1.  Go to the [Discord Developer Portal](https://discord.com/developers/applications).
-2.  Create a new application and generate a Bot Token.
-3.  Paste the token into the application's **Token** field.
+
+1. Go to the [Discord Developer Portal](https://discord.com/developers/applications).
+2. Create a new application and generate a Bot Token.
+3. Paste the token into the application's **Token** field.
 
 ### 2. Creating Logic
+
 Use the **Editor Window** to define how your bot reacts:
+
 * **Expected Message:** The trigger (e.g., "!hello").
 * **Conditions:** Refine the trigger (e.g., *User is not admin* OR *Channel name contains "general"*).
 * **Actions:** Define what happens (Reply "Hi there!", React with 😎, etc.).
 
 ### 3. Running the Bot
+
 Click the **"Turn on Bot"** button in the interface. You can view real-time logs in the "Logs" window.
 
 Alternatively, you can run the bot process headless (without GUI):
+
 ```bash
 python bot.py
 ```
 
 ## 📦 Building from Source
 
-To create a standalone executable (`.exe`) for distribution, use the included `setup.py` script which utilizes `cx_Freeze`.
+To create a standalone executable (`.exe`) for distribution, use the included `setup.py` script which utilizes
+`cx_Freeze`.
 
 ```bash
 python setup.py build
@@ -95,7 +116,8 @@ The executable will be generated in the `build/` directory, including all necess
 
 ## 💻 For Developers
 
-This project follows a strict **Model-View-Controller (MVC)** architectural pattern to ensure scalability and maintainability.
+This project follows a strict **Model-View-Controller (MVC)** architectural pattern to ensure scalability and
+maintainability.
 
 ### Project Structure
 
@@ -109,6 +131,7 @@ This project follows a strict **Model-View-Controller (MVC)** architectural patt
 To add or update languages, you need **Qt Linguist** tools.
 
 1. **Generate/Update translation files:**
+
 ```bash
 pyside6-lupdate -extensions py ./source -no-obsolete -ts translations/generated/en_us.ts
 ```
@@ -116,6 +139,7 @@ pyside6-lupdate -extensions py ./source -no-obsolete -ts translations/generated/
 2. **Edit the `.ts` file** using Qt Linguist.
 
 3. **Compile to `.qm`:**
+
 ```bash
 pyside6-lrelease translations/generated/en_us.ts -qm translations/build/en_us.qm
 ```
