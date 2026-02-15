@@ -10,7 +10,6 @@ from source.core.database import DatabaseController
 from source.core.log_handler import LogHandler
 
 
-
 class Application(BaseApplication):
     def __init__(self):
         super().__init__()
@@ -46,3 +45,10 @@ class Application(BaseApplication):
         self.main_controller.switch_project.connect(
             self.logs_controller.load_logs_model
         )
+
+    def _show_main_window(self):
+        """Mostra e ativa a janela principal quando outra instância tenta iniciar."""
+        if hasattr(self, "main_controller") and self.main_controller.view:
+            self.main_controller.view.show()
+            self.main_controller.view.raise_()
+            self.main_controller.view.activateWindow()
