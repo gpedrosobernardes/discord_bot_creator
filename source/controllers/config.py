@@ -3,8 +3,8 @@ from __future__ import annotations
 import locale
 import logging
 
-from PySide6.QtCore import QTranslator, QSettings, Signal, Slot
-from PySide6.QtGui import QGuiApplication, Qt, QFontDatabase
+from PySide6.QtCore import QSettings, QTranslator, Signal, Slot
+from PySide6.QtGui import QFontDatabase, QGuiApplication, Qt
 from PySide6.QtWidgets import QApplication
 
 from source.controllers.base import BaseController
@@ -49,6 +49,7 @@ class ConfigController(BaseController[ConfigView]):
 
         # Theme
         current_theme = user_settings.value("theme")
+
         index = self.view.theme_combo.findData(current_theme)
         if index >= 0:
             self.view.theme_combo.setCurrentIndex(index)
@@ -73,15 +74,10 @@ class ConfigController(BaseController[ConfigView]):
         selected_style = user_settings.value("style")
 
         if selected_style == "windowsvista":
-            selected_theme = "Light"
+            selected_theme = Qt.ColorScheme.Light
 
         style_hints = QGuiApplication.styleHints()
-        if selected_theme == "Dark":
-            style_hints.setColorScheme(Qt.ColorScheme.Dark)
-        elif selected_theme == "Light":
-            style_hints.setColorScheme(Qt.ColorScheme.Light)
-        else:
-            style_hints.setColorScheme(Qt.ColorScheme.Unknown)
+        style_hints.setColorScheme(selected_theme)
 
     @staticmethod
     def apply_style(user_settings: QSettings):

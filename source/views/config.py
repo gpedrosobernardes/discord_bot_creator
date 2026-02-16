@@ -1,19 +1,19 @@
 import logging
 from typing import Optional
 
-from PySide6.QtGui import QIcon
+from PySide6.QtGui import QIcon, Qt
 from PySide6.QtWidgets import (
-    QDialog,
-    QVBoxLayout,
-    QComboBox,
     QCheckBox,
-    QPushButton,
-    QHBoxLayout,
+    QComboBox,
+    QDialog,
     QFormLayout,
-    QLabel,
-    QStyleFactory,
-    QWidget,
     QGroupBox,
+    QHBoxLayout,
+    QLabel,
+    QPushButton,
+    QStyleFactory,
+    QVBoxLayout,
+    QWidget,
 )
 from qextrawidgets.core.utils import QEmojiFonts
 
@@ -58,9 +58,8 @@ class ConfigView(QDialog):
         # --- Appearance Settings ---
         self.theme_label = QLabel()
         self.theme_combo = QComboBox()
-        self.theme_combo.addItem("", "Light")
-        self.theme_combo.addItem("", "Dark")
-        self.theme_combo.addItem("", "System")
+        for color_scheme in Qt.ColorScheme:
+            self.theme_combo.addItem("", color_scheme)
 
         self.style_label = QLabel()
         self.style_combo = QComboBox()
@@ -149,9 +148,9 @@ class ConfigView(QDialog):
         self.language_combo.setItemText(0, self.tr("English"))
         self.language_combo.setItemText(1, self.tr("Portuguese"))
 
-        self.theme_combo.setItemText(0, self.tr("Light"))
-        self.theme_combo.setItemText(1, self.tr("Dark"))
-        self.theme_combo.setItemText(2, self.tr("System"))
+        self.theme_combo.setItemText(0, self.tr("System"))
+        self.theme_combo.setItemText(1, self.tr("Light"))
+        self.theme_combo.setItemText(2, self.tr("Dark"))
 
         self.log_level_combo.setItemText(0, self.tr("Critical"))
         self.log_level_combo.setItemText(1, self.tr("Error"))

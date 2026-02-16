@@ -1,6 +1,6 @@
 import logging
 
-from PySide6.QtCore import QSettings
+from PySide6.QtCore import QSettings, Qt
 from qextrawidgets.core.utils import QEmojiFonts
 
 from source.core.constants import Language
@@ -16,6 +16,7 @@ class Settings(QSettings):
             "log_level": logging.INFO,
             "database": ":memory:",
             "style": "windows11",
+            "theme": Qt.ColorScheme.Unknown,
             "emoji_font": QEmojiFonts.loadTwemojiFont(),
             "recent_emojis": [],
             "favorite_emojis": [],
