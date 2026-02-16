@@ -218,13 +218,13 @@ class MainController(BaseController[MainView]):
 
         tray_menu = QMenu()
 
-        show_action = QAction(self.tr("Show"), self.view)
-        show_action.triggered.connect(self.view.show)
-        tray_menu.addAction(show_action)
+        self.show_action = QAction(self.tr("Show"), self.view)
+        self.show_action.triggered.connect(self.view.show)
+        tray_menu.addAction(self.show_action)
 
-        quit_action = QAction(self.tr("Quit"), self.view)
-        quit_action.triggered.connect(self.on_quit_action)
-        tray_menu.addAction(quit_action)
+        self.quit_action = QAction(self.tr("Quit"), self.view)
+        self.quit_action.triggered.connect(self.on_quit_action)
+        tray_menu.addAction(self.quit_action)
 
         self.tray_icon.setContextMenu(tray_menu)
         self.tray_icon.activated.connect(self.on_tray_icon_activated)
@@ -441,6 +441,10 @@ class MainController(BaseController[MainView]):
         self.project_action.setText(self.tr("Project"))
         self.report_bug_action.setText(self.tr("Report bug"))
         self.discord_applications_action.setText(self.tr("Discord applications"))
+
+        # Tray Icon
+        self.show_action.setText(self.tr("Show"))
+        self.quit_action.setText(self.tr("Quit"))
 
     # --- Project Management Logic ---
 
@@ -1095,5 +1099,6 @@ class MainController(BaseController[MainView]):
     @Slot()
     def on_quit_action(self):
         """Handles the quit action from the tray icon."""
-        self.view.force_quit = True
         self.view.close()
+        self.bot_thread.close()
+        sys.exit()
