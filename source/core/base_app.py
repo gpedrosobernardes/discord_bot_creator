@@ -2,6 +2,7 @@ import locale
 import sys
 
 from PySide6.QtCore import QTranslator
+from PySide6.QtGui import QIcon
 from PySide6.QtNetwork import QLocalServer, QLocalSocket
 from PySide6.QtWidgets import QApplication, QMessageBox
 
@@ -11,6 +12,7 @@ from source.core.settings import Settings
 class BaseApplication(QApplication):
     def __init__(self):
         super().__init__(sys.argv)
+        self.setWindowIcon(QIcon("assets/icons/window-icon.svg"))
 
         # Verificar instância única
         self._server_name = "DiscordBotCreatorSingleInstance"
