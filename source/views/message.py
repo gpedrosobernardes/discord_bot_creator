@@ -89,8 +89,8 @@ class MessageView(QDialog):
 
         self.accordion = QAccordion()
         listbox_accordion_item = self.accordion.addSection("", self.listbox_conditions)
-        self.accordion.addSection("", self.reactions_widget)
         self.accordion.addSection("", self.listbox_replies)
+        self.accordion.addSection("", self.reactions_widget)
         self.accordion.setAnimationEnabled(False)
         listbox_accordion_item.setExpanded(True)
 
@@ -175,7 +175,7 @@ class MessageView(QDialog):
         self.settings_group.setTitle(self.tr("Rule Configuration"))
 
         for i, text in enumerate(
-            [self.tr("Conditions (Triggers)"), self.tr("Reactions"), self.tr("Replies")]
+            [self.tr("Conditions (Triggers)"), self.tr("Replies"), self.tr("Reactions")]
         ):
             self.accordion.setSectionTitle(i, text)
 
