@@ -512,19 +512,19 @@ class MessageController(BaseController[MessageView]):
                 self._str_comparator_model
             )
             self.view.listbox_conditions.set_case_insensitive_disabled(False)
-            self.view.listbox_conditions.set_value_input_mode(is_boolean=False)
+            self.view.listbox_conditions.set_value_input_mode("str")
         elif field in [f.value for f in IntField]:
             self.view.listbox_conditions.set_comparator_model(
                 self._int_comparator_model
             )
             self.view.listbox_conditions.set_case_insensitive_disabled(True)
-            self.view.listbox_conditions.set_value_input_mode(is_boolean=False)
+            self.view.listbox_conditions.set_value_input_mode("int")
         elif field in [f.value for f in BoolField]:
             self.view.listbox_conditions.set_comparator_model(
                 self._bool_comparator_model
             )
             self.view.listbox_conditions.set_case_insensitive_disabled(True)
-            self.view.listbox_conditions.set_value_input_mode(is_boolean=True)
+            self.view.listbox_conditions.set_value_input_mode("bool")
 
     def _show_conditions_menu(self, position: QPoint):
         table_view = self.view.listbox_conditions.table_view()

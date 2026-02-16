@@ -1,20 +1,28 @@
-from PySide6.QtCore import Qt, QSize, Signal
+from PySide6.QtCore import QSize, Qt, Signal
 from PySide6.QtSql import QSqlTableModel
 from PySide6.QtWidgets import (
-    QTableWidget,
-    QVBoxLayout,
-    QHBoxLayout,
-    QWidget,
-    QToolButton,
-    QComboBox,
-    QLineEdit,
-    QTableView,
-    QHeaderView,
     QAbstractItemView,
+    QComboBox,
+    QHBoxLayout,
+    QHeaderView,
+    QLineEdit,
+    QSpinBox,
+    QTableView,
+    QTableWidget,
+    QToolButton,
+    QVBoxLayout,
+    QWidget,
 )
 from qextrawidgets.gui.icons import QThemeResponsiveIcon
 
-from source.core.constants import StrField, IntField, BoolField, StrComparator, IntComparator, BoolComparator
+from source.core.constants import (
+    BoolComparator,
+    BoolField,
+    IntComparator,
+    IntField,
+    StrComparator,
+    StrField,
+)
 from source.qt.delegates.boolean import BooleanDelegate
 from source.qt.delegates.translation import TranslationDelegate
 
@@ -56,6 +64,11 @@ class QConditionForm(QWidget):
         self._case_insensitive_tool_button.setIconSize(icon_size)
 
         self._value_line_edit = QLineEdit()
+        
+        self._value_spinbox = QSpinBox()
+        self._value_spinbox.setVisible(False)
+        self._value_spinbox.setRange(-2147483648, 2147483647)
+
         self._value_combobox = QComboBox()
         self._value_combobox.setVisible(False)
         self._value_combobox.addItems(["True", "False"])
@@ -81,6 +94,7 @@ class QConditionForm(QWidget):
         fields_layout.addWidget(self._comparator_combobox, stretch=1)
         fields_layout.addWidget(self._case_insensitive_tool_button)
         fields_layout.addWidget(self._value_line_edit, stretch=1)
+        fields_layout.addWidget(self._value_spinbox, stretch=1)
         fields_layout.addWidget(self._value_combobox, stretch=1)
         fields_layout.addWidget(self._add_button)
 
@@ -157,13 +171,9 @@ class QConditionForm(QWidget):
 
     def get_value_data(self):
         if self._value_combobox.isVisible():
-            # Return "1" for True and "0" for False to be consistent with DB storage if needed,
-            # or just the string "True"/"False" if the validator handles it.
-            # The validator handles "True"/"False" strings.
-            # But let's check what the combobox has.
-            # It has "True" and "False" items.
-            # Let's return "True" or "False" string.
             return "True" if self._value_combobox.currentIndex() == 0 else "False"
+        elif self._value_spinbox.isVisible():
+            return str(self._value_spinbox.value())
         return self._value_line_edit.text()
 
     def get_case_insensitive_data(self):
@@ -179,6 +189,7 @@ class QConditionForm(QWidget):
         self._field_combobox.setCurrentIndex(0)
         self._comparator_combobox.setCurrentIndex(0)
         self._value_line_edit.clear()
+        self._value_spinbox.setValue(0)
         self._value_combobox.setCurrentIndex(0)
         self._case_insensitive_tool_button.setChecked(False)
         self._reverse_comparator_tool_button.setChecked(False)
@@ -198,10 +209,7 @@ class QConditionForm(QWidget):
     def select_all(self):
         self._table_view.selectAll()
 
-    def set_value_input_mode(self, is_boolean: bool):
-        if is_boolean:
-            self._value_line_edit.setVisible(False)
-            self._value_combobox.setVisible(True)
-        else:
-            self._value_line_edit.setVisible(True)
-            self._value_combobox.setVisible(False)
+    def set_value_input_mode(self, mode: str):
+        self._value_line_edit.setVisible(mode == "str")
+        self._value_spinbox.setVisible(mode == "int")
+        self._value_combobox.setVisible(mode == "bool")
