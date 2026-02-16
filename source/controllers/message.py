@@ -173,6 +173,7 @@ class MessageController(BaseController[MessageView]):
         # Main Window
         self.view.confirm_button.clicked.connect(self.validate)
         self.view.accepted.connect(self.on_accepted)
+        self.view.cancel_button.clicked.connect(self.view.reject)
         self.view.rejected.connect(self.on_rejected)
 
         # Replies
@@ -548,6 +549,8 @@ class MessageController(BaseController[MessageView]):
         elif not name_edit.hasAcceptableInput():
             self._show_error(self.tr("Invalid name"))
             name_edit.setFocus()
+        elif not self._has_visible_rows(self.view.listbox_conditions.table_view()):
+            self._show_error(self.tr("You must add at least one condition."))
         else:
             self.view.accept()
 

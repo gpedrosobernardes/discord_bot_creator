@@ -98,10 +98,6 @@ class MessageView(QDialog):
         self.cancel_button = QPushButton()
         self.confirm_button = QPushButton()
 
-        # Conexões padrão (opcional, mas recomendado para dialogs)
-        self.cancel_button.clicked.connect(self.reject)
-        self.confirm_button.clicked.connect(self.accept)
-
         self.setup_layout()
 
     def setup_layout(self):
