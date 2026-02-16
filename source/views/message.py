@@ -157,8 +157,8 @@ class MessageView(QDialog):
         # --- BLOCO 4: Rodapé (Botões à Direita) ---
         buttons_layout = QHBoxLayout()
         buttons_layout.addStretch()  # Empurra tudo para a direita
-        buttons_layout.addWidget(self.cancel_button)
         buttons_layout.addWidget(self.confirm_button)
+        buttons_layout.addWidget(self.cancel_button)
 
         main_layout.addLayout(buttons_layout)
 
