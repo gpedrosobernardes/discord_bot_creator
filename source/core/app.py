@@ -35,13 +35,6 @@ class Application(BaseApplication):
         sys.exit(self.exec())
 
     def setup_connections(self):
-        for controller in (
-            self.config_controller,
-            self.main_controller,
-            self.logs_controller,
-        ):
-            self.config_controller.language_changed.connect(controller.translate_ui)
-
         self.main_controller.switch_project.connect(
             self.logs_controller.load_logs_model
         )

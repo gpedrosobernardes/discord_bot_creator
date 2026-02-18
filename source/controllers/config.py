@@ -2,8 +2,15 @@ from __future__ import annotations
 
 import locale
 import logging
+import typing
 
-from PySide6.QtCore import QSettings, QTranslator, Signal, Slot
+from PySide6.QtCore import (
+    QLibraryInfo,
+    QLocale,
+    QSettings,
+    QTranslator,
+    Slot,
+)
 from PySide6.QtGui import QFontDatabase, QGuiApplication, Qt
 from PySide6.QtWidgets import QApplication
 
@@ -12,12 +19,15 @@ from source.views.config import ConfigView
 
 
 class ConfigController(BaseController[ConfigView]):
-    language_changed = Signal()
-
     def __init__(self, translator: QTranslator, user_settings: QSettings):
         super().__init__(ConfigView())
+
+        self.qt_translator = QTranslator()
+        QApplication.installTranslator(self.qt_translator)
+
         self.load_settings(user_settings)
         self.apply_theme(user_settings)
+        self.apply_language(user_settings, translator)
         self.apply_style(user_settings)
         self.apply_emoji_font(user_settings)
         self.apply_logging_config(user_settings)
@@ -68,6 +78,18 @@ class ConfigController(BaseController[ConfigView]):
 
         self._update_theme_ui_state()
 
+    def apply_language(self, user_settings: QSettings, translator: QTranslator):
+        language = user_settings.value("language")
+        q_locale = QLocale(language)
+        QLocale.setDefault(q_locale)
+
+        locale.setlocale(locale.LC_ALL, language)
+        translator.load(f"translations/build/{language}.qm")
+
+        path_qt = QLibraryInfo.path(QLibraryInfo.LibraryPath.TranslationsPath)
+        if not self.qt_translator.load("qtbase_" + language, path_qt):
+            logging.error("Failed to load Qt base translator")
+
     @staticmethod
     def apply_theme(user_settings: QSettings):
         selected_theme = user_settings.value("theme")
@@ -91,7 +113,9 @@ class ConfigController(BaseController[ConfigView]):
 
     @staticmethod
     def apply_logging_config(user_settings: QSettings):
-        selected_log_level = user_settings.value("log_level", type=int)
+        selected_log_level = typing.cast(
+            int, user_settings.value("log_level", type=int)
+        )
         logger = logging.getLogger("source.core")
         logger.setLevel(selected_log_level)
 
@@ -117,9 +141,7 @@ class ConfigController(BaseController[ConfigView]):
         # Language
         selected_lang = self.view.language_combo.currentData()
         user_settings.setValue("language", selected_lang)
-        locale.setlocale(locale.LC_ALL, selected_lang)
-        translator.load(f"translations/build/{selected_lang}.qm")
-        self.language_changed.emit()
+        self.apply_language(user_settings, translator)
 
         # Auto start
         user_settings.setValue(

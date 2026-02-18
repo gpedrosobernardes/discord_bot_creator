@@ -1,4 +1,4 @@
-from enum import IntEnum, StrEnum, Enum
+from enum import Enum, IntEnum, StrEnum
 
 from PySide6.QtCore import QT_TRANSLATE_NOOP
 
@@ -30,8 +30,8 @@ class WhereReact(IntEnum):
 
 
 class Language(StrEnum):
-    ENGLISH = "en_us"
-    PORTUGUESE = "pt_br"
+    ENGLISH = "en_US"
+    PORTUGUESE = "pt_BR"
 
 
 class StrField(Enum):

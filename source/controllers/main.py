@@ -6,6 +6,8 @@ from typing import Optional
 from discord import utils
 from PySide6.QtCore import (
     QByteArray,
+    QCoreApplication,
+    QEvent,
     QPoint,
     QSettings,
     QSortFilterProxyModel,
@@ -103,6 +105,7 @@ class MainController(BaseController[MainView]):
         self.tray_icon = QSystemTrayIcon(
             QIcon("assets/icons/window-icon.svg"), self.view
         )
+        QCoreApplication.instance().installEventFilter(self)
 
         # 4. Init Sequence
         self._init_models()

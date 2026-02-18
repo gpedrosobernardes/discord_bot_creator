@@ -17,6 +17,8 @@ from PySide6.QtWidgets import (
 )
 from qextrawidgets.core.utils import QEmojiFonts
 
+from source.core.constants import Language
+
 
 class ConfigView(QDialog):
     """
@@ -49,8 +51,8 @@ class ConfigView(QDialog):
         # --- General Settings ---
         self.language_label = QLabel()
         self.language_combo = QComboBox()
-        for lang in ("en_us", "pt_br"):
-            self.language_combo.addItem("", lang)
+        for lang in Language:
+            self.language_combo.addItem(lang, lang)
 
         self.auto_start_checkbox = QCheckBox()
         self.confirm_actions_checkbox = QCheckBox()
@@ -143,10 +145,6 @@ class ConfigView(QDialog):
         # Checkboxes
         self.auto_start_checkbox.setText(self.tr("Auto start bot"))
         self.confirm_actions_checkbox.setText(self.tr("Confirm actions"))
-
-        # Combo Items
-        self.language_combo.setItemText(0, self.tr("English"))
-        self.language_combo.setItemText(1, self.tr("Portuguese"))
 
         self.theme_combo.setItemText(0, self.tr("System"))
         self.theme_combo.setItemText(1, self.tr("Light"))

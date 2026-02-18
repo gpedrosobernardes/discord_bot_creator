@@ -1,6 +1,6 @@
 from math import ceil
 
-from PySide6.QtCore import QDateTime, QLocale, Slot
+from PySide6.QtCore import QCoreApplication, QDateTime, QEvent, QLocale, Slot
 from qextrawidgets.gui.proxys import QFormatProxyModel
 
 from source.controllers.base import BaseController
