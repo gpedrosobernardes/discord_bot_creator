@@ -44,11 +44,7 @@ class MessageView(QDialog):
         # 1. Identificação
         self.name_text = QLabel()
         self.name_line_edit = QLineEdit()
-        name_entry_validator = QRegularExpressionValidator(
-            QRegularExpression(r"[A-zÀ-ú0-9 ]+")
-        )
         self.name_line_edit.setMaxLength(40)
-        self.name_line_edit.setValidator(name_entry_validator)
 
         # 2. Configurações (Comboboxes e Spins)
         self.settings_group = QGroupBox()
@@ -164,10 +160,6 @@ class MessageView(QDialog):
         self.setWindowTitle(self.tr("Message Rule"))
         self.name_text.setText(self.tr("Rule Name"))
         self.name_line_edit.setPlaceholderText(self.tr("Ex: Anti-Spam Filter"))
-        self.name_line_edit.setToolTip(
-            self.tr("The name can include letters (with accents), numbers, and spaces.")
-        )
-
         self.settings_group.setTitle(self.tr("Rule Configuration"))
 
         for i, text in enumerate(
