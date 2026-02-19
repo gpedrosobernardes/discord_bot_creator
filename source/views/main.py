@@ -88,6 +88,7 @@ class MainView(QMainWindow):
         self.left_tab_widget.setMinimumWidth(300)
 
         # --- Right Side ---
+        self.logs_label = QLabel()
         self.logs_text_edit = QLogTextEdit()
         self.cmd_line_edit = QLineEdit()
 
@@ -215,7 +216,7 @@ class MainView(QMainWindow):
         # --- Section 2: Console (Logs + Command) ---
         console_layout = QVBoxLayout()
         console_layout.setSpacing(2)  # Cmd colado no log
-        console_layout.addWidget(QLabel(self.tr("System Logs:")))  # Label explícita
+        console_layout.addWidget(self.logs_label)  # Label explícita
         console_layout.addWidget(self.logs_text_edit)
         console_layout.addWidget(self.cmd_line_edit)
 
@@ -276,5 +277,11 @@ class MainView(QMainWindow):
         self.connection_group.setTitle(self.tr("Connection Settings"))
         self.cmd_line_edit.setPlaceholderText(self.tr("Type a command..."))
         self.token_label.setText(self.tr("Bot Token:"))
-        self.switch_bot_button.setText(self.tr("Start Bot"))
+
+        if self.switch_bot_button.isChecked():
+            self.switch_bot_button.setText(self.tr("Stop Bot"))
+        else:
+            self.switch_bot_button.setText(self.tr("Start Bot"))
+
+        self.logs_label.setText(self.tr("System Logs:"))
         self.logs_text_edit.setPlaceholderText(self.tr("Waiting for bot to start..."))

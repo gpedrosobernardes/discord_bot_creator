@@ -614,7 +614,6 @@ class MainController(BaseController[MainView]):
             key, message_controller, message_controller.view.finished
         )
 
-        self.config_controller.language_changed.connect(message_controller.translate_ui)
         message_controller.view.show()
 
     @Slot()
@@ -779,9 +778,11 @@ class MainController(BaseController[MainView]):
             self.bot_thread.set_token(token)
             self.bot_thread.start()
             self.view.token_line_edit.setReadOnly(True)
+            self.view.switch_bot_button.setText(self.tr("Stop bot"))
         else:
             self.bot_thread.close()
             self.view.token_line_edit.setReadOnly(False)
+            self.view.switch_bot_button.setText(self.tr("Start bot"))
 
     @Slot()
     def on_bot_login_failure(self):
@@ -793,6 +794,7 @@ class MainController(BaseController[MainView]):
         )
         self.view.switch_bot_button.setChecked(False)
         self.view.token_line_edit.setReadOnly(False)
+        self.view.switch_bot_button.setText(self.tr("Start bot"))
 
     @Slot()
     def on_bot_privileged_intents_error(self):
@@ -808,12 +810,14 @@ class MainController(BaseController[MainView]):
         )
         self.view.switch_bot_button.setChecked(False)
         self.view.token_line_edit.setReadOnly(False)
+        self.view.switch_bot_button.setText(self.tr("Start bot"))
 
     @Slot()
     def on_bot_finished(self):
         """Called when the bot thread finishes."""
         if self.view.switch_bot_button.isChecked():
             self.view.switch_bot_button.setChecked(False)
+            self.view.switch_bot_button.setText(self.tr("Start bot"))
         self.view.token_line_edit.setReadOnly(False)
         self.groups_model.clear()
 
