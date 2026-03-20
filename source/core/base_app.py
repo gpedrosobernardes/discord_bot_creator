@@ -8,6 +8,8 @@ from PySide6.QtWidgets import QApplication, QMessageBox
 
 from source.core.settings import Settings
 
+from PySide6.QtCore import QLocale
+
 
 class BaseApplication(QApplication):
     def __init__(self):
@@ -36,7 +38,7 @@ class BaseApplication(QApplication):
         self.translator.load(f"translations/build/{lang}.qm")
         self.installTranslator(self.translator)
 
-        locale.setlocale(locale.LC_ALL, lang)
+        self.set_locale(lang)
 
     def _check_single_instance(self) -> bool:
         """
@@ -63,7 +65,7 @@ class BaseApplication(QApplication):
         if not self._local_server.listen(self._server_name):
             return False
 
-        # Conectar sinal para receber conexões
+        # Conectar sinal para receber conexões5
         self._local_server.newConnection.connect(self._on_new_connection)
         return True
 
@@ -87,3 +89,23 @@ class BaseApplication(QApplication):
         Método para ser sobrescrito pela classe filha para mostrar a janela principal.
         """
         pass
+
+    def set_locale(self, locale_: str) -> None:
+        """
+        Define o locale da aplicação.
+        """
+        q_locale = QLocale(locale_)
+        QLocale.setDefault(q_locale)
+
+        # try:
+        #     locale.setlocale(locale.LC_ALL, locale_)
+        # except locale.Error:
+        #     try:
+        #         # Fallback to UTF-8
+        #         locale.setlocale(locale.LC_ALL, f"{locale_}.UTF-8")
+        #     except locale.Error:
+        #         try:
+        #             # Fallback to system default
+        #             locale.setlocale(locale.LC_ALL, "")
+        #         except locale.Error:
+        #             pass

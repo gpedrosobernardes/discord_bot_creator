@@ -1,4 +1,5 @@
 import logging
+import locale
 
 from PySide6.QtCore import QSettings, Qt
 from qextrawidgets.core.utils import QEmojiFonts

@@ -19,7 +19,7 @@ from source.views.config import ConfigView
 
 
 class ConfigController(BaseController[ConfigView]):
-    def __init__(self, translator: QTranslator, user_settings: QSettings):
+    def __init__(self, app: BaseApplication, translator: QTranslator, user_settings: QSettings):
         super().__init__(ConfigView())
 
         self.qt_translator = QTranslator()
@@ -27,11 +27,11 @@ class ConfigController(BaseController[ConfigView]):
 
         self.load_settings(user_settings)
         self.apply_theme(user_settings)
-        self.apply_language(user_settings, translator)
+        self.apply_language(app, user_settings, translator)
         self.apply_style(user_settings)
         self.apply_emoji_font(user_settings)
         self.apply_logging_config(user_settings)
-        self.setup_connections(user_settings, translator)
+        self.setup_connections(app, user_settings, translator)
 
     def translate_ui(self):
         self.view.translate_ui()
@@ -78,12 +78,11 @@ class ConfigController(BaseController[ConfigView]):
 
         self._update_theme_ui_state()
 
-    def apply_language(self, user_settings: QSettings, translator: QTranslator):
+    def apply_language(self, app: BaseApplication, user_settings: QSettings, translator: QTranslator):
         language = user_settings.value("language")
-        q_locale = QLocale(language)
-        QLocale.setDefault(q_locale)
 
-        locale.setlocale(locale.LC_ALL, language)
+        app.set_locale(language)
+
         translator.load(f"translations/build/{language}.qm")
 
         path_qt = QLibraryInfo.path(QLibraryInfo.LibraryPath.TranslationsPath)
@@ -119,9 +118,9 @@ class ConfigController(BaseController[ConfigView]):
         logger = logging.getLogger("source.core")
         logger.setLevel(selected_log_level)
 
-    def setup_connections(self, user_settings: QSettings, translator: QTranslator):
+    def setup_connections(self, app: BaseApplication, user_settings: QSettings, translator: QTranslator):
         self.view.save_button.clicked.connect(
-            lambda: self.save_settings(user_settings, translator)
+            lambda: self.save_settings(app, user_settings, translator)
         )
         self.view.cancel_button.clicked.connect(self.view.close)
         self.view.style_combo.currentIndexChanged.connect(self._update_theme_ui_state)
@@ -137,11 +136,11 @@ class ConfigController(BaseController[ConfigView]):
         else:
             self.view.theme_combo.setEnabled(True)
 
-    def save_settings(self, user_settings: QSettings, translator: QTranslator):
+    def save_settings(self, app: BaseApplication, user_settings: QSettings, translator: QTranslator):
         # Language
         selected_lang = self.view.language_combo.currentData()
         user_settings.setValue("language", selected_lang)
-        self.apply_language(user_settings, translator)
+        self.apply_language(app, user_settings, translator)
 
         # Auto start
         user_settings.setValue(

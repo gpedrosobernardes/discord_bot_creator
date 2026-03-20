@@ -18,7 +18,7 @@ class Application(BaseApplication):
         self.log_handler = LogHandler(self.database)
         logging.getLogger("source.core").addHandler(self.log_handler)
 
-        self.config_controller = ConfigController(self.translator, self.user_settings)
+        self.config_controller = ConfigController(self, self.translator, self.user_settings)
         self.logs_controller = LogsController(self.database)
         self.credits_controller = CreditsController()
         self.main_controller = MainController(
