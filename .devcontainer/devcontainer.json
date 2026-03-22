@@ -1,0 +1,33 @@
+{
+    "name": "PySide6 Modern Python",
+    // Busca sempre a imagem mais recente do Python 3 (atualmente 3.12/3.13)
+    "image": "mcr.microsoft.com/devcontainers/python:3",
+    
+    "features": {
+        // Instala a interface gráfica para ver o PySide6
+        "ghcr.io/devcontainers/features/desktop-lite:1": {
+            "version": "latest"
+        }
+    },
+
+    // Garante que as dependências do sistema para o Qt/PySide6 existam
+    "postCreateCommand": "sudo apt-get update && sudo apt-get install -y libegl1 libopengl0 libxcb-cursor0 && pip install --upgrade pip && pip install -r requirements.txt",
+
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-python.python",
+                "ms-python.vscode-pylance"
+            ]
+        }
+    },
+
+    // Encaminha a porta do Desktop Virtual (VNC)
+    "forwardPorts": [6080],
+    "portsAttributes": {
+        "6080": {
+            "label": "Visualizador GUI (VNC)",
+            "onAutoForward": "notify"
+        }
+    }
+}
