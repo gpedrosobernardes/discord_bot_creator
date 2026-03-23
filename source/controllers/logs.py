@@ -63,6 +63,7 @@ class LogsController(BaseController[LogsView]):
         )
 
     def translate_ui(self):
-        self.logs_model.translate()
+        if self.logs_model:
+            self.logs_model.translate()
         self.view.translate_ui()
         self.translate_log_count()
