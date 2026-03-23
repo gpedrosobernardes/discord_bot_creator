@@ -1,24 +1,26 @@
 from __future__ import annotations
 
-import locale
 import logging
 import typing
 
 from PySide6.QtCore import (
     QLibraryInfo,
-    QLocale,
     QSettings,
     QTranslator,
-    Slot,
+    Slot, Signal,
 )
-from PySide6.QtGui import QFontDatabase, QGuiApplication, Qt
+from PySide6.QtGui import QFontDatabase, QGuiApplication, Qt, QFont, QFontMetrics
 from PySide6.QtWidgets import QApplication
-
+from qextrawidgets.core.utils import QEmojiFonts
+from core.base_app import BaseApplication
 from source.controllers.base import BaseController
 from source.views.config import ConfigView
 
 
 class ConfigController(BaseController[ConfigView]):
+    emojiFontChanged = Signal(str)
+
+
     def __init__(self, app: BaseApplication, translator: QTranslator, user_settings: QSettings):
         super().__init__(ConfigView())
 
@@ -71,6 +73,10 @@ class ConfigController(BaseController[ConfigView]):
             self.view.style_combo.setCurrentIndex(index)
 
         # Emoji Font
+
+        emoji_fonts = self._get_emoji_fonts()
+        self.view.emoji_font_combo.addItems(emoji_fonts)
+
         current_emoji_font = user_settings.value("emoji_font")
         index = self.view.emoji_font_combo.findData(current_emoji_font)
         if index >= 0:
@@ -105,10 +111,11 @@ class ConfigController(BaseController[ConfigView]):
         selected_style = user_settings.value("style")
         QApplication.setStyle(selected_style)
 
-    @staticmethod
-    def apply_emoji_font(user_settings: QSettings):
+    def apply_emoji_font(self, user_settings: QSettings):
         selected_font = user_settings.value("emoji_font")
-        QFontDatabase.addApplicationEmojiFontFamily(selected_font)
+        if selected_font:
+            QFontDatabase.setApplicationEmojiFontFamilies(selected_font)
+            self.emojiFontChanged.emit(selected_font)
 
     @staticmethod
     def apply_logging_config(user_settings: QSettings):
@@ -135,6 +142,18 @@ class ConfigController(BaseController[ConfigView]):
             self.view.theme_combo.setEnabled(False)
         else:
             self.view.theme_combo.setEnabled(True)
+
+    @staticmethod
+    def _get_emoji_fonts():
+        font_db = QFontDatabase()
+        all_fonts = set(font_db.families())
+        emoji_fonts = {"DejaVu Sans", "Noto Color Emoji"}
+
+        supported_emoji_fonts = list(all_fonts.intersection(emoji_fonts))
+        twemoji_font = QEmojiFonts.loadTwemojiFont()
+        supported_emoji_fonts.append(twemoji_font)
+
+        return supported_emoji_fonts
 
     def save_settings(self, app: BaseApplication, user_settings: QSettings, translator: QTranslator):
         # Language
@@ -170,7 +189,7 @@ class ConfigController(BaseController[ConfigView]):
         self.apply_theme(user_settings)
 
         # Emoji Font
-        selected_emoji_font = self.view.emoji_font_combo.currentData()
+        selected_emoji_font = self.view.emoji_font_combo.currentText()
         user_settings.setValue("emoji_font", selected_emoji_font)
         self.apply_emoji_font(user_settings)
 

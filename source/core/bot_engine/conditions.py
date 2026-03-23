@@ -8,7 +8,7 @@ import emoji_data_python
 from PySide6.QtCore import QCoreApplication
 from PySide6.QtSql import QSqlRecord
 
-from core.bot_engine.utils.mentions import MentionsUtils, bot_mentions_count, mentions_count, mentions_someone
+from core.bot_engine.utils.mentions import bot_mentions_count, mentions_count, mentions_someone
 from source.core.constants import StrField, IntField, BoolField, StrComparator, IntComparator, BoolComparator
 
 logger = logging.getLogger(__name__)
@@ -21,6 +21,7 @@ class MessageConditionValidator:
     This class extracts specific fields from a Discord message and compares them
     against target values using specified operators (e.g., equals, contains, regex).
     """
+    emoji_regex = emoji_data_python.get_emoji_regex()
 
     def __init__(
         self,

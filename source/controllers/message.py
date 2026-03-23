@@ -8,9 +8,9 @@ from PySide6.QtCore import (
     QPoint,
     QSettings,
     Qt,
-    Slot,
+    Slot, QEvent, QSize,
 )
-from PySide6.QtGui import QAction, QKeySequence, QStandardItem, QStandardItemModel
+from PySide6.QtGui import QAction, QKeySequence, QStandardItem, QStandardItemModel, QFont
 from PySide6.QtSql import QSqlTableModel
 from PySide6.QtWidgets import (
     QDataWidgetMapper,
@@ -20,7 +20,7 @@ from PySide6.QtWidgets import (
     QTableView,
     QToolButton,
 )
-from qextrawidgets.core.utils import QTwemojiImageProvider
+from qextrawidgets.core.utils import QTwemojiImageProvider, QIconGenerator
 from qextrawidgets.gui.models import QEmojiPickerModel
 from qextrawidgets.gui.proxys.decoration_role_proxy import QDecorationRoleProxyModel
 from qextrawidgets.widgets.menus.emoji_picker_menu import QEmojiPickerMenu
@@ -78,7 +78,6 @@ class MessageController(BaseController[MessageView]):
         self._bool_comparator_model = QStandardItemModel()
 
         # View
-
         self.emoji_picker_model = emoji_picker_model
 
         # Initial State
@@ -95,6 +94,15 @@ class MessageController(BaseController[MessageView]):
             self.view.name_line_edit.setText(self.tr("New message"))
             # Do not submit immediately for new messages
             # self.data_mapper.submit()
+
+    def on_font_changed(self, font_family: str):
+        reaction_emoji_picker = self.reaction_emoji_picker_menu.picker()
+        reaction_emoji_picker.setEmojiPixmapGetter(font_family)
+        reply_emoji_picker = self.reply_emoji_picker_menu.picker()
+        reply_emoji_picker.setEmojiPixmapGetter(font_family)
+
+        reactions_grid_delegate = self.view.reactions_grid.itemDelegate()
+        reactions_grid_delegate.forceReloadAll()
 
     def _create_new_message_row(self) -> int:
         row = self.model.rowCount()
@@ -242,12 +250,12 @@ class MessageController(BaseController[MessageView]):
 
     def _setup_emoji_picker_menu(self):
         self.reply_emoji_picker_menu = QEmojiPickerMenu(
-            self.view, self.emoji_picker_model
+            self.view, self.emoji_picker_model, self.user_settings.value("emoji_font")
         )
         self.view.listbox_replies.set_emoji_button_menu(self.reply_emoji_picker_menu)
 
         self.reaction_emoji_picker_menu = QEmojiPickerMenu(
-            self.view, self.emoji_picker_model
+            self.view, self.emoji_picker_model, self.user_settings.value("emoji_font")
         )
         self.view.add_reaction_button.setMenu(self.reaction_emoji_picker_menu)
         self.view.add_reaction_button.setPopupMode(
@@ -459,7 +467,10 @@ class MessageController(BaseController[MessageView]):
         sibling_index = self.reactions_model.index(index.row(), emoji_index)
 
         emoji = self.reactions_model.data(sibling_index, Qt.ItemDataRole.EditRole)
-        emoji_pixmap = QTwemojiImageProvider.getPixmap(emoji, 0, 100)
+        emoji_font = QFont()
+        emoji_font.setFamily(self.user_settings.value("emoji_font"))
+        emoji_pixmap = QIconGenerator.charToPixmap(emoji, QSize(64, 64), emoji_font)
+        self.view.reactions_grid.setCurrentIndex(index)
         self.reactions_proxy.setData(
             persistent_index, emoji_pixmap, Qt.ItemDataRole.DecorationRole
         )

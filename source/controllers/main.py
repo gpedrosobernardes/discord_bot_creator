@@ -606,6 +606,8 @@ class MainController(BaseController[MainView]):
             index,
         )
 
+        self.config_controller.emojiFontChanged.connect(message_controller.on_font_changed)
+
         # If it was a new message (index is None), the controller creates a row and assigns an ID.
         # We need to get that ID to use as a key.
         key = message_controller.message_id

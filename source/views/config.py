@@ -15,7 +15,6 @@ from PySide6.QtWidgets import (
     QVBoxLayout,
     QWidget,
 )
-from qextrawidgets.core.utils import QEmojiFonts
 
 from source.core.constants import Language
 
@@ -70,8 +69,6 @@ class ConfigView(QDialog):
 
         self.emoji_font_label = QLabel()
         self.emoji_font_combo = QComboBox()
-        # Load Twemoji font
-        self.emoji_font_combo.addItem(QEmojiFonts.loadTwemojiFont(), "Twemoji")
 
         # --- Advanced Settings ---
         self.log_level_label = QLabel()

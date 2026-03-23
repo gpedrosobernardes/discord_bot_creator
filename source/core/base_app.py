@@ -90,22 +90,10 @@ class BaseApplication(QApplication):
         """
         pass
 
-    def set_locale(self, locale_: str) -> None:
+    @staticmethod
+    def set_locale(locale_: str) -> None:
         """
         Define o locale da aplicação.
         """
         q_locale = QLocale(locale_)
         QLocale.setDefault(q_locale)
-
-        # try:
-        #     locale.setlocale(locale.LC_ALL, locale_)
-        # except locale.Error:
-        #     try:
-        #         # Fallback to UTF-8
-        #         locale.setlocale(locale.LC_ALL, f"{locale_}.UTF-8")
-        #     except locale.Error:
-        #         try:
-        #             # Fallback to system default
-        #             locale.setlocale(locale.LC_ALL, "")
-        #         except locale.Error:
-        #             pass
