@@ -145,7 +145,7 @@ class Bot(discord.Client):
         conditions = [
             conditions_model.record(j) for j in range(conditions_model.rowCount())
         ]
-        validator = MessageConditionValidator(conditions, discord_message)
+        validator = MessageConditionValidator(self, conditions, discord_message)
         return validator.is_valid_all()
 
     async def _handle_replies(

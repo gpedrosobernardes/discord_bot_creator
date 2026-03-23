@@ -8,6 +8,7 @@ import emoji_data_python
 from PySide6.QtCore import QCoreApplication
 from PySide6.QtSql import QSqlRecord
 
+from core.bot_engine.utils.mentions import MentionsUtils, bot_mentions_count, mentions_count, mentions_someone
 from source.core.constants import StrField, IntField, BoolField, StrComparator, IntComparator, BoolComparator
 
 logger = logging.getLogger(__name__)
@@ -21,10 +22,9 @@ class MessageConditionValidator:
     against target values using specified operators (e.g., equals, contains, regex).
     """
 
-    emoji_regex = emoji_data_python.get_emoji_regex()
-
     def __init__(
         self,
+        bot: discord.Client,
         conditions: List[QSqlRecord],
         message: discord.Message,
     ):
@@ -44,16 +44,15 @@ class MessageConditionValidator:
         self._field_extractors: Dict[
             str, Callable[[discord.Message], Union[str, int, bool]]
         ] = {
-            StrField.MESSAGE.value: lambda m: str(m.clean_content),
-            StrField.AUTHOR_NAME.value: lambda m: m.author.name,
-            StrField.CHANNEL_NAME.value: lambda m: m.channel.name,
-            StrField.GUILD_NAME.value: lambda m: m.guild.name,
-            IntField.MENTIONS_TO_BOT.value: lambda m: len(
-                [u for u in m.mentions if u.bot]
-            ),
-            IntField.MENTIONS.value: lambda m: len(m.mentions),
-            IntField.EMOJIS.value: lambda m: len(self.emoji_regex.findall(m.content)),
-            BoolField.BOT_AUTHOR.value: lambda m: m.author.bot,
+            StrField.MESSAGE.value: lambda msg: str(msg.clean_content),
+            StrField.AUTHOR_NAME.value: lambda msg: msg.author.name,
+            StrField.CHANNEL_NAME.value: lambda msg: msg.channel.name,
+            StrField.GUILD_NAME.value: lambda msg: msg.guild.name,
+            IntField.BOT_MENTIONS.value: lambda msg: bot_mentions_count(msg.mentions),
+            IntField.MENTIONS.value: lambda msg: mentions_count(msg.mentions),
+            IntField.EMOJIS.value: lambda msg: len(self.emoji_regex.findall(msg.content)),
+            BoolField.BOT_AUTHOR.value: lambda msg: msg.author.bot,
+            BoolField.MENTIONS_THE_BOT.value: lambda msg: mentions_someone(msg.mentions, bot.user)
         }
 
         # 2. Integer Operators
