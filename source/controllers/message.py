@@ -8,7 +8,7 @@ from PySide6.QtCore import (
     QPoint,
     QSettings,
     Qt,
-    Slot, QEvent, QSize,
+    Slot, QSize,
 )
 from PySide6.QtGui import QAction, QKeySequence, QStandardItem, QStandardItemModel, QFont
 from PySide6.QtSql import QSqlTableModel
@@ -20,10 +20,11 @@ from PySide6.QtWidgets import (
     QTableView,
     QToolButton,
 )
-from qextrawidgets.core.utils import QTwemojiImageProvider, QIconGenerator
+from qextrawidgets.core.utils import QIconGenerator
 from qextrawidgets.gui.models import QEmojiPickerModel
 from qextrawidgets.gui.proxys.decoration_role_proxy import QDecorationRoleProxyModel
 from qextrawidgets.widgets.menus.emoji_picker_menu import QEmojiPickerMenu
+from qextrawidgets.widgets.views import QGridIconView
 
 from source.controllers.base import BaseController
 from source.core.constants import (
@@ -92,8 +93,6 @@ class MessageController(BaseController[MessageView]):
 
         if self.context == MessageWindowContext.NEW:
             self.view.name_line_edit.setText(self.tr("New message"))
-            # Do not submit immediately for new messages
-            # self.data_mapper.submit()
 
     def on_font_changed(self, font_family: str):
         reaction_emoji_picker = self.reaction_emoji_picker_menu.picker()
@@ -138,44 +137,35 @@ class MessageController(BaseController[MessageView]):
     def _setup_actions(self):
         # Replies Actions
         self.delete_replies_action = self._create_action(
-            QKeySequence.StandardKey.Delete, self.on_delete_replies
+            shortcut="Delete", triggered=self.on_delete_replies
         )
         self.clear_replies_action = self._create_action(
-            Qt.KeyboardModifier.ControlModifier | Qt.Key.Key_Delete,
-            self.on_clear_replies,
+            shortcut="Ctrl+Delete", triggered=self.on_clear_replies,
         )
         self.view.listbox_replies.add_list_view_action(self.delete_replies_action)
         self.view.listbox_replies.add_list_view_action(self.clear_replies_action)
 
         # Reactions Actions
         self.delete_reactions_action = self._create_action(
-            QKeySequence.StandardKey.Delete, self.on_delete_reactions
+            shortcut="Delete", triggered=self.on_delete_reactions
         )
         self.clear_reactions_action = self._create_action(
-            Qt.KeyboardModifier.ControlModifier | Qt.Key.Key_Delete,
-            self.on_clear_reactions,
+            shortcut="Ctrl+Delete",
+            triggered=self.on_clear_reactions,
         )
         self.view.reactions_grid.addAction(self.delete_reactions_action)
         self.view.reactions_grid.addAction(self.clear_reactions_action)
 
         # Conditions Actions
         self.delete_conditions_action = self._create_action(
-            QKeySequence.StandardKey.Delete, self.on_delete_conditions
+            shortcut="Delete", triggered=self.on_delete_conditions
         )
         self.clear_conditions_action = self._create_action(
-            Qt.KeyboardModifier.ControlModifier | Qt.Key.Key_Delete,
-            self.on_clear_conditions,
+            shortcut="Ctrl+Delete",
+            triggered=self.on_clear_conditions,
         )
         self.view.listbox_conditions.add_action(self.delete_conditions_action)
         self.view.listbox_conditions.add_action(self.clear_conditions_action)
-
-    @staticmethod
-    def _create_action(shortcut, slot):
-        action = QAction(
-            shortcut=shortcut, shortcutContext=Qt.ShortcutContext.WidgetShortcut
-        )
-        action.triggered.connect(slot)
-        return action
 
     def _setup_connections(self):
         # Main Window
@@ -324,7 +314,7 @@ class MessageController(BaseController[MessageView]):
     def _delete_selected_rows(
         model: QSqlTableModel,
         selected_indexes: typing.List[QModelIndex],
-        view_widget: typing.Union[QListView, QTableView],
+        view_widget: typing.Union[QListView, QTableView, QGridIconView],
     ):
         rows = sorted(set(index.row() for index in selected_indexes), reverse=True)
         for row in rows:
@@ -582,12 +572,3 @@ class MessageController(BaseController[MessageView]):
         self.reactions_model.revertAll()
         self.reply_model.revertAll()
         self.conditions_model.revertAll()
-
-        if self.context == MessageWindowContext.NEW:
-            # For new messages, we might need to remove the row if it was inserted but not committed
-            # However, since we are using OnManualSubmit, revertAll should handle it if it wasn't submitted.
-            # But if we inserted it into the model, we might need to remove it explicitly if revertAll doesn't catch it.
-            # Given the previous logic, let's keep the explicit removal just in case,
-            # but usually revertAll is enough for OnManualSubmit.
-            # Actually, if we inserted a row and didn't submit, it's just in the cache.
-            pass

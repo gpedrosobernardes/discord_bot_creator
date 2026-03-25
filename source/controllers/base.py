@@ -1,7 +1,9 @@
-from typing import Generic, TypeVar
+from typing import Generic, TypeVar, Optional, Callable
 
 from PySide6.QtCore import QCoreApplication, QEvent, QObject
+from PySide6.QtGui import QAction, QKeySequence, Qt
 from PySide6.QtWidgets import QWidget
+from qextrawidgets.gui.icons import QThemeResponsiveIcon
 
 T = TypeVar("T", bound=QWidget)
 
@@ -32,3 +34,22 @@ class BaseController(QObject, Generic[T]):
 
     def translate_ui(self):
         pass
+
+    # Helpers
+    def _create_action(
+        self,
+        icon_name: Optional[str] = None,
+        shortcut: Optional[str] = None,
+        triggered: Optional[Callable] = None,
+        shortcut_context: Qt.ShortcutContext = Qt.ShortcutContext.WidgetShortcut,
+    ) -> QAction:
+        """Helper to create a QAction."""
+        action = QAction(self._view)
+        if icon_name:
+            action.setIcon(QThemeResponsiveIcon.fromAwesome(icon_name))
+        if shortcut:
+            action.setShortcut(QKeySequence(shortcut))
+            action.setShortcutContext(shortcut_context)
+        if triggered:
+            action.triggered.connect(triggered)
+        return action

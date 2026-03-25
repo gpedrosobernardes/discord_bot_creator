@@ -1,11 +1,9 @@
 from PySide6.QtCore import (
-    QRegularExpression,
     QSize,
     Qt,
 )
 from PySide6.QtGui import (
     QIcon,
-    QRegularExpressionValidator,
 )
 from PySide6.QtWidgets import (
     QComboBox,
@@ -46,24 +44,24 @@ class MessageView(QDialog):
         self.name_line_edit = QLineEdit()
         self.name_line_edit.setMaxLength(40)
 
-        # 2. Configurações (Comboboxes e Spins)
+        # 2. Configurações
         self.settings_group = QGroupBox()
 
         self.action_label = QLabel()
         self.action_combobox = QComboBox()
-        self.action_combobox.insertItems(0, map(str, Actions))
+        self.action_combobox.insertItems(0, list(map(str, Actions)))
 
         self.punishment_label = QLabel()
         self.punishment_combobox = QComboBox()
-        self.punishment_combobox.insertItems(0, map(str, Punishment))
+        self.punishment_combobox.insertItems(0, list(map(str, Punishment)))
 
         self.where_reply_label = QLabel()
         self.where_reply_combobox = QComboBox()
-        self.where_reply_combobox.insertItems(0, map(str, WhereReply))
+        self.where_reply_combobox.insertItems(0, list(map(str, WhereReply)))
 
         self.where_react_label = QLabel()
         self.where_react_combobox = QComboBox()
-        self.where_react_combobox.insertItems(0, map(str, WhereReact))
+        self.where_react_combobox.insertItems(0, list(map(str, WhereReact)))
 
         self.delay_label = QLabel()
         self.delay_spin_box = QSpinBox()
@@ -168,19 +166,19 @@ class MessageView(QDialog):
             self.accordion.setSectionTitle(i, text)
 
         self.action_label.setText(self.tr("Action:"))
-        for i, text in enumerate([self.tr("Pin"), self.tr("Delete"), self.tr("None")]):
+        for i, text in enumerate([self.tr("None"), self.tr("Pin"), self.tr("Delete")]):
             self.action_combobox.setItemText(i, text)
 
         self.punishment_label.setText(self.tr("Punishment:"))
-        for i, text in enumerate([self.tr("Kick"), self.tr("Ban"), self.tr("None")]):
+        for i, text in enumerate([self.tr("None"), self.tr("Kick"), self.tr("Ban")]):
             self.punishment_combobox.setItemText(i, text)
 
         self.where_reply_label.setText(self.tr("Reply Scope:"))
         for i, text in enumerate(
             [
+                self.tr("Same Channel"),
                 self.tr("Group"),
                 self.tr("Private"),
-                self.tr("Same Channel"),
                 self.tr("Both"),
                 self.tr("None"),
             ]

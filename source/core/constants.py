@@ -4,21 +4,21 @@ from PySide6.QtCore import QT_TRANSLATE_NOOP
 
 
 class Actions(IntEnum):
-    PIN = 0
-    DELETE = 1
-    NONE = 2
+    NONE = 0
+    PIN = 1
+    DELETE = 2
 
 
 class Punishment(IntEnum):
-    KICK = 0
-    BAN = 1
-    NONE = 2
+    NONE = 0
+    KICK = 1
+    BAN = 2
 
 
 class WhereReply(IntEnum):
-    GROUP = 0
-    PRIVATE = 1
-    SAME_CHANNEL = 2
+    SAME_CHANNEL = 0
+    GROUP = 1
+    PRIVATE = 2
     BOTH = 3
     NONE = 4
 

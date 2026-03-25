@@ -291,23 +291,6 @@ class MainController(BaseController[MainView]):
                     return
 
     # --- Action Setup Helpers ---
-
-    def _create_action(
-        self,
-        icon_name: Optional[str] = None,
-        shortcut: Optional[str] = None,
-        triggered=None,
-    ) -> QAction:
-        """Helper to create a QAction."""
-        action = QAction(self.view)
-        if icon_name:
-            action.setIcon(QThemeResponsiveIcon.fromAwesome(icon_name))
-        if shortcut:
-            action.setShortcut(QKeySequence(shortcut))
-        if triggered:
-            action.triggered.connect(triggered)
-        return action
-
     def _setup_project_actions(self):
         self.new_project_action = self._create_action(
             shortcut="Ctrl+Shift+N", triggered=self.on_new_project_action
