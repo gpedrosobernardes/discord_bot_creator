@@ -73,12 +73,11 @@ class ConfigController(BaseController[ConfigView]):
             self.view.style_combo.setCurrentIndex(index)
 
         # Emoji Font
-
         emoji_fonts = self._get_emoji_fonts()
         self.view.emoji_font_combo.addItems(emoji_fonts)
 
         current_emoji_font = user_settings.value("emoji_font")
-        index = self.view.emoji_font_combo.findData(current_emoji_font)
+        index = self.view.emoji_font_combo.findText(current_emoji_font)
         if index >= 0:
             self.view.emoji_font_combo.setCurrentIndex(index)
 
@@ -114,7 +113,7 @@ class ConfigController(BaseController[ConfigView]):
     def apply_emoji_font(self, user_settings: QSettings):
         selected_font = user_settings.value("emoji_font")
         if selected_font:
-            QFontDatabase.setApplicationEmojiFontFamilies(selected_font)
+            QFontDatabase.setApplicationEmojiFontFamilies([selected_font])
             self.emojiFontChanged.emit(selected_font)
 
     @staticmethod
