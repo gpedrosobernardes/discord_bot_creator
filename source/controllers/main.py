@@ -293,22 +293,22 @@ class MainController(BaseController[MainView]):
     # --- Action Setup Helpers ---
     def _setup_project_actions(self):
         self.new_project_action = self._create_action(
-            shortcut="Ctrl+Shift+N", triggered=self.on_new_project_action
+            "fa6s.file-circle-plus", "Ctrl+Shift+N", self.on_new_project_action
         )
         self.load_project_action = self._create_action(
-            shortcut="Ctrl+O", triggered=self.on_load_project_action
+            "fa6s.file-import", "Ctrl+O", self.on_load_project_action
         )
         self.save_as_project_action = self._create_action(
-            shortcut="Ctrl+Shift+S", triggered=self.on_save_as_project_action
+            "fa6s.file-circle-check", "Ctrl+Shift+S", self.on_save_as_project_action
         )
         self.rename_project_action = self._create_action(
-            shortcut="F2", triggered=self.on_rename_project_action
+            "fa6s.file-pen", "F2", self.on_rename_project_action
         )
         self.config_action = self._create_action(
-            shortcut="Ctrl+,", triggered=self.config_view.show
+            "fa6s.sliders", "Ctrl+,", self.config_view.show
         )
         self.exit_action = self._create_action(
-            shortcut="Ctrl+Q", triggered=self.on_quit_action
+            "fa6s.arrow-right-from-bracket", "Ctrl+Q", self.on_quit_action
         )
 
         self.view.project_menu.addActions(
@@ -367,25 +367,28 @@ class MainController(BaseController[MainView]):
 
     def _setup_help_actions(self):
         self.discord_applications_action = self._create_action(
+            "fa6b.discord",
             triggered=lambda: webbrowser.open(
                 "https://discord.com/developers/applications/"
             )
         )
         self.report_bug_action = self._create_action(
+            "fa6s.bug",
             triggered=lambda: webbrowser.open(
                 "https://github.com/gustavopedrosob/discord_bot_creator/issues/new"
             )
         )
         self.project_action = self._create_action(
+            "fa6b.github",
             triggered=lambda: webbrowser.open(
                 "https://github.com/gustavopedrosob/discord_bot_creator"
             )
         )
         self.logs_action = self._create_action(
-            shortcut="Ctrl+L", triggered=self.logs_view.show
+            "fa6s.file-lines", "Ctrl+L", self.logs_view.show
         )
         self.credits_action = self._create_action(
-            shortcut="F1", triggered=self.credits_view.window.show
+            "fa6s.people-group", "F1", self.credits_view.window.show
         )
 
         self.view.help_menu.addActions(

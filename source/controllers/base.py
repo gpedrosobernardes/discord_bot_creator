@@ -41,7 +41,7 @@ class BaseController(QObject, Generic[T]):
         icon_name: Optional[str] = None,
         shortcut: Optional[str] = None,
         triggered: Optional[Callable] = None,
-        shortcut_context: Qt.ShortcutContext = Qt.ShortcutContext.WidgetShortcut,
+        shortcut_context: Qt.ShortcutContext = None
     ) -> QAction:
         """Helper to create a QAction."""
         action = QAction(self._view)
@@ -49,6 +49,7 @@ class BaseController(QObject, Generic[T]):
             action.setIcon(QThemeResponsiveIcon.fromAwesome(icon_name))
         if shortcut:
             action.setShortcut(QKeySequence(shortcut))
+        if shortcut_context:
             action.setShortcutContext(shortcut_context)
         if triggered:
             action.triggered.connect(triggered)
